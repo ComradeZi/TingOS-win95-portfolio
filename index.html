@@ -1,341 +1,2015 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Home - Pintereso Bootstrap Template</title>
-    <script type="text/javascript"> (function() { var css = document.createElement('link'); css.href = 'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'; css.rel = 'stylesheet'; css.type = 'text/css'; document.getElementsByTagName('head')[0].appendChild(css); })(); </script>
-    <link rel="stylesheet" href="assets/css/app.css">
-    <link rel="stylesheet" href="assets/css/theme.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com" />
+    <title>Retro Desktop Workspace with Windows 98 Taskbar</title>
+    <style>
 
+              /* Forces the embedded window canvas to match the parent frame perfectly */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Use 100dvh to automatically compensate for shifting mobile browser address bars */
+        .my-content-wrapper {
+            width: 100%;
+            height: 100dvh; 
+            background-color: #ffffff;
+        }
+      
+        /* --- Theme Variables & Reset --- */
+        :root {
+            --xp-bg: #ece9d8;
+            --xp-window-border: #004eef;
+            --w98-bg: #d4d0c8;
+            --w98-edge-light: #fff;
+            --w98-edge-dark: #808080;
+            --w98-edge-darkest: #0a0a0a;
+            --w98-blue: #000080;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Tahoma", "Segoe UI", sans-serif;
+            font-size: 13px;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            background: #008080;
+        }
+
+        /* --- Desktop Background --- */
+        .desktop {
+            height: calc(100vh - 56px); /* Account for 56px Windows 98 Taskbar */
+            background-image: url('https://static.wixstatic.com/media/ba5d7e_2ecd68240b9d4fd5ab89cb736ab4c9c5~mv2.webp?q=80&w=1974&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* --- Desktop Video Background Layer --- */
+        .desktop-video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            display: none;
+        }
+
+        /* Ensure icon layout and windows float safely above background engines */
+        .icon-grid, .window {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Centered Icon Grid Layout --- */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 25px;
+            justify-items: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        /* --- Desktop Icons --- */
+        .folder-trigger {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            background: none;
+            border: none;
+            outline: none;
+            width: 90px;
+        }
+
+        .folder-trigger img {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 5px;
+            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
+        }
+
+        .folder-trigger span {
+            padding: 2px 4px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            word-break: break-word;
+            color: white;
+        }
+
+        .folder-trigger:hover span {
+            background-color: rgba(49, 106, 197, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Fixed recycling bin placement style */
+        .recycle-bin-position {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            z-index: 10;
+        }
+
+        /* --- Draggable & Resizable Window Management --- */
+        .window {
+            display: none;
+            flex-direction: column;
+            position: fixed !important;
+            
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            
+            width: 55vw;
+            min-width: 320px;
+            max-width: 700px;
+            height: 450px;
+            background: var(--xp-bg);
+            border: 3px solid var(--xp-window-border);
+            border-top-width: 0px;
+            border-radius: 5px 5px 0 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            
+            resize: both; 
+            overflow: hidden; 
+        }
+
+        .window.active-window {
+            z-index: 1001;
+        }
+
+        /* Maximized Window Override Class */
+        .window.maximized-window {
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
+            width: 100vw !important;
+            height: calc(100vh - 56px) !important;
+            max-width: none !important;
+            resize: none !important;
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        .title-bar {
+            background: linear-gradient(to bottom, #0058e6 0%, #0045cc 10%, #0058e6 50%, #001899 100%);
+            padding: 5px 8px;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px 4px 0 0;
+            height: 32px;
+            margin-top: -3px;
+            margin-left: -3px;
+            margin-right: -3px;
+            cursor: move;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .title-text {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-shadow: 1px 1px 1px #000;
+            pointer-events: none;
+        }
+
+        .title-controls {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        .win-ctrl-btn {
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            box-shadow: inset 1px 1px 0 var(--w98-edge-light);
+            color: black;
+            font-family: "Tahoma", sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .win-ctrl-btn:active {
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+            box-shadow: inset 1px 1px 0 var(--w98-edge-darkest);
+            padding: 2px 0px 0px 2px;
+        }
+
+        .win-ctrl-btn.close-btn {
+            background: linear-gradient(to bottom, #e76043 0%, #e12702 10%, #f14e30 50%, #bc1b02 100%);
+            border: 0px solid #7a0e00;
+            color: white;
+            box-shadow: inset 1px 1px 1px rgba(255,255,255,0.4);
+            font-size: 11px;
+        }
+
+        .win-ctrl-btn.close-btn:active {
+            border: 1px solid #7a0e00;
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.6);
+            padding: 2px 0px 0px 2px;
+        }
+
+        .window-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #fff;
+            margin: 4px;
+            border: 1px solid #7f9db9;
+            color: #000;
+            text-align: left;
+        }
+
+        .window-body h2 {
+            font-size: 18px;
+            color: var(--w98-blue);
+            margin-bottom: 5px;
+        }
+
+        .window-body p {
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* --- Modified Project Images Grid --- */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .project-grid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #7f9db9;
+            padding: 2px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .project-grid img:hover {
+            outline: 2px solid var(--w98-blue);
+        }
+
+        .media-box {
+            margin-top: 15px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .media-box img {
+            width: 100%;
+            max-width: 245px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        /* --- Project Window Video Items --- */
+        .window-body video {
+            width: 100%;
+            max-width: 245px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .window-body video:hover {
+            outline: 2px solid var(--w98-blue);
+        }
+
+        /* --- Windows 98 Authentic Taskbar --- */
+        .w98-taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 56px;
+            background: var(--w98-bg);
+            border-top: 2px solid var(--w98-edge-light);
+            box-shadow: inset 0 1px 0 var(--w98-edge-light), 0 -1px 0 var(--w98-edge-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px;
+            z-index: 2000;
+            user-select: none;
+        }
+
+        .w98-start-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 44px;
+            background: var(--w98-bg);
+            border-top: 2px solid var(--w98-edge-light);
+            border-left: 2px solid var(--w98-edge-light);
+            border-right: 2px solid var(--w98-edge-dark);
+            border-bottom: 2px solid var(--w98-edge-dark);
+            box-shadow: inset 1px 1px 0 var(--w98-edge-light), 1px 1px 0 var(--w98-edge-darkest);
+            font-weight: bold;
+            font-size: 16px;
+            padding: 0 12px;
+            cursor: pointer;
+        }
+
+        .w98-start-btn.pressed {
+            border-top: 2px solid var(--w98-edge-dark);
+            border-left: 2px solid var(--w98-edge-dark);
+            border-right: 2px solid var(--w98-edge-light);
+            border-bottom: 2px solid var(--w98-edge-light);
+            box-shadow: inset 1px 1px 0 var(--w98-edge-darkest);
+            padding: 1px 11px 0 13px;
+        }
+
+        .w98-start-btn img {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* --- Windows 98 Authentic Start Menu --- */
+        .w98-start-menu {
+            display: none;
+            position: fixed;
+            bottom: 52px;
+            left: 4px;
+            width: 220px;
+            background: var(--w98-bg);
+            border-top: 2px solid var(--w98-edge-light);
+            border-left: 2px solid var(--w98-edge-light);
+            border-right: 2px solid var(--w98-edge-dark);
+            border-bottom: 2px solid var(--w98-edge-dark);
+            box-shadow: 1px 1px 0 var(--w98-edge-darkest);
+            z-index: 3000;
+            padding: 2px;
+        }
+
+        .start-menu-sidebar {
+            width: 28px;
+            background: linear-gradient(to top, var(--w98-blue), #004eef);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        .start-menu-sidebar span {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transform: rotate(-90deg);
+            transform-origin: bottom center;
+            white-space: nowrap;
+        }
+
+        .start-menu-links {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .start-menu-item {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            cursor: pointer;
+            color: black;
+            text-decoration: none;
+        }
+
+        .start-menu-item:hover {
+            background: var(--w98-blue);
+            color: white;
+        }
+
+        .start-menu-item img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .start-menu-divider {
+            height: 2px;
+            background: var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-light);
+            margin: 4px 2px;
+        }
+
+        .w98-tray {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 44px;
+            background: var(--w98-bg);
+            border-top: 2px solid var(--w98-edge-dark);
+            border-left: 2px solid var(--w98-edge-dark);
+            border-right: 2px solid var(--w98-edge-light);
+            border-bottom: 2px solid var(--w98-edge-light);
+            padding: 0 12px;
+            margin-right: 2px;
+        }
+
+        .tray-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-right: 12px;
+            border-right: 1px solid var(--w98-edge-dark);
+            box-shadow: 1px 0 0 var(--w98-edge-light);
+        }
+
+        .tray-icon {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .tray-icon img {
+            width: 24px;
+            height: 24px;
+            image-rendering: pixelated; 
+        }
+
+        .w98-clock {
+            font-size: 14px;
+            font-weight: normal;
+            color: #000;
+        }
+
+        /* --- Windows 98 Image Viewer & Media Player Shared Custom Styles --- */
+        .w98-image-viewer-body {
+            background: #d4d0c8 !important;
+            border: none !important;
+            padding: 2px !important;
+            margin: 0 !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viewer-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            border-bottom: 1px solid var(--w98-edge-dark);
+            background: var(--w98-bg);
+        }
+
+        .viewer-btn {
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            padding: 2px 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .viewer-btn:active {
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+        }
+
+        .viewer-canvas-container {
+            background: #808080;
+            border-top: 2px solid var(--w98-edge-darkest);
+            border-left: 2px solid var(--w98-edge-darkest);
+            border-right: 2px solid var(--w98-edge-light);
+            border-bottom: 2px solid var(--w98-edge-light);
+            flex-grow: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .viewer-canvas-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            background: white;
+        }
+
+        /* --- Windows Media Player 6.4 Style Theme UI --- */
+        .player-video-frame {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            border-top: 2px solid var(--w98-edge-dark);
+            border-left: 2px solid var(--w98-edge-dark);
+            border-right: 2px solid var(--w98-edge-light);
+            border-bottom: 2px solid var(--w98-edge-light);
+            overflow: hidden;
+        }
+
+        .player-video-frame video {
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .player-seek-bar {
+            margin: 6px 4px;
+            height: 12px;
+            background: #fff;
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+            position: relative;
+        }
+
+        .player-seek-handle {
+            width: 10px;
+            height: 16px;
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            position: absolute;
+            top: -3px;
+            left: 0%;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            padding: 2px 4px 6px 4px;
+            gap: 2px;
+        }
+
+        .player-btn-group {
+            display: flex;
+            border-right: 2px solid var(--w98-edge-dark);
+            padding-right: 4px;
+            margin-right: 4px;
+            gap: 1px;
+        }
+
+        .player-control-btn {
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            min-width: 26px;
+            height: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 10px;
+            user-select: none;
+        }
+
+        .player-control-btn:active {
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+        }
+
+        .player-status-bar {
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+            background: var(--w98-bg);
+            padding: 3px 6px;
+            font-size: 11px;
+            color: #000;
+        }
+
+        /* --- Windows 98 Authentic Internet Explorer UI Style --- */
+        .w98-ie-address-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 6px;
+            background: var(--w98-bg);
+            border-bottom: 1px solid var(--w98-edge-dark);
+        }
+
+        .w98-ie-address-bar span {
+            color: #000;
+            user-select: none;
+        }
+
+        .w98-ie-input-frame {
+            flex-grow: 1;
+            background: #fff;
+            border-top: 1px solid var(--w98-edge-darkest);
+            border-left: 1px solid var(--w98-edge-darkest);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+            padding: 2px 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .w98-ie-input-frame input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: "Tahoma", sans-serif;
+            color: #000;
+        }
+
+        .w98-ie-go-btn {
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            padding: 2px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .w98-ie-go-btn:active {
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+        }
+
+        .ie-iframe-container {
+            background: #fff;
+            border-top: 2px solid var(--w98-edge-darkest);
+            border-left: 2px solid var(--w98-edge-darkest);
+            border-right: 2px solid var(--w98-edge-light);
+            border-bottom: 2px solid var(--w98-edge-light);
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ie-iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        /* --- Windows 98 Authentic Display Properties Styling --- */
+        .w98-display-body {
+            background: var(--w98-bg) !important;
+            border: none !important;
+            padding: 10px !important;
+            color: #000;
+        }
+
+        .w98-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: -1px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .w98-tab {
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .w98-tab.active-tab {
+            font-weight: bold;
+            padding-bottom: 5px;
+            margin-top: -2px;
+            border-bottom: none;
+            background: var(--w98-bg);
+            box-shadow: 0 1px 0 var(--w98-bg);
+        }
+
+        .w98-tab-content {
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            box-shadow: 1px 1px 0 var(--w98-edge-darkest);
+            padding: 12px;
+            background: var(--w98-bg);
+            height: calc(100% - 24px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .w98-monitor-preview {
+            width: 150px;
+            height: 120px;
+            background: #808080;
+            border: 4px solid #fff;
+            border-bottom: 8px solid #fff;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            margin: 0 auto;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Video element for display property applet screen box */
+        .w98-monitor-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .w98-monitor-stand {
+            width: 40px;
+            height: 15px;
+            background: #d4d0c8;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #808080;
+            margin: 0 auto;
+        }
+
+        .w98-monitor-base {
+            width: 80px;
+            height: 6px;
+            background: #d4d0c8;
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #808080;
+            border-bottom: 1px solid #808080;
+            margin: 0 auto;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .w98-wallpaper-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex-grow: 1;
+        }
+
+        .w98-listbox {
+            background: #fff;
+            border-top: 1px solid var(--w98-edge-darkest);
+            border-left: 1px solid var(--w98-edge-darkest);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+            height: 110px;
+            overflow-y: auto;
+        }
+
+        .w98-listbox-item {
+            padding: 3px 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .w98-listbox-item:hover, .w98-listbox-item.selected {
+            background: var(--w98-blue);
+            color: #fff;
+        }
+
+        .w98-dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        .w98-btn {
+            background: var(--w98-bg);
+            border-top: 1px solid var(--w98-edge-light);
+            border-left: 1px solid var(--w98-edge-light);
+            border-right: 1px solid var(--w98-edge-dark);
+            border-bottom: 1px solid var(--w98-edge-dark);
+            box-shadow: inset 1px 1px 0 var(--w98-edge-light);
+            padding: 4px 16px;
+            cursor: pointer;
+            min-width: 75px;
+            text-align: center;
+        }
+
+        .w98-btn:active {
+            border-top: 1px solid var(--w98-edge-dark);
+            border-left: 1px solid var(--w98-edge-dark);
+            border-right: 1px solid var(--w98-edge-light);
+            border-bottom: 1px solid var(--w98-edge-light);
+            box-shadow: inset 1px 1px 0 var(--w98-edge-darkest);
+            padding: 5px 15px 3px 17px;
+        }
+
+        /* ==========================================================================
+           CELLPHONE & TABLET OPTIMIZATIONS
+           ========================================================================== */
+        @media (max-width: 650px) {
+            .desktop {
+                padding-bottom: 70px;
+            }
+
+            .icon-grid {
+                grid-template-columns: repeat(2, 105px);
+                grid-gap: 20px;
+                padding: 20px;
+            }
+
+            .window {
+                width: 100vw !important;
+                height: calc(100vh - 56px) !important;
+                top: 0 !important;
+                left: 0 !important;
+                transform: none !important;
+                resize: none !important;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+            
+            .title-bar {
+                cursor: default !important;
+            }
+
+            .project-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .media-box {
+                flex-direction: column;
+            }
+
+            .media-box img {
+                max-width: 100%;
+            }
+
+            .window-body video {
+                max-width: 100%;
+            }
+
+            .window-body iframe {
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            .ie-iframe-container {
+                height: calc(100% - 70px);
+            }
+        }
+    </style>
 </head>
-
 <body>
+<div class="my-content-wrapper">
+<!-- This is Desktop Icons section -->
+    <div id="app-container" style="width:100%; height:100dvh;">
+        <main class="desktop" onclick="hideStartMenu()">
+            <video id="main-desktop-video-bg" class="desktop-video-bg" autoplay muted loop playsinline></video>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
-    <a class="navbar-brand font-weight-bolder mr-3" href="index.html"><img src="assets/img/logo.png"></a>
-    <button class="navbar-light navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarsDefault">
-    	<ul class="navbar-nav mr-auto align-items-center">
-    		<form class="bd-search hidden-sm-down">
-    			<input type="text" class="form-control bg-graylight border-0 font-weight-bold" id="search-input" placeholder="Search..." autocomplete="off">
-    			<div class="dropdown-menu bd-search-results" id="search-results">
-    			</div>
-    		</form>
-    	</ul>
-    	<ul class="navbar-nav ml-auto align-items-center">
-    		<li class="nav-item">
-    		<a class="nav-link active" href="index.html">Home</a>
-    		</li>
-    		<li class="nav-item">
-    		<a class="nav-link" href="post.html">Post</a>
-    		</li>
-    		<li class="nav-item">
-    		<a class="nav-link" href="author.html"><img class="rounded-circle mr-2" src="assets/img/av.png" width="30"><span class="align-middle">Author</span></a>
-    		</li>
-    		<li class="nav-item dropdown">
-    		<a class="nav-link" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    		<svg style="margin-top:10px;" class="_3DJPT" version="1.1" viewbox="0 0 32 32" width="21" height="21" aria-hidden="false" data-reactid="71"><path d="M7 15.5c0 1.9-1.6 3.5-3.5 3.5s-3.5-1.6-3.5-3.5 1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5zm21.5-3.5c-1.9 0-3.5 1.6-3.5 3.5s1.6 3.5 3.5 3.5 3.5-1.6 3.5-3.5-1.6-3.5-3.5-3.5zm-12.5 0c-1.9 0-3.5 1.6-3.5 3.5s1.6 3.5 3.5 3.5 3.5-1.6 3.5-3.5-1.6-3.5-3.5-3.5z" data-reactid="22"></path></svg>
-    		</a>
-    		<div class="dropdown-menu dropdown-menu-right shadow-lg" aria-labelledby="dropdown02">
-    			<h4 class="dropdown-header display-4">Download Pintereso<br/> HTML Bootstrap Template</h4>
-    			<div class="dropdown-divider">
-    			</div>
-    			<span class="dropdown-item"><a href="https://github.com/wowthemesnet/template-pintereso-bootstrap-html/archive/master.zip" class="btn btn-primary d-block"><i class="fa fa-download"></i> Download</a></span>
-    		</div>
-    		</li>
-    	</ul>
-    </div>
-    </nav>    
-    <main role="main">
-        
-    
-    <section class="mt-4 mb-5">
-    <div class="container mb-4">
-    	<h1 class="font-weight-bold title">Explore</h1>
-    	<div class="row">
-    		<nav class="navbar navbar-expand-lg navbar-light bg-white pl-2 pr-2">
-    		<button class="navbar-light navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExplore" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
-    		<span class="navbar-toggler-icon"></span>
-    		</button>
-    		<div class="collapse navbar-collapse" id="navbarsExplore">
-    			<ul class="navbar-nav">
-    				<li class="nav-item">
-    				<a class="nav-link" href="#">Lifestyle</a>
-    				</li>
-    				<li class="nav-item">
-    				<a class="nav-link" href="#">Food</a>
-    				</li>
-    				<li class="nav-item">
-    				<a class="nav-link" href="#">Home</a>
-    				</li>
-    				<li class="nav-item">
-    				<a class="nav-link" href="#">Travel</a>
-    				</li>
-    				<li class="nav-item dropdown">
-    				<a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More</a>
-    				<div class="dropdown-menu shadow-lg" aria-labelledby="dropdown01">
-    					<a class="dropdown-item" href="#">Astronomy</a>
-    					<a class="dropdown-item" href="#">Nature</a>
-    					<a class="dropdown-item" href="#">Cooking</a>
-    					<a class="dropdown-item" href="#">Fashion</a>
-    					<a class="dropdown-item" href="#">Wellness</a>
-    					<a class="dropdown-item" href="#">Dieting</a>
-    				</div>
-    				</li>
-    			</ul>
-    		</div>
-    		</nav>
-    	</div>
-    </div>
-    <div class="container-fluid">
-    	<div class="row">
-    		<div class="card-columns">
-    			<div class="card card-pin">
-    				<img class="card-img" src="assets/img/Artworks/TMK - May Brunch Flyer.png" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1519996521430-02b798c1d881?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=79f770fc1a5d8ff9b0eb033d0f09e15d&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1505210512658-3ae58ae08744?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=2ef2e23adda7b89a804cf232f57e3ca3&auto=format&fit=crop&w=333&q=80" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1488353816557-87cd574cea04?ixlib=rb-0.3.5&s=06371203b2e3ad3e241c45f4e149a1b3&auto=format&fit=crop&w=334&q=80" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1518450757707-d21c8c53c8df?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=c88b5f311958f841525fdb01ab3b5deb&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1483190656465-2c49e54d29f3?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=7c4d831daffc28f6ce144ae9e44072e2&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1501813531019-338a4182efb0?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=ad934c7483b928cae6b0b9cde5ae3445&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1518542331925-4e91e9aa0074?ixlib=rb-0.3.5&s=6958cfb3469de1e681bf17587bed53be&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1513028179155-324cfec2566c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=32ce1df4016dadc177d6fce1b2df2429&auto=format&fit=crop&w=350&q=80" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1516601255109-506725109807?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=ce4f3db9818f60686e8e9b62d4920ce5&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1509233631037-deb7efd36207?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=75a5d784cdfc8f5ced8a6fe26c6d921e&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-0.3.5&s=c0043ea5aa03f62a294636f93725dd6e&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1485627658391-1365e4e0dbfe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=976b0db5c3c2b9932bb20e72f98f9b61&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1502550900787-e956c314a221?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=e90f191de3a03c2002ac82c009490e07&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=9e3cd6ce6496c9c05cbf1b6cda8be0f9&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1509885903707-b68568db61ed?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=5f11503655b51165836c2dcefa51a040&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1518707399486-6d702a84ff00?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=b5bb16fa7eaed1a1ed47614488f7588d&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1519408299519-b7a0274f7d67?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=d4891b98f4554cc55eab1e4a923cbdb1&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1506706435692-290e0c5b4505?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=0bb464bb1ceea5155bc079c4f50bc36a&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    			<div class="card card-pin">
-    				<img class="card-img" src="https://images.unsplash.com/photo-1512355144108-e94a235b10af?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=c622d56d975113a08c71c912618b5f83&auto=format&fit=crop&w=500&q=60" alt="Card image">
-    				<div class="overlay">
-    					<h2 class="card-title title">Cool Title</h2>
-    					<div class="more">
-    						<a href="post.html">
-    						<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i> More </a>
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    	</div>
-    </div>
-    </section>
-        
-    </main>
+            <div class="icon-grid">
+                <button class="folder-trigger" onclick="openWindow('about-win'); event.stopPropagation();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/users-2.png" alt="Folder">
+                    <span>About Me</span>
+                </button>
 
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/theme.js"></script>
-    
-    <footer class="footer pt-5 pb-5 text-center">
-        
-    <div class="container">
-        
-          <div class="socials-media">
-    
-            <ul class="list-unstyled">
-              <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-facebook"></i></a></li>
-              <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-twitter"></i></a></li>
-              <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-instagram"></i></a></li>
-              <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-google-plus"></i></a></li>
-              <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-behance"></i></a></li>
-              <li class="d-inline-block ml-1 mr-1"><a href="#" class="text-dark"><i class="fa fa-dribbble"></i></a></li>
-            </ul>
-    
-          </div>
-        
-            <!--
-              All the links in the footer should remain intact.
-              You may remove the links only if you donate:
-              https://www.wowthemes.net/freebies-license/
-            -->
-          <p>©  <span class="credits font-weight-bold">        
-            <a target="_blank" class="text-dark" href="https://www.wowthemes.net/pintereso-free-html-bootstrap-template/"><u>Pintereso Bootstrap HTML Template</u> by WowThemes.net.</a>
-          </span>
-          </p>
-    
-    
+                <button class="folder-trigger" onclick="openWindow('resume-win'); event.stopPropagation();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/printer-0.png" alt="Folder">
+                    <span>Resume</span>
+                </button>
+
+                <button class="folder-trigger" onclick="openWindow('work-win'); event.stopPropagation();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/directory_open_file_mydocs_2k-4.png" alt="Folder">
+                    <span>My Work</span>
+                </button>
+
+                <button class="folder-trigger" onclick="openInternetExplorer('https://www.myinstants.com/en/search/?name=meme'); event.stopPropagation();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/joystick-4.png" alt="Folder">
+                    <span>for Fun</span>
+                </button>
+            </div>
+
+            <!-- <button class="folder-trigger recycle-bin-position" onclick="">
+                <img src="https://win98icons.alexmeub.com/icons/png/recycle_bin_full-4.png" alt="Recycle Bin">
+                <span>Recycle Bin</span>
+            </button> -->
+
+<!-- This is Window Content section -->
+<!-- About Me window -->
+          
+            <div id="about-win" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/directory_open_file_mydocs-0.png" width="16">
+                        About Me.txt
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('about-win')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('about-win')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('about-win')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Welcome to my hideout!</h2>
+                    <br>
+                    <p>Barton Ting is a Multimedia designer bridging the gap between old-school aesthetics and modern tech mediums.</p>
+                    <p><strong>What I do:</strong> 3D, Animations, Layout and Graphic designs, Interactive Displays, Activations and Popup designs</p>
+                    <p><strong>Last Seen:</strong> Currently works and lives in Hong Kong.</p>
+                    <p>Feel free to browse around!</p>
+                    <div class="media-box">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_600358aaece04a80b4c692a21f4d6f53~mv2.jpeg?q=80&w=200" alt="Profile" onclick="openImageViewer(this.src)">
+                    </div>
+                </div>
+            </div>
+          
+<!-- Resume window -->
+          
+            <div id="resume-win" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/write_wordpad-0.png" width="16">
+                        Resume.doc
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('resume-win')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('resume-win')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('resume-win')">X</div>
+                    </div>
+                </div>
+                        <div class="viewer-toolbar">
+                        <div class="viewer-btn" onclick="downloadPDF('https://ba5d7eb3-ecac-46da-95f7-d78b1b9fe230.usrfiles.com/ugd/ba5d7e_2f46fd6731aa40ecbdae15c6cc5959df.pdf', 'Barton-Ting-Resume.pdf')">Download</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Edit</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">View</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Favorites</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Help</div>
+                    </div>
+                <div class="window-body">
+      <img src="https://static.wixstatic.com/media/ba5d7e_f4ccc954616d4a51aecdae957dd94f7b~mv2.png" style="float: left; margin-right: 15px; width:100px;height:100px;" alt="ProfilePic">
+                    
+                    <p><strong>Barton Ting</strong>
+                      <br>Multimedia Designer
+                      <br>
+                      <a href="mailto:ting.barton@gmail.com">ting.barton@gmail.com</a>
+                      <br>
+                      <a href="https://www.bting.net/">www.bting.net</a>
+                      <br>Hong Kong, PRC
+                    </p>
+                    <br>
+                    <h3>Experience History</h3>
+                    <hr><br>
+                    <p><strong>Multimedia Senior Art Director</strong> @ CASETiFY (2024 - Present)</p>
+                    <p>Retail VM, Animations, Activation and Popup concept and designs.</p>
+                    <br>
+                    <p><strong>Digital Marketing Executive</strong> @ Lai Sun Group (2020 - 2022)</p>
+                    <p>Content creation, copywriter, design and production, social media and website managements</p>
+                    <br>
+                    <p><strong>Graphic Designer, Illustrator</strong> @ Turipamwe Design (2018)</p>
+                    <p>Illustration, graphic design and publications</p>
+                    <br>
+                    <p><strong>Animation Assistant, Illustrator</strong> @ InTouch · Internship (2015)</p>
+                    <p>Storyboard, touchups, animation keyframes</p>
+                    <br>
+                    <h3>Technical Skills</h3>
+                    <hr><br>
+                    <p>Web Design in HTML5, Next.JS, JavaScript. Interactive experience via Touchdesigner. Animation, Graphics, Typography and Layout designs in Adobe, opensource alternatives. 3D with CADs, and every other 3D softwares under the sun.</p>
+                </div>
+            </div>
+
+<!-- My Work window -->
+          
+            <div id="work-win" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/directory_open_file_mydocs_2k-4.png" width="16">
+                        My Projects
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('work-win')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('work-win')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('work-win')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <div class="project-grid">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_efc710b352b94069b3f0f283cc49cea3~mv2.jpg" alt="Mura1" onclick="openWindow('proj-murakami'); hideStartMenu();">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_90fc709718014cc09939fec7af418719~mv2.avif" alt="Eva2" onclick="openWindow('proj-evangelion'); hideStartMenu();">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_46e83163c8ea478dae841fd500ae551c~mv2.png/v1/fill/w_643,h_360,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ba5d7e_46e83163c8ea478dae841fd500ae551c~mv2.png" alt="ChinaTang" onclick="openInternetExplorer('https://www.bting.net/mooncake-ar')">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_85c950b318b74ab0ae322f545bc0239b~mv2.jpg" alt="PirataPosters" onclick="openInternetExplorer('https://www.bting.net/piratagroup')">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_97b3981d08bb4d4b8a7889ed2dc911fc~mv2.webp" alt="Star1" onclick="openWindow('proj-starwars'); hideStartMenu();">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_7c95eb41900d4e17b85da3248676f846~mv2.jpeg" alt="PiciTruck" onclick="openInternetExplorer('https://www.bting.net/papertoytruck')">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_b39354a0ac304d3e8193eed7cc0ea295~mv2.jpeg" alt="PrayGround" onclick="openInternetExplorer('https://www.bting.net/praygroundcaritas')">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_077c2582f2ab40c79bf4312dd42b25c7~mv2.jpg" alt="Nuts" onclick="openInternetExplorer('https://www.bting.net/nuts')">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_db6a6af1b0fe41bf9469ba31d1788a1d~mv2.jpg" alt="FnBDesigns" onclick="openInternetExplorer('https://www.bting.net/fnbdesigns')">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_4d5496c955b64546945cc9b568766871~mv2.webp" alt="WonsojuComplexCon" onclick="openWindow('proj-wonsoju'); hideStartMenu();">
+                    </div>
+                </div>
+            </div>
+
+<!-- For Fun window -->
+          
+            <div id="fun-win" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/joystick-2.png" width="16">
+                        Crushy Bird
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('fun-win')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('fun-win')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('fun-win')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <iframe src="https://funhtml5games.com?embed=crushybird" style="width:480px;height:480px;border:none;" scrolling="no"></iframe>
+                </div>
+            </div>
+
+<!-- Murakami Window -->
+          
+            <div id="proj-murakami" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://www.kaikaikiki.com/favicon.ico" width="16"> Murakami Workspace</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-murakami')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-murakami')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-murakami')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Project Murakami 2025</h2>
+                    <p>Project Murakami was a year long expansive collaboration project with CASETiFY, that spanned across 5 activations and major events throughout the year, sprawling between US, Hong Kong, Japan, Korea. As well as global retail takeovers. It was an ambitious and massive endeavor that reached phenomal coverage, sales and helped elevate CASETiFY to a new level of sophistication.</p>
+                  <div>
+                                    <iframe src="https://lumalabs.ai/embed/27ddd93d-a76f-4c47-9fc2-ef5086a3995e?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="300" title="luma embed" style="border: none;"></iframe>
+                  </div>
+                    <div class="project-grid">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_efc710b352b94069b3f0f283cc49cea3~mv2.jpg" alt="Mura1" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_9b795e88f9d34587aa980ec3e6d876e6~mv2.jpg" alt="Mura2" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_36f59b6f1a6b42b0bdbbacae3384dae1~mv2.png" alt="Mura3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_a631f4562ab140e3b211069d9eca5e4b~mv2.jpg" alt="Mura4" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_888ecaff4eb747b8ab4400826f016c5b~mv2.jpg" alt="Mura5" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_87098307bdd64a8dbd979f50b5217866~mv2.jpg" alt="Mura6" onclick="openImageViewer(this.src)">
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_8fcc1f3de63547e0b7a79d2ae8887e2bf002.jpg/v1/fit/w_150,h_150/ba5d7e_8fcc1f3de63547e0b7a79d2ae8887e2bf002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_8fcc1f3de63547e0b7a79d2ae8887e2b/720p/mp4/file.mp4')">
+                        </video>                                                                                                                     <video poster="https://static.wixstatic.com/media/ba5d7e_255e9cae935446388215aa985f8aeeb0f002.jpg/v1/fit/w_150,h_150/ba5d7e_255e9cae935446388215aa985f8aeeb0f002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_255e9cae935446388215aa985f8aeeb/720p/mp4/file.mp4')">
+                        </video>
+                      <img src="https://static.wixstatic.com/media/ba5d7e_d6d3ec72ff3e4e468640f115dc35e5a4~mv2.jpg" alt="Mura7" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_0f34ff988559455cbfbf4f758d84ebf9~mv2.jpg" alt="Mura8" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_be571cb6c69940cc9c512d277a1b7e10~mv2.png" alt="Mura9" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_8a5ef792e7fa427eaf3c3037ac52c6bb~mv2.jpg" alt="Mura10" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_6699d4c8a08b4bef84701fac78dae597~mv2.jpg" alt="Mura11" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_6b50909731ae412c96c55c84cb9d17d8~mv2.jpg" alt="Mura12" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_07220e5ee18542f18df37cea5b0b42e4~mv2.jpg" alt="Mura13" onclick="openImageViewer(this.src)">
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_bc81de5fc4b34afb981c3eaea04fad73f002.jpg/v1/fit/w_150,h_150/ba5d7e_bc81de5fc4b34afb981c3eaea04fad73f002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_bc81de5fc4b34afb981c3eaea04fad73/480p/mp4/file.mp4')">
+                        <source src="https://video.wixstatic.com/video/ba5d7e_b41c40c9f06b4a7dae4c7210a68a0857/720p/mp4/file.mp4" type="video/mp4">
+                        </video>
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_8e568a6ed3d9480fbf4f8b6ee0bcdd27f002.jpg/v1/fit/w_150,h_150/ba5d7e_8e568a6ed3d9480fbf4f8b6ee0bcdd27f002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_8e568a6ed3d9480fbf4f8b6ee0bcdd27/720p/mp4/file.mp4')">
+                        </video>
+                        <img src="https://static.wixstatic.com/media/ba5d7e_11287c37e3244f70a9f326e4b2458c28~mv2.jpg" alt="Mura14" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_1679d31e82934a4cb42051f4cbe53410~mv2.jpg" alt="Mura15" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_11e6b98713a74b3394a329de1e41d622~mv2.png" alt="Mura16" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_443b0f2fadf144fcb2e9a3a6279b4b1b~mv2.jpg" alt="Mura17" onclick="openImageViewer(this.src)">
+                    </div>
+                  <br>
+                                   <h3>Credits</h3>
+                  <hr><br>
+                    <p>Activation Designs: Barton Ting, Benny Fan, Jovi Chan
+                    <br>3D Modeling: Barton Ting, Benny Fan, Jovi Chan
+                    <br>Animations: Barton Ting
+                    <br>Graphics: Barton Ting, Benny Fan, Jovi Chan, Rachel Ricafort
+                    <br>Project Manager: Kyle Chan, Kathy Kan, Luna Lee, Lian Kang 
+                    <br>Creative Lead: Crystal Lo, Joe Kwan, Edward Chiu
+                    <br>Partnership Manager: Stella Ozaki
+                    <br>Installation/Production: AMAZ, ONED, MUNO, SAGE HOUSE</p>
+                </div>
+            </div>
+
+<!-- Evangelion Window -->
+          
+            <div id="proj-evangelion" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://static.wikia.nocookie.net/evangelion/images/4/4a/Site-favicon.ico/" width="16"> Evangelion Framework</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-evangelion')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-evangelion')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-evangelion')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Evangelion Shinjuku</h2>
+                    <p>To celebrate the release of its highly-anticipated Evangelion “PROJECT-CSTF: PROTECTION from IMPACT” collaboration, global tech accessory brand CASETiFY recently put together the “IMPACT!” launch event. Ahead of the drop of the special range, CASETiFY and Japanese animation studio ©Khara unveiled a four-meter high, seven-meter-wide EVA-01 in the heart of Tokyo’s Shinjuku district. The impressive display also shows the iconic mecha holding a CASETiFY Impact Case featuring a design from the collaboration.</p>
+                  <div>
+                                    <iframe src="https://lumalabs.ai/embed/255a2a3c-2dd1-46a0-bd6f-6997175226be?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="320" title="luma embed" style="border: none;"></iframe>
+                  </div>
+                    <div class="project-grid">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_90fc709718014cc09939fec7af418719~mv2.avif?w=300&q=80" alt="Eva 1" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_b91b55439b3c453f9ed4935af3434e23~mv2.avif?w=300&q=80" alt="Eva 2" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_8f3525fba03244d0b214214488caefd8~mv2.webp?w=300&q=80" alt="Eva 3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_af90a9345286442f94d6ee361c76b28b~mv2.jpg?w=300&q=80" alt="Eva 3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_e7a18d4c63444b49a73eb37c48266c8e~mv2.jpg?w=300&q=80" alt="Eva 3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_d44d1d2737e54c44bea9734fd3f525b9~mv2.jpg?w=300&q=80" alt="Eva 3" onclick="openImageViewer(this.src)">
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_b41c40c9f06b4a7dae4c7210a68a0857f002.jpg/v1/fit/w_150,h_150/ba5d7e_b41c40c9f06b4a7dae4c7210a68a0857f002.jpg?fileUsed=false?q=10&w=30" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_b41c40c9f06b4a7dae4c7210a68a0857/720p/mp4/file.mp4')">
+                        </video>
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_14c4df46ac954ddfbbd711d52e0c1717f002.jpg/v1/fill/w_244,h_137/ba5d7e_14c4df46ac954ddfbbd711d52e0c1717f002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_14c4df46ac954ddfbbd711d52e0c1717/720p/mp4/file.mp4')">
+                        </video>
+                    </div>
+                  <br>
+                                   <h3>Credits</h3>
+                  <hr><br>
+                    <p>Pop-up Design: Barton Ting
+                    <br>3D Modeling: Barton Ting
+                    <br>AR Filters: Barton Ting, Benny Fan 
+                    <br>Marketing: Yutaro Furusawa
+                    <br>Concepts: Crystal Lo
+                    <br>Graphics: Barton Ting
+                    <br>Installation/Production: AMAZ</p>
+                </div>
+            </div>
+
+<!-- StarWars Window -->
+          
+            <div id="proj-starwars" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://lumiere-a.akamaihd.net/v1/images/sw-the-mandalorian-and-grogu-sw-favicon-512x512_cf5319d3.png" width="16"> Star Wars Project</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-starwars')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-starwars')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-starwars')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Star Wars Celebration 2022</h2>
+                    <p>The booth was inspired by the interiors of the Millennium Falcon, to highlight the star of the CASETiFY x Star Wars collection. The setup was just in time for the Star Wars Celebration 2022, that's right after the pandemic, everyone is excited again for conventions and expos. So we put all our efforts together to make one of the coolest setup in the show!</p>
+                  <div>
+                                    <iframe src="https://lumalabs.ai/embed/47c54af0-3f6c-427e-a511-6002be43495c?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="320" frameborder="0" title="luma embed" style="border: none;"></iframe>
+                  </div>
+                    <div class="project-grid">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_319d3264dd0748e1a13d1dbb46f3a11f~mv2.webp" alt="Star1" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_ce575ace2104495ba14e897c85ecf3fe~mv2.webp" alt="Star2" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_59b3ed192022411198f11ff06353b1fe~mv2.webp" alt="Star3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_ca4208aa7d3e4406a8b6e7e733ca748c~mv2.webp" alt="Star4" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_f5cc4f5f142e4c9caa5ed3d49ce3fdf7~mv2.webp" alt="Star5" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_97b3981d08bb4d4b8a7889ed2dc911fc~mv2.webp" alt="Star6" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_f7c7f4ff511a41feb8effb5fb392f532~mv2.webp" alt="Star7" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_074fc7140daa415ca057c03d35073cbf~mv2.webp" alt="Star8" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_8e5cf23ffaa14df282c9c3918e58763f~mv2.webp" alt="Star9" onclick="openImageViewer(this.src)">
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_e12a40cce8164e5683bd678f7cd42446f002.jpg/v1/fit/w_150,h_150/ba5d7e_e12a40cce8164e5683bd678f7cd42446f002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_e12a40cce8164e5683bd678f7cd42446/720p/mp4/file.mp4')">
+                        </video>
+                    </div>
+                  <br>
+                                   <h3>Credits</h3>
+                  <hr><br>
+                    <p>Pop-up Design: Barton Ting
+                    <br>3D Modeling: Barton Ting
+                    <br>3D Printing: Koka Ko 
+                    <br>Animation: Benny Fan
+                    <br>Graphics: Barton Ting
+                    <br>Creative Lead: Crystal Lo</p>
+                </div>
+            </div>
+
+<!-- Kuromi Window -->
+          
+            <div id="proj-kuromi" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://win98icons.alexmeub.com/icons/png/cd_audio_cd_a-4.png" width="16"> Kuromi Studio</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-kuromi')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-kuromi')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-kuromi')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Kuromi Alternative Palette</h2>
+                    <p>An experimental interactive layout focusing on high-contrast cyberpunk themes, pastel goth wireframes, and alternative dark-mode window templates.</p>
+                    <div class="project-grid">
+                        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=300&q=80" alt="Kuromi 1" onclick="openImageViewer(this.src)">
+                        <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?w=300&q=80" alt="Kuromi 2" onclick="openImageViewer(this.src)">
+                        <img src="https://images.unsplash.com/photo-1502691876148-a84978e59fa8?w=300&q=80" alt="Kuromi 3" onclick="openImageViewer(this.src)">
+                    </div>
+                </div>
+            </div>
+
+<!-- Animation Window -->
+          
+            <div id="proj-animation" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://win98icons.alexmeub.com/icons/png/movie_maker-1.png" width="16"> Animations</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-animation')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-animation')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-animation')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>CASETiFY Cube</h2>
+                    <p>These are a series of animations designed for an immersive experience displayed inside 4-way mirrored rooms installed over several major Casetify retail stores in Hong Kong, Korea and Thailand. Best viewed on Youtube in 1080p.</p>
+                  
+                    <div class="project-grid">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_2b7c8091130b4112978c42a11d7e5870~mv2.gif" alt="cube1" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_f2aad89c6b3949f4a5f696973d86d037~mv2.gif" alt="cube2" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_a70e1183f3be4fb3a3f0f4ef487aff30~mv2.webp" alt="cube3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_47785fa9ebf44e9dae23df5745bf935c~mv2.webp" alt="cube4" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_cacb9257044d4bc297382640945c9a49~mv2.webp" alt="cube5" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_081a4475bada42429d2fde3a16ed98a2~mv2.webp" alt="cube6" onclick="openImageViewer(this.src)">
+                    </div>
+                    <br>
+                    <div>
+                        <iframe width="100%" height="315" src="https://www.youtube.com/embed/G-2P5ESkYvc?si=abOm7OOcJ03Q6lC9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <iframe width="100%" height="315" src="https://www.youtube.com/embed/-rfKmhs7rOA?si=7QWSzBhrhKMuUOyY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <iframe width="100%" height="315" src="https://www.youtube.com/embed/aJkh8Xf0ctQ?si=KH7p8AbgBjrL-0iJ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <iframe width="100%" height="315" src="https://www.youtube.com/embed/3d7M-pFwtdw?si=31hcREfFz-bfsEGV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                      <iframe width="100%" height="315" src="https://www.youtube.com/embed/x5yB2aLDcek?si=BZnyOHUu3S93s3Tb" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    <br>
+                    <br>
+                    <h3>Credits</h3>
+                    <hr><br>
+                    <p>Animation Lead: Barton Ting
+                    <br>Animation and Storyboard: Barton Ting, Benny Fan
+                    <br>Music, Sfx: <a href="https://www.instagram.com/voranah/">VORANAH</a>
+                    <br>Cube Room Designer: Crystal Lo</p>
+                    </div>
+                </div>
+            </div>
+
+<!-- JJK Window -->
+          
+            <div id="proj-jjk" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://win98icons.alexmeub.com/icons/png/game_solitaire-0.png" width="16"> JJK Domain</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-jjk')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-jjk')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-jjk')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Domain Expansion Web Canvas</h2>
+                    <p>High-refresh rate canvas animations showcasing interactive modern particle systems, rendering spatial coordinates with advanced mathematical algorithms.</p>
+                    <div class="project-grid">
+                        <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=300&q=80" alt="JJK 1" onclick="openImageViewer(this.src)">
+                        <img src="https://images.unsplash.com/photo-1533158326339-7f3cf2404354?w=300&q=80" alt="JJK 2" onclick="openImageViewer(this.src)">
+                        <img src="https://images.unsplash.com/photo-1561715276-a2d087060f1d?w=300&q=80" alt="JJK 3" onclick="openImageViewer(this.src)">
+                    </div>
+                </div>
+            </div>
+
+<!-- Wonsoju Window -->
+          
+            <div id="proj-wonsoju" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text"><img src="https://win98icons.alexmeub.com/icons/png/world-3.png" width="16">ComplexCon 2024</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('proj-wonsoju')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-wonsoju')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('proj-wonsoju')">X</div>
+                    </div>
+                </div>
+                <div class="window-body">
+                    <h2>Wonsoju @ComplexCon 2024</h2>
+                    <p>A minimalist design for Wonsoju x Casetify colab booth @ComplexCon 2024, highlight of the booth are the archway LED and the Disco globe configured on auto-spin, drawing eyeballs and queues as photospot.</p>
+                    <div>
+                       <iframe src="https://lumalabs.ai/embed/e6a4d7a8-c404-4d07-adc9-a7a4d9aa1487?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="320" frameborder="0" title="luma embed" style="border: none;"></iframe>
+                    </div>
+                    <div class="project-grid">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_76be592303224db3abc1d30b6cd5d193~mv2.webp" alt="Soju 1" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_e34a3f2d8cd942779a462fb0bc3cdbe4~mv2.webp" alt="Soju 2" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_b7eea7a6b1c643a896e9a885ce29e60d~mv2.webp" alt="Soju 3" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_3f22371ddbb54f40b3facadc193948a7~mv2.webp" alt="Soju 4" onclick="openImageViewer(this.src)">
+                        <video poster="https://static.wixstatic.com/media/ba5d7e_5e5b778d88a641879e07259a3db12b42f002.jpg/v1/fill/w_101,h_180/ba5d7e_5e5b778d88a641879e07259a3db12b42f002.jpg?fileUsed=false" height="150" onclick="openMediaPlayer('https://video.wixstatic.com/video/ba5d7e_5e5b778d88a641879e07259a3db12b42/720p/mp4/file.mp4')">
+                        </video>
+                        <img src="https://static.wixstatic.com/media/ba5d7e_b8f87a3e1a1547e492147e2598f2a4a4~mv2.webp" alt="Soju 5" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_046882e5df044e938991b1e69c55b07d~mv2.webp" alt="Soju 6" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_e561c67fbe304c649702e27a7a1d7314~mv2.webp" alt="Soju 7" onclick="openImageViewer(this.src)">
+                        <img src="https://static.wixstatic.com/media/ba5d7e_4d5496c955b64546945cc9b568766871~mv2.webp" alt="Soju 8" onclick="openImageViewer(this.src)">
+                    </div>
+                    <br>
+                    <h3>Credits</h3>
+                    <hr><br>
+                    <p>Pop-up Design: Barton Ting
+                    <br>3D Modeling: Barton Ting, Adrian Chan 
+                    <br>Graphics: Coco Fung
+                    <br>Creative Lead: Crystal Lo</p>
+                </div>
+            </div>
+
+<!-- This is Image Viewer Windows -->
+          
+            <div id="w98-image-viewer" class="window" style="max-width: 600px; height: 400px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/paint_old-1.png" width="16">
+                        <span id="viewer-title-filename">ImageViewer.exe</span>
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('w98-image-viewer')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('w98-image-viewer')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('w98-image-viewer')">X</div>
+                    </div>
+                </div>
+                <div class="window-body w98-image-viewer-body">
+                    <div class="viewer-toolbar">
+                        <div class="viewer-btn" onclick="closeWindow('w98-image-viewer')">Close</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Edit</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Zoom</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Help</div>
+                    </div>
+                    <div class="viewer-canvas-container">
+                        <img id="viewer-target-image" src="" alt="Viewer Render">
+                    </div>
+                </div>
+            </div>
+
+<!-- This is Media Player Windows -->
+          
+            <div id="w98-media-player" class="window" style="max-width: 500px; height: 380px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/mplayer_11-1.png" width="16">
+                        <span id="player-title-filename">mplay32.exe</span>
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('w98-media-player')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('w98-media-player')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeMediaPlayer()">X</div>
+                    </div>
+                </div>
+                <div class="window-body w98-image-viewer-body">
+                    <div class="viewer-toolbar">
+                        <div class="viewer-btn" onclick="closeMediaPlayer()">Close</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">View</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Play</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Favorites</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Help</div>
+                    </div>
+                    <div class="player-video-frame">
+                        <video id="player-target-video"></video>
+                    </div>
+                    <div class="player-seek-bar">
+                        <div class="player-seek-handle" id="player-seek-thumb"></div>
+                    </div>
+                    <div class="player-controls">
+                        <div class="player-btn-group">
+                            <div class="player-control-btn" onclick="document.getElementById('player-target-video').play()">▶</div>
+                            <div class="player-control-btn" onclick="document.getElementById('player-target-video').pause()">❚❚</div>
+                            <div class="player-control-btn" onclick="const v = document.getElementById('player-target-video'); v.pause(); v.currentTime = 0;">■</div>
+                        </div>
+                        <div class="player-btn-group">
+                            <div class="player-control-btn" onclick="document.getElementById('player-target-video').currentTime -= 5">◄◄</div>
+                            <div class="player-control-btn" onclick="document.getElementById('player-target-video').currentTime += 5">►►</div>
+                        </div>
+                    </div>
+                    <div class="player-status-bar" id="player-status-text">
+                        Ready
+                    </div>
+                </div>
+            </div>
+
+<!-- This is Internet Explorer Windows -->
+          
+            <div id="w98-internet-explorer" class="window" style="max-width: 750px; height: 500px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/msie2-2.png" width="16">
+                        Internet Browser
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('w98-internet-explorer')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('w98-internet-explorer')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('w98-internet-explorer')">X</div>
+                    </div>
+                </div>
+                <div class="window-body w98-image-viewer-body">
+                    <div class="viewer-toolbar">
+                        <div class="viewer-btn" onclick="closeWindow('w98-internet-explorer')">Back</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Edit</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">View</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Favorites</div>
+                        <div class="viewer-btn" style="color:gray; cursor:default;">Help</div>
+                    </div>
+                    <div class="w98-ie-address-bar">
+                        <span>Address</span>
+                        <div class="w98-ie-input-frame">
+                            <input type="text" id="ie-address-input" value="about:blank" readonly>
+                        </div>
+                        <div class="w98-ie-go-btn">Go</div>
+                    </div>
+                    <div class="ie-iframe-container">
+                        <iframe id="ie-target-frame" src=""></iframe>
+                    </div>
+                </div>
+            </div>
+
+<!-- This is Display Properties Windows -->
+          
+            <div id="display-properties-win" class="window" style="max-width: 400px; height: 430px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" width="16">
+                        Display Properties
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('display-properties-win')">_</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('display-properties-win')">X</div>
+                    </div>
+                </div>
+                <div class="window-body w98-display-body">
+                    <div class="w98-tabs">
+                        <div class="w98-tab active-tab">Background</div>
+                        <div class="w98-tab" style="color: grey; cursor: not-allowed;">Screen Saver</div>
+                        <div class="w98-tab" style="color: grey; cursor: not-allowed;">Rule34</div>
+                    </div>
+                    <div class="w98-tab-content">
+                        <div class="w98-monitor-preview-container">
+                            <div id="monitor-preview" class="w98-monitor-preview">
+                                <video id="monitor-preview-video" autoplay muted loop playsinline></video>
+                            </div>
+                            <div class="w98-monitor-stand"></div>
+                            <div class="w98-monitor-base"></div>
+                        </div>
+                        
+                        <div class="w98-wallpaper-selector">
+                            <p style="margin-bottom: 4px;">Select a video or a picture as your desktop wallpaper:</p>
+                            <div class="w98-listbox" id="wallpaper-list">
+                            </div>
+                        </div>
+
+                        <div class="w98-dialog-buttons">
+                            <button class="w98-btn" onclick="applyWallpaper()">OK</button>
+                            <button class="w98-btn" onclick="closeWindow('display-properties-win')">Cancel</button>
+                            <button class="w98-btn" id="apply-btn" onclick="applyWallpaper()" disabled>Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+<!-- This is Start Menu sections -->
+      
+        <div id="start-menu" class="w98-start-menu">
+            <div class="start-menu-sidebar">
+                <span> </span>
+            </div>
+            <div class="start-menu-links">
+                <button class="start-menu-item" onclick="openWindow('proj-murakami'); hideStartMenu();">
+                    <img src="https://www.kaikaikiki.com/favicon.ico" alt="Icon"> Murakami
+                </button>
+                <button class="start-menu-item" onclick="openWindow('proj-evangelion'); hideStartMenu();">
+                    <img src="https://static.wikia.nocookie.net/evangelion/images/4/4a/Site-favicon.ico/" alt="Icon"> Evangelion
+                </button>
+                <button class="start-menu-item" onclick="openWindow('proj-starwars'); hideStartMenu();">
+                    <img src="https://lumiere-a.akamaihd.net/v1/images/sw-the-mandalorian-and-grogu-sw-favicon-512x512_cf5319d3.png" alt="Icon"> Star Wars
+                </button>
+                <!--<button class="start-menu-item" onclick="openWindow('proj-jjk'); hideStartMenu();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/game_solitaire-0.png" alt="Icon"> Jujutsu Kaisen
+                </button> -->
+                <button class="start-menu-item" onclick="openWindow('proj-wonsoju'); hideStartMenu();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/globe_map-5.png" alt="Icon"> ComplexCon 2024
+                </button>
+                <button class="start-menu-item" onclick="openWindow('proj-animation'); hideStartMenu();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/movie_maker-1.png" alt="Icon"> Animations
+                </button>
+                <!-- <button class="start-menu-item" onclick="openWindow('proj-kuromi'); hideStartMenu();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/cd_audio_cd_a-4.png" alt="Icon"> Kuromi
+                </button> -->
+                
+                <div class="start-menu-divider"></div>
+                <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
+                </button>
+            </div>
         </div>
-        
-    </footer>    
+
+<!-- This is Start Button -->
+      
+        <footer class="w98-taskbar">
+            <div class="w98-start-btn" id="start-btn" onclick="toggleStartMenu(event)">
+                <img src="https://static.wixstatic.com/media/ba5d7e_126d2f00cc8f48129608fe5479e11f90~mv2.jpg" alt="Win logo">
+                START
+            </div>
+
+<!-- This is Tray Icon section -->
+          
+            <div class="w98-tray">
+                <div class="tray-icons">
+                    <a href="https://www.instagram.com/barton.ting/" target="_blank" class="tray-icon" title="Instagram">
+                        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
+                    </a>
+                    <a href="https://www.linkedin.com/in/barton-ting-52828237/" target="_blank" class="tray-icon" title="LinkedIn">
+                        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                    </a>
+
+                    <a href="mailto:ting.barton@gmail.com" class="tray-icon" title="Email Me">
+                        <img src="https://win98icons.alexmeub.com/icons/png/outlook_express-4.png" alt="Email">
+                    </a>
+                </div>
+                <div class="w98-clock" id="system-clock">12:00 PM</div>
+            </div>
+        </footer>
+    </div>
+
+    <canvas id="singularity-canvas"></canvas>
+
+    <div id="retro-reload-container">
+        <button class="w98-btn" onclick="window.location.reload();" style="font-size:14px; font-weight:bold; padding:8px 24px;">Reload</button>
+    </div>
+</div>
+    <!-- Using a CLippy JavaScript Module to safely handle async loading of assets -->
+    <script type="module">
+        import { initAgent } from "https://unpkg.com/clippyjs/dist/index.mjs";
+        import * as agents from "https://unpkg.com/clippyjs/dist/agents/index.mjs";
+
+        async function startClippy() {
+            try {
+                // Initialize Clippy with working asset paths
+                const agent = await initAgent(agents.Rocky);
+
+                const targetX = window.innerWidth - 140; 
+                const targetY = window.innerHeight - 160;
+                agent.moveTo(targetX, targetY);
+                
+                agent.show();
+                agent.speak("Click anywhere on the screen and I will say something!");
+
+                // Array of funny responses for Clippy to cycle through
+                const phrases = [
+                    "Wanna change a wallpaper? Click the Display Properties",
+                    "You'd think microslop would've brought me back first now that AI is a thing...",
+                    "If you want my opinion, I think he's a pretty swell guy!",
+                    "There's more of his work in the Start Menu~",
+                    "Are you looking for something important?",
+                    "Hmm, fascinating choice.",
+                    "Don't worry, I am tracking all your inputs!"
+                ];
+
+                // Global event listener to capture clicks anywhere on the page
+                window.addEventListener('click', (event) => {
+                    // Prevent Clippy from reacting to clicks on his own body or popup speech bubble
+
+
+                    // Pick a random phrase from our array
+                    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+                    
+                    // Force Clippy to speak and trigger a random background animation
+                    agent.speak(randomPhrase);
+                    agent.animate();
+                });
+
+            } catch (error) {
+                console.error("Clippy failed to load:", error);
+            }
+        }
+
+        // Run the function
+        startClippy();
+    </script>
+
+  
+    <script>
+        let activeTarget = null;
+        let startX = 0, startY = 0;
+
+        /* --- Start Menu Engine Functions --- */
+        function toggleStartMenu(event) {
+            event.stopPropagation(); 
+            const menu = document.getElementById('start-menu');
+            const btn = document.getElementById('start-btn');
+            
+            if (menu.style.display === 'flex') {
+                hideStartMenu();
+            } else {
+                menu.style.display = 'flex';
+                btn.classList.add('pressed');
+            }
+        }
+
+        function hideStartMenu() {
+            document.getElementById('start-menu').style.display = 'none';
+            document.getElementById('start-btn').classList.remove('pressed');
+        }
+
+        function openWindow(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'flex';
+            
+            if (window.innerWidth > 650 && !win.classList.contains('maximized-window')) {
+                win.style.top = '45%';
+                win.style.left = '50%';
+                win.style.transform = 'translate(-50%, -50%)';
+            } else if (window.innerWidth <= 650) {
+                win.style.top = '';
+                win.style.left = '';
+                win.style.transform = '';
+                win.style.width = '';
+                win.style.height = '';
+            }
+            
+            focusWindow(win);
+        }
+
+        function closeWindow(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'none';
+            if(win.classList.contains('maximized-window')) {
+                toggleMaximize(id);
+            }
+        }
+
+        function minimizeWindow(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+         /* --- A download Resume Button --- */
+        function downloadPDF(pdfUrl, fileName) {
+            // 1. Fetch the file data from the URL
+            fetch(pdfUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob(); // Convert the server response to a Blob object
+                })
+                .then(blob => {
+                    // 2. Create a temporary local URL for the Blob object
+                    const localUrl = window.URL.createObjectURL(blob);
+                    
+                    // 3. Create a temporary hidden anchor (<a>) element
+                    const tempLink = document.createElement('a');
+                    tempLink.href = localUrl;
+                    tempLink.download = fileName; // Set the forced download filename
+                    
+                    // 4. Append to body, trigger click, and cleanup
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    
+                    // Remove elements and revoke URL to free up memory
+                    document.body.removeChild(tempLink);
+                    window.URL.revokeObjectURL(localUrl);
+                })
+                .catch(error => {
+                    console.error('There was a problem with the download:', error);
+                    alert('Failed to download the PDF. See console for details.');
+                });
+        }
+      
+        /* --- Maximize / Restore Window Management Layout Engine --- */
+        function toggleMaximize(id) {
+            const win = document.getElementById(id);
+            const maxBtn = win.querySelector('.max-btn');
+            if (!maxBtn) return; 
+            
+            if (win.classList.contains('maximized-window')) {
+                win.classList.remove('maximized-window');
+                maxBtn.textContent = "⛶";
+                
+                if(win.dataset.preMaxW) {
+                    win.style.width = win.dataset.preMaxW;
+                    win.style.height = win.dataset.preMaxH;
+                    win.style.top = win.dataset.preMaxTop;
+                    win.style.left = win.dataset.preMaxLeft;
+                    win.style.transform = win.dataset.preMaxTransform || 'none';
+                } else {
+                    win.style.top = '45%';
+                    win.style.left = '50%';
+                    win.style.transform = 'translate(-50%, -50%)';
+                }
+            } else {
+                win.dataset.preMaxW = win.style.width;
+                win.dataset.preMaxH = win.style.height;
+                win.dataset.preMaxTop = win.style.top;
+                win.dataset.preMaxLeft = win.style.left;
+                win.dataset.preMaxTransform = win.style.transform;
+                
+                win.classList.add('maximized-window');
+                maxBtn.textContent = "🗗";
+                
+                win.style.top = '';
+                win.style.left = '';
+                win.style.transform = '';
+                win.style.width = '';
+                win.style.height = '';
+            }
+        }
+
+        function focusWindow(focusedWin) {
+            document.querySelectorAll('.window').forEach(w => w.classList.remove('active-window'));
+            focusedWin.classList.add('active-window');
+        }
+
+        /* --- Custom Windows 98 Image Viewer Opener --- */
+        function openImageViewer(imageSrc) {
+            const imgElement = document.getElementById('viewer-target-image');
+            const titleElement = document.getElementById('viewer-title-filename');
+            
+            let filename = "Image.jpg";
+            try {
+                const urlObj = new URL(imageSrc);
+                const pathParts = urlObj.pathname.split('/');
+                const lastPart = pathParts[pathParts.length - 1];
+                if(lastPart && lastPart.includes('.')) {
+                    filename = lastPart.split('?')[0];
+                } else if (imageSrc.includes('unsplash.com')) {
+                    filename = "Unsplash_Photo.jpg";
+                }
+            } catch(e) {
+                filename = "Image.jpg";
+            }
+            
+            titleElement.textContent = filename + " - Picture Viewer";
+            imgElement.src = imageSrc;
+            
+            openWindow('w98-image-viewer');
+        }
+
+        /* --- Internet Explorer Window Activation Engine --- */
+        function openInternetExplorer(targetUrl) {
+            const ieFrame = document.getElementById('ie-target-frame');
+            const addressInput = document.getElementById('ie-address-input');
+            
+            addressInput.value = targetUrl;
+            ieFrame.src = targetUrl;
+            
+            openWindow('w98-internet-explorer');
+        }
+
+        /* --- Windows Media Player Engine Logic --- */
+        function openMediaPlayer(videoSrc) {
+            const videoElement = document.getElementById('player-target-video');
+            const titleElement = document.getElementById('player-title-filename');
+            const statusElement = document.getElementById('player-status-text');
+            const thumbElement = document.getElementById('player-seek-thumb');
+            
+            let filename = "file.mp4";
+            try {
+                const urlObj = new URL(videoSrc);
+                const pathParts = urlObj.pathname.split('/');
+                const lastPart = pathParts[pathParts.length - 1];
+                if (lastPart && lastPart.includes('.')) {
+                    filename = lastPart.split('?')[0];
+                }
+            } catch(e) {
+                filename = "file.mp4";
+            }
+            
+            titleElement.textContent = filename + " - Media Player";
+            statusElement.textContent = "Opening file...";
+            
+            videoElement.src = videoSrc;
+            openWindow('w98-media-player');
+            videoElement.play();
+
+            videoElement.oncanplay = () => { statusElement.textContent = "Ready"; };
+            videoElement.onplay = () => { statusElement.textContent = "Playing"; };
+            videoElement.onpause = () => { statusElement.textContent = "Paused"; };
+            
+            videoElement.ontimeupdate = () => {
+                if (videoElement.duration) {
+                    const percentage = (videoElement.currentTime / videoElement.duration) * 100;
+                    thumbElement.style.left = `calc(${percentage}% - 5px)`;
+                }
+            };
+        }
+
+        function closeMediaPlayer() {
+            const videoElement = document.getElementById('player-target-video');
+            videoElement.pause();
+            videoElement.src = ""; 
+            closeWindow('w98-media-player');
+        }
+
+        /* --- Drag Engine Hook --- */
+        function dragStart(e) {
+            if (e.target.closest('.title-controls')) return;
+            if (window.innerWidth <= 650) return;
+
+            activeTarget = e.target.closest('.window');
+            if (activeTarget.classList.contains('maximized-window')) return; 
+            
+            focusWindow(activeTarget);
+
+            const rect = activeTarget.getBoundingClientRect();
+
+            if (activeTarget.style.transform.includes('translate(-50%, -50%)')) {
+                activeTarget.style.transform = 'none';
+                activeTarget.style.width = rect.width + 'px';
+                activeTarget.style.height = rect.height + 'px';
+                activeTarget.style.top = rect.top + 'px';
+                activeTarget.style.left = rect.left + 'px';
+            }
+
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+
+            e.target.setPointerCapture(e.pointerId);
+            
+            e.target.addEventListener('pointermove', dragMove);
+            e.target.addEventListener('pointerup', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!activeTarget) return;
+            let newX = e.clientX - startX;
+            let newY = e.clientY - startY;
+
+            if(newY < 0) newY = 0; 
+            if(newX < 0) newX = 0;
+
+            activeTarget.style.left = newX + 'px';
+            activeTarget.style.top = newY + 'px';
+        }
+
+        function dragEnd(e) {
+            if (!activeTarget) return;
+            e.target.removeEventListener('pointermove', dragMove);
+            e.target.removeEventListener('pointerup', dragEnd);
+            activeTarget = null;
+        }
+
+        /* --- Resize Observer --- */
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const target = entry.target;
+                if (window.innerWidth <= 650 || target.classList.contains('maximized-window')) continue; 
+                
+                if (target.style.transform.includes('translate(-50%, -50%)')) {
+                    const rect = target.getBoundingClientRect();
+                    target.style.transform = 'none';
+                    target.style.top = rect.top + 'px';
+                    target.style.left = rect.left + 'px';
+                    target.style.width = rect.width + 'px';
+                    target.style.height = rect.height + 'px';
+                }
+            }
+        });
+        document.querySelectorAll('.window').forEach(win => resizeObserver.observe(win));
+
+        /* --- Dynamic Tray Clock Script --- */
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            document.getElementById('system-clock').textContent = `${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        /* --- Wallpaper Sample Database Object Array --- */
+        const wallpaperOptions = [
+            { name: "Blessing", url: "https://static.wixstatic.com/media/ba5d7e_2ecd68240b9d4fd5ab89cb736ab4c9c5~mv2.webp?q=80&w=1974&auto=format&fit=crop" },
+            { name: "Windows 98 Teal (Solid)", url: "" },
+            { name: "Windows 98 Setup", url: "https://static.wixstatic.com/media/ba5d7e_2ef96bf1145e4bf0b441b2307f4e0d0e~mv2.webp" },
+            { name: "Matrix", url: "https://static.wixstatic.com/media/ba5d7e_4631bbf9bd9f440b9ab0da36f47a2e35~mv2.webp" },
+            { name: "Matrix Motion", url: "https://video.wixstatic.com/video/ba5d7e_e077435bcf354856a9d1344f40a5022c/720p/mp4/file.mp4" },
+            { name: "Train", url: "https://video.wixstatic.com/video/ba5d7e_b2d674b2fffc47f89c32e4f21fc759c8/480p/mp4/file.mp4" },
+            { name: "Vaporwave", url: "https://static.wixstatic.com/media/ba5d7e_48fe650fbe63410fbf212afca62f7232~mv2.webp" },
+            { name: "Hackerman", url: "https://static.wixstatic.com/media/ba5d7e_7532e3df6923429292ed38fe2f9554b4~mv2.webp" },
+            { name: "The Bliss", url: "https://static.wixstatic.com/media/ba5d7e_33bfdd0d4e734abcb296eee04360836e~mv2.webp?w=1000&q=80" },
+            { name: "90sCGI", url: "https://static.wixstatic.com/media/ba5d7e_8c17e6f11c3440daa435fe39dabff33d~mv2.webp?w=1000&q=80" },
+            { name: "Event Horizon", url: "https://static.wixstatic.com/media/ba5d7e_31c5cecbdb644178bd5468188ce71abb~mv2.jpg" },
+            { name: "Gridlock", url: "https://video.wixstatic.com/video/ba5d7e_51b327087db046069eddf94427ed4591/480p/mp4/file.mp4" },
+            { name: "Cyberpunk Grid Vector", url: "https://static.wixstatic.com/media/ba5d7e_c5d1435643e646709da712cbe4b617b8~mv2.jpg?w=1000&q=80" }
+        ];
+
+        let selectedWallpaperUrl = wallpaperOptions[0].url;
+
+        function initDisplayProperties() {
+            const listbox = document.getElementById('wallpaper-list');
+            const preview = document.getElementById('monitor-preview');
+            preview.style.backgroundImage = `url('${wallpaperOptions[0].url}')`;
+            
+            wallpaperOptions.forEach((option, index) => {
+                const item = document.createElement('div');
+                item.className = `w98-listbox-item ${index === 0 ? 'selected' : ''}`;
+                item.textContent = option.name;
+                item.onclick = () => selectWallpaperItem(item, option.url);
+                listbox.appendChild(item);
+            });
+        }
+
+        function selectWallpaperItem(element, url) {
+            document.querySelectorAll('.w98-listbox-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            selectedWallpaperUrl = url;
+            const preview = document.getElementById('monitor-preview');
+            const previewVideo = document.getElementById('monitor-preview-video');
+            const applyBtn = document.getElementById('apply-btn');
+            
+            if (url && url.toLowerCase().endsWith('.mp4')) {
+                preview.style.backgroundImage = "none";
+                previewVideo.src = url;
+                previewVideo.style.display = "block";
+                previewVideo.play();
+            } else if (url) {
+                previewVideo.style.display = "none";
+                previewVideo.pause();
+                preview.style.background = `url('${url}')`;
+                preview.style.backgroundSize = "cover";
+                preview.style.backgroundPosition = "center";
+            } else {
+                previewVideo.style.display = "none";
+                previewVideo.pause();
+                preview.style.background = "#008080"; 
+            }
+            
+            applyBtn.removeAttribute('disabled');
+        }
+
+        function applyWallpaper() {
+            const desktop = document.querySelector('.desktop');
+            const desktopVideo = document.getElementById('main-desktop-video-bg');
+            const applyBtn = document.getElementById('apply-btn');
+            
+            if (selectedWallpaperUrl && selectedWallpaperUrl.toLowerCase().endsWith('.mp4')) {
+                desktop.style.backgroundImage = "none";
+                desktopVideo.src = selectedWallpaperUrl;
+                desktopVideo.style.display = "block";
+                desktopVideo.play();
+            } else if (selectedWallpaperUrl) {
+                desktopVideo.style.display = "none";
+                desktopVideo.pause();
+                desktopVideo.src = "";
+                desktop.style.backgroundImage = `url('${selectedWallpaperUrl}')`;
+                desktop.style.backgroundSize = "cover";
+                desktop.style.backgroundPosition = "center";
+            } else {
+                desktopVideo.style.display = "none";
+                desktopVideo.pause();
+                desktopVideo.src = "";
+                desktop.style.backgroundImage = "none";
+                document.body.style.background = "#008080";
+                desktop.style.backgroundColor = "#008080";
+            }
+            
+            applyBtn.setAttribute('disabled', 'true');
+        }
+
+        initDisplayProperties();
+      
+    </script>
 </body>
-    
 </html>
