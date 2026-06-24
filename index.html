@@ -1461,6 +1461,21 @@
                 </div>
             </div>
 
+<!-- Banana Clicker Window -->
+          
+            <div id="banana" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                      🐒<img src="" width="2"> Banana Clicker</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('banana')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('banana')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('banana')">X</div>
+                    </div>
+                </div>
+<iframe src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/HTML/banana_clicker_game_retro.html" width="100%" height="100%" loading="lazy"></iframe>
+            </div>
+          
 <!-- This is Display Properties Windows -->
           
             <div id="display-properties-win" class="window" style="max-width: 400px; height: 430px;">
@@ -1536,6 +1551,9 @@
                 </button> -->
                 
                 <div class="start-menu-divider"></div>
+                <button class="start-menu-item" onclick="openWindow('banana'); hideStartMenu();">
+                    <p width="15">🍌 </p> Banana Clicker
+                </button>
                 <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
                     <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
                 </button>
