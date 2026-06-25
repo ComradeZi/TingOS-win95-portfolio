@@ -207,9 +207,9 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen p-2 md:p-4 flex justify-center items-center overflow-hidden relative">
+<body class="h-screen w-screen overflow-hidden relative m-0 p-0">
 
-    <div id="mainWindow" class="w-full h-full max-w-6xl win95-outset bg-[#c0c0c0] flex flex-col relative overflow-hidden">
+    <div id="mainWindow" class="w-full h-full bg-[#c0c0c0] flex flex-col relative overflow-hidden">
       
 
         <div class="bg-[#c0c0c0] border-b border-[#808080] flex gap-4 px-2 py-1 text-xs text-black border-t border-t-white shrink-0 relative z-50">
@@ -940,7 +940,7 @@
                 gameState.bananas += bonus;
                 gameState.lifetimeBananas += bonus;
                 isBsodActive = false;
-                document.getElementById('bsodScreen').classList.add('hidden');
+                document.getElementById('bsodScreen').style.display = 'none';
                 playSynthesizedSound('buy');
                 updateUI();
                 saveGame();
