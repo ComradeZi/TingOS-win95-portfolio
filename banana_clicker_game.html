@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full w-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Clicker Supreme - Windows 95 Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        win95: {
+                            gray: '#c0c0c0',
+                            darkGray: '#808080',
+                            lightGray: '#dfdfdf',
+                            navy: '#000080',
+                            teal: '#008080',
+                            blueActive: '#1084d0'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Classic Windows 95 Typography and Bevel Styling */
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        body {
+            font-family: "MS Sans Serif", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #c0c0c0;
+            image-rendering: pixelated;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 3D Outset Border (Raised elements) */
+        .win95-outset {
+            border: 2px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            box-shadow: 1px 1px 0px 0px #000000;
+        }
+
+        /* 3D Inset Border (Sunken elements, inputs, list boxes) */
+        .win95-inset {
+            border: 2px solid;
+            border-top-color: #808080;
+            border-left-color: #808080;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+            box-shadow: inset 1px 1px 0px 0px #000000;
+        }
+
+        /* Standard Win95 Clickable Command Button */
+        .win95-btn {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            box-shadow: 1px 1px 0px 0px #000000;
+            color: #000000;
+            padding: 4px 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .win95-btn:active:not([disabled]) {
+            border-top-color: #808080;
+            border-left-color: #808080;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+            box-shadow: none;
+            padding-top: 5px;
+            padding-left: 13px;
+            padding-bottom: 3px;
+            padding-right: 11px;
+        }
+
+        .win95-btn[disabled] {
+            color: #808080;
+            text-shadow: 1px 1px 0px #ffffff;
+            cursor: not-allowed;
+        }
+
+        /* Vintage Titlebar styling */
+        .win95-titlebar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: #ffffff;
+        }
+
+        /* Window controls buttons */
+        .win95-title-btn {
+            width: 16px;
+            height: 14px;
+            background-color: #c0c0c0;
+            border: 1.5px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #404040;
+            border-bottom-color: #404040;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            color: #000000;
+            line-height: 1;
+        }
+
+        .win95-title-btn:active {
+            border-top-color: #404040;
+            border-left-color: #404040;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+            padding-top: 1px;
+            padding-left: 1px;
+        }
+
+        /* Classic Win95 Scrollbar Track Pattern */
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background-color: #dfdfdf;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="2" height="2" viewBox="0 0 2 2"><rect width="1" height="1" fill="%23ffffff"/><rect x="1" y="1" width="1" height="1" fill="%23ffffff"/><rect y="1" width="1" height="1" fill="%23c0c0c0"/><rect x="1" width="1" height="1" fill="%23c0c0c0"/></svg>');
+            background-size: 4px 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+        }
+
+        /* Active Tab indicator */
+        .win95-tab {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-top-color: #ffffff;
+            border-left-color: #ffffff;
+            border-right-color: #808080;
+            border-bottom-color: transparent;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000000;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            cursor: pointer;
+            margin-right: 2px;
+            z-index: 10;
+        }
+
+        .win95-tab-active {
+            margin-top: -2px;
+            padding-bottom: 6px;
+            background-color: #c0c0c0;
+            border-bottom-color: #c0c0c0;
+            z-index: 20;
+        }
+
+        .win95-tab-inactive {
+            background-color: #b0b0b0;
+            border-bottom-color: #808080;
+            margin-top: 2px;
+            padding-bottom: 4px;
+        }
+
+        /* Micro animation for banana drop squish */
+        .banana-active:active {
+            transform: scale(0.85) rotate(-5deg);
+        }
+
+        /* Retro Floating number animation */
+        @keyframes floatUpAndOut {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateY(-100px) scale(0.9);
+            }
+        }
+        .click-particle {
+            position: absolute;
+            animation: floatUpAndOut 0.7s steps(10) forwards;
+            pointer-events: none;
+            font-family: 'Courier Prime', monospace;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden select-none">
+
+    <!-- MAIN APPLICATION WINDOW (Stretched Full-Screen Component) -->
+    <div id="mainWindow" class="w-full h-full flex flex-col bg-[#c0c0c0]">
+
+        <!-- Classic Menu bar (Acting as the top-level boundary now) -->
+        <div class="bg-[#c0c0c0] border-b border-[#808080] flex gap-4 px-2 py-1.5 text-xs text-black border-t border-t-white shrink-0">
+            <div class="relative group cursor-pointer hover:bg-[#000080] hover:text-white px-2 py-0.5">
+                <span class="underline">F</span>ile
+                <!-- Dropdown mockup -->
+                <div class="absolute left-0 mt-1 hidden group-hover:block bg-[#c0c0c0] border-2 border-white win95-outset py-1 z-50 text-black w-36 shadow-lg">
+                    <button onclick="confirmRecycle()" class="w-full text-left px-4 py-1 hover:bg-[#000080] hover:text-white">Wipe Progress</button>
+                    <div class="border-t border-gray-400 my-1"></div>
+                    <button onclick="triggerShutdown()" class="w-full text-left px-4 py-1 hover:bg-[#000080] hover:text-white">Exit Game</button>
+                </div>
+            </div>
+            <div class="relative group cursor-pointer hover:bg-[#000080] hover:text-white px-2 py-0.5">
+                <span class="underline">O</span>ptions
+                <div class="absolute left-0 mt-1 hidden group-hover:block bg-[#c0c0c0] border-2 border-white win95-outset py-1 z-50 text-black w-36 shadow-lg">
+                    <button id="soundToggleMenu" onclick="toggleSound()" class="w-full text-left px-4 py-1 hover:bg-[#000080] hover:text-white">Mute Sound</button>
+                </div>
+            </div>
+            <div class="relative group cursor-pointer hover:bg-[#000080] hover:text-white px-2 py-0.5">
+                <span class="underline">H</span>elp
+                <div class="absolute left-0 mt-1 hidden group-hover:block bg-[#c0c0c0] border-2 border-white win95-outset py-1 z-50 text-black w-48 shadow-lg">
+                    <button onclick="openAboutModal()" class="w-full text-left px-4 py-1 hover:bg-[#000080] hover:text-white">About Banana.exe...</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Area (Split pane grid - fully scrollable within viewport context) -->
+        <div class="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 flex-1 overflow-y-auto">
+            
+            <!-- Left: Clicker Module (5 columns) -->
+            <div class="md:col-span-5 flex flex-col bg-[#c0c0c0] p-3 win95-outset" style="border-width: 1.5px;">
+                <div class="win95-titlebar px-1.5 py-0.5 text-xs font-bold mb-3">Harvester Screen</div>
+                
+                <!-- Digital Readout Output Boxes -->
+                <div class="space-y-2 mb-4">
+                    <div class="win95-inset bg-[#000000] text-[#00ff00] p-2 flex flex-col items-end font-mono">
+                        <span class="text-[10px] text-gray-500 uppercase font-sans font-bold w-full text-left">Harvest Output Register:</span>
+                        <div class="text-4xl font-bold tracking-widest mt-1" id="bananaCount">00000000</div>
+                    </div>
+
+                    <div class="win95-inset bg-[#c0c0c0] p-1.5 flex justify-between items-center text-xs text-black font-bold">
+                        <span>AUTO_FLOW RATE:</span>
+                        <span class="win95-inset bg-white px-2 py-0.5 text-blue-900 font-mono"><span id="bpsCount">0</span> BPS</span>
+                    </div>
+                </div>
+
+                <!-- Sunken Click Field Box -->
+                <div class="win95-inset bg-white p-4 flex-1 flex flex-col justify-center items-center relative overflow-hidden min-h-[220px]" id="bananaClickZone">
+                    <!-- Grid pattern backdrop standard to paint programs -->
+                    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 20%, transparent 20%), radial-gradient(#000 20%, transparent 20%); background-size: 8px 8px; background-position: 0 0, 4px 4px;"></div>
+                    
+                    <!-- The Big Clickable Banana Emoji -->
+                    <div id="giantBanana" class="text-8xl md:text-9xl cursor-pointer select-none z-10 banana-shadow banana-active transition-transform duration-75 active:scale-90 transform-gpu" style="filter: drop-shadow(0px 8px 0px rgba(0,0,0,0.15));">
+                        🍌
+                    </div>
+                </div>
+
+                <div class="text-[10px] text-gray-600 font-bold mt-2 text-center bg-[#b0b0b0] py-1 border border-white">
+                    HARVEST RATE AT: <span id="clickPowerDisplay" class="text-black font-mono">+1</span> PER REVOLUTION
+                </div>
+            </div>
+
+            <!-- Right: Stats & Progression Tabs Module (7 columns) -->
+            <div class="md:col-span-7 flex flex-col bg-[#c0c0c0]">
+                
+                <!-- Tab Headers -->
+                <div class="flex items-end -mb-[2px] z-10 pl-1">
+                    <button id="tab-upgrades" onclick="switchTab('upgrades')" class="win95-tab win95-tab-active">Upgrades.dll</button>
+                    <button id="tab-achievements" onclick="switchTab('achievements')" class="win95-tab win95-tab-inactive">Rewards.sys</button>
+                    <button id="tab-stats" onclick="switchTab('stats')" class="win95-tab win95-tab-inactive">Telemetry.log</button>
+                </div>
+
+                <!-- Tab Container Content Box -->
+                <div class="win95-outset bg-[#c0c0c0] p-3 flex-1 flex flex-col min-h-[350px]">
+                    
+                    <!-- TAB 1: UPGRADES -->
+                    <div id="content-upgrades" class="flex-1 flex flex-col">
+                        <p class="text-xs text-black font-bold mb-2">Available Industrial Hardware Upgrades:</p>
+                        <div class="win95-inset bg-white p-1 flex-1 overflow-y-auto max-h-[280px]" id="upgradesContainer">
+                            <!-- Dynamically Rendered Retroware Upgrades -->
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ACHIEVEMENTS -->
+                    <div id="content-achievements" class="flex-1 flex flex-col hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs text-black font-bold">Unlocking Milestone Registers:</p>
+                            <span id="achievementRatio" class="text-xs bg-[#c0c0c0] px-2 py-0.5 win95-inset font-bold font-mono">0/4</span>
+                        </div>
+                        <div class="win95-inset bg-white p-1 flex-1 overflow-y-auto max-h-[280px]" id="achievementsContainer">
+                            <!-- Achievements listing -->
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: STATS -->
+                    <div id="content-stats" class="flex-1 flex flex-col hidden">
+                        <p class="text-xs text-black font-bold mb-2">Diagnostic Hardware Statistics:</p>
+                        <div class="win95-inset bg-white p-3 flex-1 overflow-y-auto text-xs font-mono space-y-2 text-black">
+                            <div class="flex justify-between border-b border-dotted border-gray-400 pb-1">
+                                <span>LIFETIME_HARVEST_QTY:</span>
+                                <span id="lifetimeDisplay" class="font-bold">0</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dotted border-gray-400 pb-1">
+                                <span>USER_CLICK_EVENTS:</span>
+                                <span id="totalClicksDisplay" class="font-bold">0</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dotted border-gray-400 pb-1">
+                                <span>SYSTEM_AUDIO_SETTING:</span>
+                                <span id="audioLogStatus" class="font-bold text-green-700">ENABLED</span>
+                            </div>
+                            <div class="flex justify-between border-b border-dotted border-gray-400 pb-1">
+                                <span>KERNEL_VERSION:</span>
+                                <span class="font-bold">Win95-BUILD-950-A</span>
+                            </div>
+                            <div class="p-2 bg-[#dfdfdf] win95-inset text-[10px] text-gray-600 mt-4 leading-relaxed font-sans">
+                                <strong>PRO-TIP:</strong> You can hit the <strong>[SPACEBAR]</strong> on your manual input terminal device to harvest bananas at extreme frequency rates.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer status bar -->
+        <div class="bg-[#c0c0c0] border-t border-t-[#808080] p-1 grid grid-cols-3 gap-2 text-xs text-black select-none font-medium mt-auto shrink-0">
+            <div class="win95-inset px-2 py-0.5 truncate bg-[#dfdfdf]">Status: Operational</div>
+            <div class="win95-inset px-2 py-0.5 truncate bg-[#dfdfdf]">Buffer: Normal</div>
+            <div class="win95-inset px-2 py-0.5 truncate bg-[#dfdfdf]" id="statusBarBps">0.0 BPS</div>
+        </div>
+
+    </div>
+
+    <!-- RETRO ABOUT DIALOGUE WINDOW MODAL -->
+    <div id="aboutModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
+        <div class="win95-outset bg-[#c0c0c0] w-full max-w-sm flex flex-col">
+            <div class="win95-titlebar flex items-center justify-between p-1 font-bold text-xs select-none">
+                <span>About Banana Clicker</span>
+                <button class="win95-title-btn" onclick="closeAboutModal()">X</button>
+            </div>
+            <div class="p-4 flex gap-3 text-xs text-black">
+                <span class="text-4xl select-none shrink-0">💻</span>
+                <div class="space-y-1.5 flex-1">
+                    <p class="font-bold">Banana Clicker Supreme Edition</p>
+                    <p class="text-gray-600">Microsoft Fruit Operating System v1.0</p>
+                    <p class="text-gray-600">Copyright &copy; 1995-1996 MicroFruit Corp.</p>
+                    <p class="text-[10px] text-gray-500 pt-2 leading-relaxed border-t border-gray-400">This software is licensed under the terms of retro gaming agreements to peel local bananas at extreme automation frequencies.</p>
+                </div>
+            </div>
+            <div class="p-2 border-t border-t-white flex justify-end">
+                <button class="win95-btn font-bold text-xs" onclick="closeAboutModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHUTDOWN SCREEN (SAFE TO TURN OFF) OVERLAY -->
+    <div id="shutdownScreen" class="fixed inset-0 bg-[#000000] z-[9999] hidden flex-col items-center justify-center text-center p-6 select-none font-mono">
+        <p class="text-[#c00000] text-3xl font-bold tracking-wider mb-6">It is now safe</p>
+        <p class="text-[#ff5500] text-2xl font-bold tracking-wide">to turn off your computer.</p>
+        <button class="win95-btn mt-12 bg-gray-900 border-2 border-white text-white font-mono hover:bg-gray-800" onclick="restartComputer()">
+            Click to reboot terminal
+        </button>
+    </div>
+
+    <!-- Scripts and Logic -->
+    <script>
+        // Core Game State Variables
+        let gameState = {
+            bananas: 0,
+            lifetimeBananas: 0,
+            totalClicks: 0,
+            clickPower: 1,
+            soundEnabled: true,
+            upgrades: {
+                autoClicker: {
+                    id: 'autoClicker',
+                    name: 'Helper Monkey',
+                    description: 'Peels bananas for you.',
+                    baseCost: 15,
+                    cost: 15,
+                    count: 0,
+                    bpsMultiplier: 0.2,
+                    emoji: '🐒'
+                },
+                bananaTree: {
+                    id: 'bananaTree',
+                    name: 'Wild Banana Tree',
+                    description: 'Produces organic fruit.',
+                    baseCost: 100,
+                    cost: 100,
+                    count: 0,
+                    bpsMultiplier: 1,
+                    emoji: '🌴'
+                },
+                bananaCart: {
+                    id: 'bananaCart',
+                    name: 'Delivery Cart',
+                    description: 'Transports crates to market.',
+                    baseCost: 1100,
+                    cost: 1100,
+                    count: 0,
+                    bpsMultiplier: 8,
+                    emoji: '🛒'
+                },
+                bananaFactory: {
+                    id: 'bananaFactory',
+                    name: 'Peeling Facility',
+                    description: 'Industrial automated plant.',
+                    baseCost: 12000,
+                    cost: 12000,
+                    count: 0,
+                    bpsMultiplier: 47,
+                    emoji: '🏭'
+                },
+                superPeeler: {
+                    id: 'superPeeler',
+                    name: 'Golden Upgrade',
+                    description: 'Boost manual clicking power directly.',
+                    baseCost: 50,
+                    cost: 50,
+                    count: 0,
+                    isClickPower: true,
+                    emoji: '✨'
+                }
+            },
+            achievements: [
+                { id: 'first_click', name: 'First Harvest', desc: 'Click the big banana once.', unlocked: false, icon: '🍌' },
+                { id: 'banana_hoarder', name: 'Premium Hoarder', desc: 'Reach 1,000 lifetime bananas.', unlocked: false, icon: '📦' },
+                { id: 'automation_era', name: 'Industrial Tycoon', desc: 'Own at least 5 Helper Monkeys.', unlocked: false, icon: '⚙️' },
+                { id: 'banana_god', name: 'Yellow Royalty', desc: 'Reach 50 Bananas Per Second.', unlocked: false, icon: '👑' }
+            ]
+        };
+
+        // DOM elements
+        const bananaCountEl = document.getElementById('bananaCount');
+        const bpsCountEl = document.getElementById('bpsCount');
+        const statusBarBps = document.getElementById('statusBarBps');
+        const clickPowerDisplayEl = document.getElementById('clickPowerDisplay');
+        const totalClicksDisplayEl = document.getElementById('totalClicksDisplay');
+        const lifetimeDisplayEl = document.getElementById('lifetimeDisplay');
+        const upgradesContainer = document.getElementById('upgradesContainer');
+        const achievementsContainer = document.getElementById('achievementsContainer');
+        const achievementRatioEl = document.getElementById('achievementRatio');
+        const bananaClickZone = document.getElementById('bananaClickZone');
+        const aboutModal = document.getElementById('aboutModal');
+        const shutdownScreen = document.getElementById('shutdownScreen');
+        const audioLogStatus = document.getElementById('audioLogStatus');
+
+        // Web Audio Synthesizer helper
+        function playSynthesizedSound(type) {
+            if (!gameState.soundEnabled) return;
+            
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(380, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.11);
+                } else if (type === 'buy') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(290, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.08);
+                    gainNode.gain.setValueAtTime(0.06, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.32);
+                } else if (type === 'achievement') {
+                    osc.type = 'triangle';
+                    const scale = [261.6, 329.6, 392.0, 523.3, 659.3];
+                    scale.forEach((freq, index) => {
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (index * 0.08));
+                    });
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.65);
+                }
+            } catch (e) {
+                console.warn("Audio Context blocked.");
+            }
+        }
+
+        // Initialize Local Storage
+        function loadGame() {
+            const savedState = localStorage.getItem('bananaClickerProgress_v2');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    gameState.bananas = parsed.bananas || 0;
+                    gameState.lifetimeBananas = parsed.lifetimeBananas || 0;
+                    gameState.totalClicks = parsed.totalClicks || 0;
+                    gameState.clickPower = parsed.clickPower || 1;
+                    gameState.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+                    
+                    if (parsed.upgrades) {
+                        for (const key in parsed.upgrades) {
+                            if (gameState.upgrades[key]) {
+                                gameState.upgrades[key].count = parsed.upgrades[key].count || 0;
+                                gameState.upgrades[key].cost = parsed.upgrades[key].cost || gameState.upgrades[key].baseCost;
+                            }
+                        }
+                    }
+
+                    if (parsed.achievements) {
+                        parsed.achievements.forEach(item => {
+                            const index = gameState.achievements.findIndex(a => a.id === item.id);
+                            if (index !== -1) {
+                                gameState.achievements[index].unlocked = item.unlocked;
+                            }
+                        });
+                    }
+                } catch(e) {
+                    console.error("Could not parse saved data. Resetting.", e);
+                }
+            }
+            updateUI();
+        }
+
+        function saveGame() {
+            localStorage.setItem('bananaClickerProgress_v2', JSON.stringify(gameState));
+        }
+
+        // Helper calculations
+        function getBananasPerSecond() {
+            let totalBps = 0;
+            for (const key in gameState.upgrades) {
+                const upg = gameState.upgrades[key];
+                if (!upg.isClickPower) {
+                    totalBps += upg.count * upg.bpsMultiplier;
+                }
+            }
+            return parseFloat(totalBps.toFixed(1));
+        }
+
+        // Click power formula helper
+        function getClickPower() {
+            return 1 + (gameState.upgrades.superPeeler.count * 2);
+        }
+
+        // Render Upgrades List inside custom white viewport panel box
+        function renderUpgrades() {
+            upgradesContainer.innerHTML = '';
+            for (const key in gameState.upgrades) {
+                const upg = gameState.upgrades[key];
+                const canAfford = gameState.bananas >= upg.cost;
+                
+                let benefitText = '';
+                if (upg.isClickPower) {
+                    benefitText = `+2 Click power`;
+                } else {
+                    benefitText = `+${upg.bpsMultiplier} BPS`;
+                }
+
+                const itemHTML = `
+                    <div class="flex items-center justify-between p-2 border-b border-dotted border-gray-400 text-black hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-none bg-[#c0c0c0] win95-outset flex items-center justify-center text-xl shrink-0" style="border-width: 1.5px;">
+                                ${upg.emoji}
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-xs truncate text-black">${upg.name} <span class="font-normal text-gray-500">(${upg.count} owned)</span></h4>
+                                <p class="text-[10px] text-gray-600 truncate max-w-[210px] sm:max-w-xs mt-0.5">${upg.description}</p>
+                                <span class="text-[9px] text-[#000080] font-bold tracking-wider">${benefitText}</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="buyUpgrade('${upg.id}')" 
+                                class="win95-btn text-xs font-bold px-3 py-1.5 min-w-[85px]"
+                                ${!canAfford ? 'disabled' : ''}>
+                            🍌 ${Math.floor(upg.cost).toLocaleString()}
+                        </button>
+                    </div>
+                `;
+                upgradesContainer.insertAdjacentHTML('beforeend', itemHTML);
+            }
+        }
+
+        // Render Achievements Panel with classic list checkbox look
+        function renderAchievements() {
+            achievementsContainer.innerHTML = '';
+            let unlockedCount = 0;
+            
+            gameState.achievements.forEach(ach => {
+                if (ach.unlocked) unlockedCount++;
+                const achHTML = `
+                    <div class="flex items-start gap-2.5 p-2 border-b border-dotted border-gray-400 text-black text-xs">
+                        <input type="checkbox" ${ach.unlocked ? 'checked' : ''} disabled class="accent-[#000080] shrink-0 mt-0.5">
+                        <span class="text-xl select-none leading-none shrink-0">${ach.icon}</span>
+                        <div class="min-w-0 flex-1">
+                            <p class="font-bold ${ach.unlocked ? 'text-black' : 'text-gray-400'}" style="font-family: inherit;">${ach.name}</p>
+                            <p class="text-[10px] text-gray-500 leading-tight mt-0.5">${ach.desc}</p>
+                        </div>
+                    </div>
+                `;
+                achievementsContainer.insertAdjacentHTML('beforeend', achHTML);
+            });
+
+            achievementRatioEl.textContent = `${unlockedCount}/${gameState.achievements.length}`;
+        }
+
+        // Perform Purchase of Upgrades
+        window.buyUpgrade = function(id) {
+            const upg = gameState.upgrades[id];
+            if (gameState.bananas >= upg.cost) {
+                gameState.bananas -= upg.cost;
+                upg.count++;
+                
+                // Classic exponential price scaling
+                upg.cost = Math.floor(upg.baseCost * Math.pow(1.15, upg.count));
+                
+                gameState.clickPower = getClickPower();
+                
+                playSynthesizedSound('buy');
+                checkAchievements();
+                updateUI();
+                saveGame();
+            }
+        };
+
+        // Coordinate clicks and pixelated float elements
+        function createClickParticle(e, value) {
+            const particle = document.createElement('div');
+            particle.className = 'click-particle font-bold text-sm text-[#000000] bg-[#ffffcc] border border-black px-1.5 py-0.5 z-50 shadow';
+            particle.innerHTML = `🍌 +${value}`;
+            
+            const bounds = bananaClickZone.getBoundingClientRect();
+            let x, y;
+            
+            if (e && e.clientX && e.clientY) {
+                x = e.clientX - bounds.left;
+                y = e.clientY - bounds.top;
+            } else {
+                x = bounds.width / 2;
+                y = bounds.height / 2;
+            }
+            
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            bananaClickZone.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 700);
+        }
+
+        function clickBanana(e) {
+            const gain = getClickPower();
+            gameState.bananas += gain;
+            gameState.lifetimeBananas += gain;
+            gameState.totalClicks++;
+
+            createClickParticle(e, gain);
+            playSynthesizedSound('click');
+
+            // Bevel squish
+            const bananaSvg = document.getElementById('giantBanana');
+            bananaSvg.classList.add('banana-active');
+            setTimeout(() => {
+                bananaSvg.classList.remove('banana-active');
+            }, 80);
+
+            checkAchievements();
+            updateUI();
+            saveGame();
+        }
+
+        // Check Milestone states
+        function checkAchievements() {
+            let newlyUnlocked = false;
+
+            gameState.achievements.forEach(ach => {
+                if (!ach.unlocked) {
+                    if (ach.id === 'first_click' && gameState.totalClicks >= 1) {
+                        ach.unlocked = true;
+                        newlyUnlocked = true;
+                    } else if (ach.id === 'banana_hoarder' && gameState.lifetimeBananas >= 1000) {
+                        ach.unlocked = true;
+                        newlyUnlocked = true;
+                    } else if (ach.id === 'automation_era' && gameState.upgrades.autoClicker.count >= 5) {
+                        ach.unlocked = true;
+                        newlyUnlocked = true;
+                    } else if (ach.id === 'banana_god' && getBananasPerSecond() >= 50) {
+                        ach.unlocked = true;
+                        newlyUnlocked = true;
+                    }
+                }
+            });
+
+            if (newlyUnlocked) {
+                playSynthesizedSound('achievement');
+                renderAchievements();
+            }
+        }
+
+        // Interface Tab Changer Logic
+        window.switchTab = function(tabName) {
+            document.getElementById('content-upgrades').classList.add('hidden');
+            document.getElementById('content-achievements').classList.add('hidden');
+            document.getElementById('content-stats').classList.add('hidden');
+            
+            document.getElementById('tab-upgrades').className = 'win95-tab win95-tab-inactive';
+            document.getElementById('tab-achievements').className = 'win95-tab win95-tab-inactive';
+            document.getElementById('tab-stats').className = 'win95-tab win95-tab-inactive';
+            
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).className = 'win95-tab win95-tab-active';
+        };
+
+        // Redraw telemetry & registry outputs
+        function updateUI() {
+            // LED Digital Output formatted to strict 8-digit padding
+            const formattedTotal = String(Math.floor(gameState.bananas)).padStart(8, '0');
+            bananaCountEl.textContent = formattedTotal;
+
+            const currentBps = getBananasPerSecond();
+            bpsCountEl.textContent = currentBps.toLocaleString();
+            statusBarBps.textContent = `${currentBps.toLocaleString()} BPS`;
+
+            clickPowerDisplayEl.textContent = `+${getClickPower()}`;
+            totalClicksDisplayEl.textContent = gameState.totalClicks.toLocaleString();
+            lifetimeDisplayEl.textContent = Math.floor(gameState.lifetimeBananas).toLocaleString();
+
+            // Sound status indicators
+            audioLogStatus.textContent = gameState.soundEnabled ? 'ENABLED' : 'MUTED';
+            audioLogStatus.className = gameState.soundEnabled ? 'font-bold text-green-700' : 'font-bold text-red-700';
+            
+            const soundToggleMenu = document.getElementById('soundToggleMenu');
+            if (soundToggleMenu) {
+                soundToggleMenu.textContent = gameState.soundEnabled ? 'Mute Sound' : 'Unmute Sound';
+            }
+
+            renderUpgrades();
+            renderAchievements();
+        }
+
+        // About modal controllers
+        window.openAboutModal = function() {
+            aboutModal.classList.remove('hidden');
+            aboutModal.classList.add('flex');
+        };
+        window.closeAboutModal = function() {
+            aboutModal.classList.add('hidden');
+            aboutModal.classList.remove('flex');
+        };
+
+        // sound controller
+        window.toggleSound = function() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            updateUI();
+            saveGame();
+        };
+
+        // Safe shut down emulation
+        window.triggerShutdown = function() {
+            shutdownScreen.classList.remove('hidden');
+            shutdownScreen.classList.add('flex');
+        };
+
+        window.restartComputer = function() {
+            shutdownScreen.classList.add('hidden');
+            shutdownScreen.classList.remove('flex');
+        };
+
+        // Recycle Progress controller
+        window.confirmRecycle = function() {
+            const deletePrompt = window.confirm("C:\\Recycle Bin\\ Are you sure you want to delete and recycle your banana harvest registry? This will wipe progress.");
+            if (deletePrompt) {
+                localStorage.removeItem('bananaClickerProgress_v2');
+                gameState.bananas = 0;
+                gameState.lifetimeBananas = 0;
+                gameState.totalClicks = 0;
+                gameState.clickPower = 1;
+                for (const key in gameState.upgrades) {
+                    gameState.upgrades[key].count = 0;
+                    gameState.upgrades[key].cost = gameState.upgrades[key].baseCost;
+                }
+                gameState.achievements.forEach(ach => ach.unlocked = false);
+                updateUI();
+                saveGame();
+            }
+        };
+
+        // Idle Game Loop
+        const ticksPerSecond = 10;
+        setInterval(() => {
+            const bps = getBananasPerSecond();
+            if (bps > 0) {
+                const gainPerTick = bps / ticksPerSecond;
+                gameState.bananas += gainPerTick;
+                gameState.lifetimeBananas += gainPerTick;
+                
+                checkAchievements();
+                
+                // Fast screen count redraws
+                const formattedTotal = String(Math.floor(gameState.bananas)).padStart(8, '0');
+                bananaCountEl.textContent = formattedTotal;
+                lifetimeDisplayEl.textContent = Math.floor(gameState.lifetimeBananas).toLocaleString();
+            }
+        }, 1000 / ticksPerSecond);
+
+        // Slow loop for store state checking
+        setInterval(() => {
+            updateUI();
+        }, 1000);
+
+        // Manual triggers
+        bananaClickZone.addEventListener('mousedown', (e) => {
+            clickBanana(e);
+        });
+
+        // Spacebar controller
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                clickBanana(null);
+            }
+        });
+
+        // Load game to initiate variables
+        loadGame();
+    </script>
+</body>
+</html>
