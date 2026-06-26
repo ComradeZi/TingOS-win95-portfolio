@@ -82,7 +82,7 @@
         /* --- Centered Icon Grid Layout --- */
         .icon-grid {
             display: grid;
-            grid-template-columns: repeat(4, 100px);
+            grid-template-columns: repeat(5, 100px);
             grid-gap: 25px;
             justify-items: center;
             align-items: center;
@@ -950,6 +950,11 @@
                     <img src="https://win98icons.alexmeub.com/icons/png/joystick-4.png" alt="Folder">
                     <span>for Fun</span>
                 </button>
+
+                <button class="folder-trigger" onclick="openWindow('game-doom'); event.stopPropagation();">
+                    <img src="https://user-images.githubusercontent.com/63191757/107875047-8c7bed80-6eb5-11eb-92b0-5580b2a4ec51.png" alt="Folder">
+                    <span>DOOM</span>
+                </button>
             </div>
 
             <!-- <button class="folder-trigger recycle-bin-position" onclick="">
@@ -1475,6 +1480,21 @@
                 </div>
 <iframe src="banana_clicker_game.html" width="100%" height="100%" loading="lazy"></iframe>
             </div>
+
+<!-- Doom Window -->
+          
+            <div id="game-doom" class="window">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                      <img src="https://user-images.githubusercontent.com/63191757/107875047-8c7bed80-6eb5-11eb-92b0-5580b2a4ec51.png" width="16"> DOOM</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('game-doom')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('game-doom')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('game-doom')">X</div>
+                    </div>
+                </div>
+<iframe src="https://cssdoom.wtf/" width="100%" height="100%" loading="lazy"></iframe>
+            </div>
           
 <!-- This is Display Properties Windows -->
           
@@ -1553,6 +1573,9 @@
                 <div class="start-menu-divider"></div>
                 <button class="start-menu-item" onclick="openWindow('banana'); hideStartMenu();">
                     <p width="15">🍌 </p> Banana Clicker
+                </button>
+                <button class="start-menu-item" onclick="openWindow('game-doom'); hideStartMenu();">
+                    <img src="https://user-images.githubusercontent.com/63191757/107875047-8c7bed80-6eb5-11eb-92b0-5580b2a4ec51.png" alt="Doom"> DOOM
                 </button>
                 <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
                     <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
