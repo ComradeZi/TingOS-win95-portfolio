@@ -141,11 +141,6 @@
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
-        .folder-trigger:hover span {
-            background-color: rgba(49, 106, 197, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
         /* Fixed recycling bin placement style */
         .recycle-bin-position {
             position: absolute;
@@ -305,11 +300,11 @@
 
         .project-grid img {
             width: 100%;
-            height: 120px;
+            height: 150px;
             object-fit: cover;
             border: 1px solid #7f9db9;
             padding: 2px;
-            background: #fff;
+            background: #ccc;
             cursor: pointer;
         }
         
@@ -433,6 +428,8 @@
         .start-menu-links {
             flex-grow: 1;
             display: flex;
+            flex-grow: 1;
+            display: flex;
             flex-direction: column;
         }
 
@@ -494,6 +491,9 @@
             display: flex;
             align-items: center;
             text-decoration: none;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
 
         .tray-icon img {
@@ -1126,7 +1126,7 @@
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami3.webp" alt="Mura4" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami4.webp" alt="Mura5" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami9.webp" alt="Mura6" onclick="openImageViewer(this.src)">
-                        <video src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/kaikaikiki.mp4" autoplay muted loop playsinline height="130" onclick="openMediaPlayer('https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/kaikaikiki.mp4')"></video>                                                          
+                        <video src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/kaikaikiki.mp4" autoplay muted loop playsinline height="130" onclick="openMediaPlayer('https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/kaikaikiki.mp4')"></video>                                                    
                         <video src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/DOB.mp4" autoplay muted loop playsinline height="130" onclick="openMediaPlayer('https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/DOB.mp4')"></video>
                       <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami13.webp" alt="Mura7" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami12.webp" alt="Mura8" onclick="openImageViewer(this.src)">
@@ -1264,7 +1264,7 @@
                 <div class="window-body">
                     <h2>CASETiFY Cube</h2>
                     <p>These are a series of animations designed for an immersive experience displayed inside 4-way mirrored rooms installed over several major Casetify retail stores in Hong Kong, Korea and Thailand. Best viewed on Youtube in 1080p.</p>
-                  
+                    
                     <div class="project-grid">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/casetifycube/47548c93-331d-492f-ad7b-37a7aabba516.gif" alt="cube1" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/casetifycube/46c35d71-9e53-4a3f-a911-98eb23bad005.gif" alt="cube2" onclick="openImageViewer(this.src)">
@@ -1314,7 +1314,7 @@
 
 <div id="proj-wonsoju" class="window">
                 <div class="title-bar" onpointerdown="dragStart(event)">
-                    <div class="title-text"><img src="https://win98icons.alexmeub.com/icons/png/world-3.png" width="16">ComplexCon 2024</div>
+                    <div class="title-text"><img src="https://win98icons.alexmeub.com/icons/png/globe_map-5.png" width="16">ComplexCon 2024</div>
                     <div class="title-controls">
                         <div class="win-ctrl-btn" onclick="minimizeWindow('proj-wonsoju')">_</div>
                         <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('proj-wonsoju')">⛶</div>
@@ -1561,6 +1561,9 @@
 
 <div class="w98-tray">
                 <div class="tray-icons">
+                    <button class="tray-icon" id="clippy-tray-toggle" title="Summon/Unsummon Clippy">
+                        <img src="https://win98icons.alexmeub.com/icons/png/msagent-1.png" alt="Clippy">
+                    </button>
                     <a href="https://www.instagram.com/barton.ting/" target="_blank" class="tray-icon" title="Instagram">
                         <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
                     </a>
@@ -1587,17 +1590,20 @@
         import { initAgent } from "https://unpkg.com/clippyjs/dist/index.mjs";
         import * as agents from "https://unpkg.com/clippyjs/dist/agents/index.mjs";
 
+        let clippyAgent = null;
+        let clippyVisible = true;
+
         async function startClippy() {
             try {
                 // Initialize Clippy with working asset paths
-                const agent = await initAgent(agents.Rocky);
+                clippyAgent = await initAgent(agents.Rocky);
 
                 const targetX = window.innerWidth - 140; 
                 const targetY = window.innerHeight - 160;
-                agent.moveTo(targetX, targetY);
+                clippyAgent.moveTo(targetX, targetY);
                 
-                agent.show();
-                agent.speak("Click anywhere on the screen and I will say something!");
+                clippyAgent.show();
+                clippyAgent.speak("Click anywhere on the screen and I will say something!");
 
                 // Array of funny responses for Clippy to cycle through
                 const phrases = [
@@ -1612,15 +1618,17 @@
 
                 // Global event listener to capture clicks anywhere on the page
                 window.addEventListener('click', (event) => {
-                    // Prevent Clippy from reacting to clicks on his own body or popup speech bubble
-
+                    if (!clippyAgent || !clippyVisible) return;
+                    
+                    // Prevent interacting/speaking if user clicked tray icon to close it
+                    if (event.target.closest('#clippy-tray-toggle')) return;
 
                     // Pick a random phrase from our array
                     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
                     
                     // Force Clippy to speak and trigger a random background animation
-                    agent.speak(randomPhrase);
-                    agent.animate();
+                    clippyAgent.speak(randomPhrase);
+                    clippyAgent.animate();
                 });
 
             } catch (error) {
@@ -1628,8 +1636,23 @@
             }
         }
 
-        // Run the function
+        function toggleClippy(event) {
+            if (event) event.stopPropagation();
+            if (!clippyAgent) return;
+
+            if (clippyVisible) {
+                clippyAgent.hide();
+                clippyVisible = false;
+            } else {
+                clippyAgent.show();
+                clippyVisible = true;
+                clippyAgent.speak("I have returned!");
+            }
+        }
+
+        // Run setup and bind tray button click context handler
         startClippy();
+        document.getElementById('clippy-tray-toggle').addEventListener('click', toggleClippy);
     </script>
 
   
