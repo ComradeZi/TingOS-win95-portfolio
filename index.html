@@ -7,8 +7,7 @@
     <title>TingOS|Bting.io</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico">
     <style>
-
-              /* Forces the embedded window canvas to match the parent frame perfectly */
+        /* Forces the embedded window canvas to match the parent frame perfectly */
         html, body {
             margin: 0;
             padding: 0;
@@ -426,8 +425,6 @@
         }
 
         .start-menu-links {
-            flex-grow: 1;
-            display: flex;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -892,6 +889,177 @@
             padding: 5px 15px 3px 17px;
         }
 
+        /* --- Custom Retro Context Menu styling --- */
+        .w98-context-menu {
+            display: none;
+            position: fixed;
+            background: var(--w98-bg);
+            border-top: 2px solid var(--w98-edge-light);
+            border-left: 2px solid var(--w98-edge-light);
+            border-right: 2px solid var(--w98-edge-dark);
+            border-bottom: 2px solid var(--w98-edge-dark);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            z-index: 5000;
+            width: 160px;
+            padding: 2px;
+        }
+
+        .context-menu-item {
+            padding: 6px 12px;
+            cursor: pointer;
+            color: black;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .context-menu-item:hover {
+            background: var(--w98-blue);
+            color: white;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: var(--w98-edge-dark);
+            margin: 4px 1px;
+            border-bottom: 1px solid var(--w98-edge-light);
+        }
+
+        /* --- Minesweeper Game Custom Styles --- */
+        .minesweeper-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--w98-bg);
+            border: 3px solid var(--w98-edge-light);
+            border-right-color: var(--w98-edge-dark);
+            border-bottom-color: var(--w98-edge-dark);
+            padding: 6px;
+            user-select: none;
+        }
+
+        .ms-dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: var(--w98-bg);
+            border: 2px solid var(--w98-edge-dark);
+            border-right-color: var(--w98-edge-light);
+            border-bottom-color: var(--w98-edge-light);
+            padding: 4px 8px;
+            margin-bottom: 6px;
+        }
+
+        .ms-counter {
+            background: black;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border: 1px solid var(--w98-edge-dark);
+            letter-spacing: 1px;
+        }
+
+        .ms-face {
+            width: 30px;
+            height: 30px;
+            background: var(--w98-bg);
+            border: 2px solid var(--w98-edge-light);
+            border-right-color: var(--w98-edge-dark);
+            border-bottom-color: var(--w98-edge-dark);
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .ms-face:active {
+            border: 2px solid var(--w98-edge-dark);
+            border-right-color: var(--w98-edge-light);
+            border-bottom-color: var(--w98-edge-light);
+        }
+
+        .ms-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 24px);
+            grid-template-rows: repeat(9, 24px);
+            gap: 1px;
+            background: var(--w98-edge-dark);
+            border: 2px solid var(--w98-edge-dark);
+            border-right-color: var(--w98-edge-light);
+            border-bottom-color: var(--w98-edge-light);
+        }
+
+        .ms-cell {
+            width: 24px;
+            height: 24px;
+            background: var(--w98-bg);
+            border: 2px solid var(--w98-edge-light);
+            border-right-color: var(--w98-edge-dark);
+            border-bottom-color: var(--w98-edge-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .ms-cell.revealed {
+            background: #c0c0c0;
+            border: 1px solid #999;
+        }
+
+        .ms-cell.mine {
+            background: #ff0000;
+        }
+
+        /* --- Fake Blue Screen Of Death Layout Class --- */
+        .bsod-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0000aa;
+            color: #ffffff;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 16px;
+            padding: 8% 12%;
+            z-index: 99999;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        .bsod-overlay h1 {
+            background: #ffffff;
+            color: #0000aa;
+            display: inline-block;
+            padding: 2px 10px;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .bsod-overlay p {
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .bsod-center-btn {
+            margin-top: 40px;
+            background: #ffffff;
+            color: #0000aa;
+            border: none;
+            padding: 6px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         /* ==========================================================================
            CELLPHONE & TABLET OPTIMIZATIONS
            ========================================================================== */
@@ -949,10 +1117,10 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="showContextMenu(event)">
 <div class="my-content-wrapper">
 <div id="app-container" style="width:100%; height:100dvh;">
-        <main class="desktop" onclick="hideStartMenu()">
+        <main class="desktop" onclick="handleDesktopClick()">
             <video id="main-desktop-video-bg" class="desktop-video-bg" autoplay muted loop playsinline></video>
             <iframe id="main-desktop-iframe-bg" class="desktop-iframe-bg"></iframe>
 
@@ -973,13 +1141,20 @@
                 </button>
 
                 <button class="folder-trigger" onclick="openInternetExplorer('https://www.myinstants.com/en/search/?name=meme'); event.stopPropagation();">
-                    <img src="https://win98icons.alexmeub.com/icons/png/joystick-4.png" alt="Folder">
+                    <img src="https://win98icons.alexmeub.com/icons/png/computer_sound-4.png" alt="Folder">
                     <span>for Fun</span>
                 </button>
 
                 <button class="folder-trigger" onclick="openWindow('game-doom'); event.stopPropagation();">
                     <img src="https://user-images.githubusercontent.com/63191757/107875047-8c7bed80-6eb5-11eb-92b0-5580b2a4ec51.png" alt="Folder">
                     <span>DOOM (PC Only)</span>
+                </button>
+            </div>
+
+            <div class="recycle-bin-position">
+                <button class="folder-trigger" onclick="event.stopPropagation();" ondblclick="triggerBSOD(); event.stopPropagation();" title="Double click to open!">
+                    <img src="https://win98icons.alexmeub.com/icons/png/recycle_bin_empty-4.png" alt="Recycle Bin">
+                    <span>Recycle Bin</span>
                 </button>
             </div>
 
@@ -1104,6 +1279,29 @@
                 </div>
                 <div class="window-body">
                     <iframe src="https://funhtml5games.com?embed=crushybird" style="width:480px;height:480px;border:none;" scrolling="no"></iframe>
+                </div>
+            </div>
+
+<div id="minesweeper-win" class="window" style="max-width: 220px; height: 340px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="assets/img/Microsoft_Minesweeper_(1990).svg" width="16">
+                        Minesweeper
+                    </div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('minesweeper-win')">_</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('minesweeper-win')">X</div>
+                    </div>
+                </div>
+                <div class="window-body w98-image-viewer-body" style="display:flex; justify-content:center; align-items:center;">
+                    <div class="minesweeper-container">
+                        <div class="ms-dashboard">
+                            <div class="ms-counter" id="ms-mine-count">010</div>
+                            <div class="ms-face" id="ms-reset-btn" onclick="resetMinesweeper()">🙂</div>
+                            <div class="ms-counter" id="ms-timer">000</div>
+                        </div>
+                        <div class="ms-grid" id="ms-grid-element"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1544,6 +1742,9 @@
                     <img src="https://win98icons.alexmeub.com/icons/png/movie_maker-1.png" alt="Icon"> Animations
                 </button>
                 <div class="start-menu-divider"></div>
+                <button class="start-menu-item" onclick="openWindow('minesweeper-win'); hideStartMenu();">
+                    <img src="assets/img/Microsoft_Minesweeper_(1990).svg" alt="Icon"> Minesweeper
+                </button>
                 <button class="start-menu-item" onclick="openWindow('banana'); hideStartMenu();">
                     <p width="15">🍌 </p> Banana Clicker
                 </button>
@@ -1583,6 +1784,26 @@
         </footer>
     </div>
 
+    <div id="desktop-context-menu" class="w98-context-menu">
+        <div class="context-menu-item" onclick="openWindow('about-win')"><span>About Me</span></div>
+        <div class="context-menu-item" onclick="openWindow('work-win')"><span>My Work</span></div>
+        <div class="context-menu-item" onclick="openWindow('minesweeper-win')"><span>Minesweeper</span></div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" onclick="window.location.reload();"><span>Refresh</span></div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" onclick="openWindow('display-properties-win')"><span>Properties</span></div>
+    </div>
+
+    <div id="bsod-screen" class="bsod-overlay">
+        <h1>Curtains</h1>
+        <p>A fatal exception 0E has occurred at 0157:BF801E8F in TingOS. The current application will be terminated.</p>
+        <p>* Press any button below to restore your timeline safely.</p>
+        <p>Error: RECYCLE_BIN_OVERFLOW_DESIGN_ASSETS</p>
+        <center>
+            <button class="bsod-center-btn" onclick="dismissBSOD()">Press here to continue</button>
+        </center>
+    </div>
+
     <canvas id="singularity-canvas"></canvas>
 
     <div id="retro-reload-container">
@@ -1601,8 +1822,8 @@
                 // Initialize Clippy with working asset paths
                 clippyAgent = await initAgent(agents.Rocky);
 
-                const targetX = window.innerWidth - 140; 
-                const targetY = window.innerHeight - 160;
+                const targetX = window.innerWidth - 300; 
+                const targetY = window.innerHeight - 150;
                 clippyAgent.moveTo(targetX, targetY);
                 
                 clippyAgent.show();
@@ -1625,6 +1846,7 @@
                     
                     // Prevent interacting/speaking if user clicked tray icon to close it
                     if (event.target.closest('#clippy-tray-toggle')) return;
+                    if (event.target.closest('#desktop-context-menu')) return;
 
                     // Pick a random phrase from our array
                     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -1663,6 +1885,12 @@
         let activeTarget = null;
         let startX = 0, startY = 0;
 
+        /* --- Global Desktop Event Controller --- */
+        function handleDesktopClick() {
+            hideStartMenu();
+            hideContextMenu();
+        }
+
         /* --- Start Menu Engine Functions --- */
         function toggleStartMenu(event) {
             event.stopPropagation(); 
@@ -1682,6 +1910,32 @@
             document.getElementById('start-btn').classList.remove('pressed');
         }
 
+        /* --- Authentic Right-Click Context Menu Logic --- */
+        function showContextMenu(e) {
+            e.preventDefault();
+            // Block inside window titles or taskbars to prevent weird overlapping behaviors
+            if (e.target.closest('.window') || e.target.closest('.w98-taskbar')) return;
+            
+            const contextMenu = document.getElementById('desktop-context-menu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.clientX + 'px';
+            contextMenu.style.top = e.clientY + 'px';
+        }
+
+        function hideContextMenu() {
+            document.getElementById('desktop-context-menu').style.display = 'none';
+        }
+
+        /* --- Fake Blue Screen of Death Trigger Engines --- */
+        function triggerBSOD() {
+            document.getElementById('bsod-screen').style.display = 'block';
+        }
+
+        function dismissBSOD() {
+            document.getElementById('bsod-screen').style.display = 'none';
+        }
+
+        /* --- Window Openers & Logic Engines --- */
         function openWindow(id) {
             const win = document.getElementById(id);
             win.style.display = 'flex';
@@ -1699,6 +1953,7 @@
             }
             
             focusWindow(win);
+            if(id === 'minesweeper-win') { resetMinesweeper(); }
         }
 
         function closeWindow(id) {
@@ -1715,28 +1970,20 @@
 
          /* --- A download Resume Button --- */
         function downloadPDF(pdfUrl, fileName) {
-            // 1. Fetch the file data from the URL
             fetch(pdfUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return response.blob(); // Convert the server response to a Blob object
+                    return response.blob();
                 })
                 .then(blob => {
-                    // 2. Create a temporary local URL for the Blob object
                     const localUrl = window.URL.createObjectURL(blob);
-                    
-                    // 3. Create a temporary hidden anchor (<a>) element
                     const tempLink = document.createElement('a');
                     tempLink.href = localUrl;
-                    tempLink.download = fileName; // Set the forced download filename
-                    
-                    // 4. Append to body, trigger click, and cleanup
+                    tempLink.download = fileName;
                     document.body.appendChild(tempLink);
                     tempLink.click();
-                    
-                    // Remove elements and revoke URL to free up memory
                     document.body.removeChild(tempLink);
                     window.URL.revokeObjectURL(localUrl);
                 })
@@ -1951,13 +2198,12 @@
         updateClock();
 
         /* --- Wallpaper Sample Database Object Array --- */
-        /* --- Get Matrix Variations from https://github.com/Rezmason/matrix --- */
         const wallpaperOptions = [
             { name: "Blessing", url: "assets/img/wallpaper/buddha_wallpaper_bitmap3.webp" },
             { name: "Windows 98 Teal (Solid)", url: "" },
             { name: "Windows 98 Setup", url: "assets/img/wallpaper/wallpaper_win95.webp" },
             { name: "Matrix Morpheus", url: "https://rezmason.github.io/matrix/?version=morpheus&skipIntro=false", isLink: true },
-            { name: "Matrix Motion", url: "https://rezmason.github.io/matrix/?skipIntro=false", isLink: true }, // Replaced empty quotes with your matrix code link 
+            { name: "Matrix Motion", url: "https://rezmason.github.io/matrix/?skipIntro=false", isLink: true }, 
             { name: "Train", url: "assets/img/wallpaper/wallpaper_video1.mp4" },
             { name: "Vaporwave", url: "assets/img/wallpaper/wallpaper_vapor1.webp" },
             { name: "Hackerman", url: "assets/img/wallpaper/wallpaper_hackerman.webp" },
@@ -1974,6 +2220,7 @@
         function initDisplayProperties() {
             const listbox = document.getElementById('wallpaper-list');
             const preview = document.getElementById('monitor-preview');
+            if(!listbox) return;
             preview.style.backgroundImage = `url('${wallpaperOptions[0].url}')`;
             
             wallpaperOptions.forEach((option, index) => {
@@ -1997,7 +2244,6 @@
             const previewIframe = document.getElementById('monitor-preview-iframe');
             const applyBtn = document.getElementById('apply-btn');
             
-            // Clear current states
             previewVideo.style.display = "none";
             previewVideo.pause();
             previewIframe.style.display = "none";
@@ -2028,7 +2274,6 @@
             const desktopIframe = document.getElementById('main-desktop-iframe-bg');
             const applyBtn = document.getElementById('apply-btn');
             
-            // Reset previous setups
             desktopVideo.style.display = "none";
             desktopVideo.pause();
             desktopVideo.src = "";
@@ -2055,8 +2300,126 @@
             applyBtn.setAttribute('disabled', 'true');
         }
 
+        /* --- Fully Functional Lightweight 9x9 Minesweeper Engine --- */
+        let msGrid = [];
+        let msMines = 10;
+        let msTimerInterval = null;
+        let msTimeElapsed = 0;
+        let msGameOver = false;
+
+        function resetMinesweeper() {
+            clearInterval(msTimerInterval);
+            msTimerInterval = null;
+            msTimeElapsed = 0;
+            msGameOver = false;
+            document.getElementById('ms-timer').textContent = "000";
+            document.getElementById('ms-mine-count').textContent = "010";
+            document.getElementById('ms-reset-btn').textContent = "🙂";
+            
+            buildMinesweeperGrid();
+        }
+
+        function buildMinesweeperGrid() {
+            const gridEl = document.getElementById('ms-grid-element');
+            gridEl.innerHTML = '';
+            msGrid = Array(81).fill(0).map(() => ({ mine: false, revealed: false, count: 0 }));
+
+            // Distribute 10 bombs randomly
+            let minesPlaced = 0;
+            while(minesPlaced < msMines) {
+                let idx = Math.floor(Math.random() * 81);
+                if(!msGrid[idx].mine) {
+                    msGrid[idx].mine = true;
+                    minesPlaced++;
+                }
+            }
+
+            // Map and parse localized safe perimeter metrics
+            for(let i=0; i<81; i++) {
+                if(msGrid[i].mine) continue;
+                let r = Math.floor(i / 9), c = i % 9, count = 0;
+                for(let x=-1; x<=1; x++) {
+                    for(let y=-1; y<=1; y++) {
+                        let nr = r + x, nc = c + y;
+                        if(nr >= 0 && nr < 9 && nc >= 0 && nc < 9 && msGrid[nr * 9 + nc].mine) count++;
+                    }
+                }
+                msGrid[i].count = count;
+            }
+
+            // Append fully reactive rendering nodes to view matrix
+            for(let i=0; i<81; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'ms-cell';
+                cell.dataset.index = i;
+                cell.onclick = () => revealMscell(i);
+                gridEl.appendChild(cell);
+            }
+        }
+
+        function revealMscell(idx) {
+            if(msGameOver || msGrid[idx].revealed) return;
+            
+            // Fire up system internal logic clock framework instantly on initial keyclick input action
+            if(!msTimerInterval) {
+                msTimerInterval = setInterval(() => {
+                    msTimeElapsed = Math.min(msTimeElapsed + 1, 999);
+                    document.getElementById('ms-timer').textContent = String(msTimeElapsed).padStart(3, '0');
+                }, 1000);
+            }
+
+            const cellEl = document.getElementById('ms-grid-element').children[idx];
+            msGrid[idx].revealed = true;
+
+            if(msGrid[idx].mine) {
+                cellEl.classList.add('mine');
+                cellEl.textContent = '💣';
+                endMinesweeper(false);
+                return;
+            }
+
+            cellEl.classList.add('revealed');
+            if(msGrid[idx].count > 0) {
+                cellEl.textContent = msGrid[idx].count;
+                // Standard Minesweeper UI text color mapping
+                const colors = ["", "blue", "green", "red", "darkblue", "brown", "cyan", "black", "gray"];
+                cellEl.style.color = colors[msGrid[idx].count];
+            } else {
+                // Flood-fill logic for blank nodes
+                let r = Math.floor(idx / 9), c = idx % 9;
+                for(let x=-1; x<=1; x++) {
+                    for(let y=-1; y<=1; y++) {
+                        let nr = r + x, nc = c + y;
+                        if(nr >= 0 && nr < 9 && nc >= 0 && nc < 9) {
+                            let nIdx = nr * 9 + nc;
+                            if(!msGrid[nIdx].revealed) revealMscell(nIdx);
+                        }
+                    }
+                }
+            }
+
+            // Scan completion states
+            if(msGrid.filter(c => !c.mine && !c.revealed).length === 0) {
+                endMinesweeper(true);
+            }
+        }
+
+        function endMinesweeper(win) {
+            msGameOver = true;
+            clearInterval(msTimerInterval);
+            document.getElementById('ms-reset-btn').textContent = win ? "😎" : "😵";
+            if(!win) {
+                msGrid.forEach((c, i) => {
+                    if(c.mine) {
+                        const el = document.getElementById('ms-grid-element').children[i];
+                        el.classList.add('revealed');
+                        el.textContent = '💣';
+                    }
+                });
+            }
+        }
+
         initDisplayProperties();
-      
     </script>
 </body>
 </html>
