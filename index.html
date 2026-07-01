@@ -161,7 +161,7 @@
             width: 55vw;
             min-width: 320px;
             max-width: 700px;
-            height: 450px;
+            height: 80%;
             background: var(--xp-bg);
             border: 3px solid var(--xp-window-border);
             border-top-width: 0px;
@@ -1076,7 +1076,7 @@
 
             .window {
                 width: 100vw !important;
-                height: calc(100% - 150px) !important;
+                height: calc(100% - 50px) !important;
                 top: 0 !important;
                 left: 0 !important;
                 transform: none !important;
@@ -1113,6 +1113,13 @@
 
             .ie-iframe-container {
                 height: calc(100% - 70px);
+            }
+
+            .recycle-bin-position {
+            position: absolute;
+            bottom: 655px;
+            right: 25px;
+            z-index: 10;
             }
         }
     </style>
@@ -1170,9 +1177,7 @@
                         <div class="win-ctrl-btn close-btn" onclick="closeWindow('about-win')">X</div>
                     </div>
                 </div>
-                        <div class="viewer-toolbar">
-                        <div class="viewer-btn" onclick="openInternetExplorer('digime.html')">Digitize!</div>
-                        </div>
+
                 <div class="window-body">
                     <h2>Welcome to my hideout!</h2>
                     <br>
