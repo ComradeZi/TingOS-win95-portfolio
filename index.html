@@ -50,7 +50,7 @@
         /* --- Desktop Background --- */
         .desktop {
             height: calc(100vh - 56px); /* Account for 56px Windows 98 Taskbar */
-            background-image: url('assets/img/wallpaper/buddha_wallpaper_bitmap3.webp');
+            background-image: url('assets/img/wallpaper/wallpaper_90sCG.webp');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -161,7 +161,7 @@
             width: 55vw;
             min-width: 320px;
             max-width: 700px;
-            height: 80%;
+            height: 70%;
             background: var(--xp-bg);
             border: 3px solid var(--xp-window-border);
             border-top-width: 0px;
@@ -1165,7 +1165,7 @@
                 </button>
             </div>
 
-            <div id="about-win" class="window">
+            <div id="about-win" class="window" style="max-width: 300px; height: 680px;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
                     <div class="title-text">
                         <img src="https://win98icons.alexmeub.com/icons/png/directory_open_file_mydocs-0.png" width="16">
@@ -1681,6 +1681,19 @@
                 </div>
 <iframe src="https://cssdoom.wtf/" width="100%" height="100%" loading="lazy"></iframe>
             </div>
+
+<div id="chatbox" class="window" style="max-width: 400px; height: 430px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        ✒️<img src="" width="1">Leave A Message</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('chatbox')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('chatbox')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('chatbox')">X</div>
+                    </div>
+                </div>
+<iframe src="https://www3.cbox.ws/box/?boxid=3557211&boxtag=xUp5I0" width="100%" height="450" allowtransparency="yes" allow="autoplay" frameborder="0" marginheight="0" marginwidth="0" scrolling="auto" loading="lazy"></iframe>
+            </div>            
           
 <div id="display-properties-win" class="window" style="max-width: 400px; height: 430px;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
@@ -1747,6 +1760,9 @@
                     <img src="https://win98icons.alexmeub.com/icons/png/movie_maker-1.png" alt="Icon"> Animations
                 </button>
                 <div class="start-menu-divider"></div>
+                <button class="start-menu-item" onclick="openWindow('chatbox'); hideStartMenu();">
+                    <img src="https://win98icons.alexmeub.com/icons/png/mailbox_world-0.png" alt="Icon"> ChatBox
+                </button>
                 <button class="start-menu-item" onclick="openWindow('minesweeper-win'); hideStartMenu();">
                     <img src="assets/img/Microsoft_Minesweeper_(1990).svg" alt="Icon"> Minesweeper
                 </button>
