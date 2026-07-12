@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows 95 Explorer - Classic Desktop Simulation</title>
+  <style>
+    /* Reset and Classic Windows 95 Font Base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "MS Sans Serif", Tahoma, Arial, sans-serif;
+      font-size: 11px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: #ece9d8; /* Standard Win95 base color */
+      color: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Bevel and Border Utility Classes */
+    .outset-deep {
+      border: 2px solid;
+      border-color: #ffffff #5a5a5a #5a5a5a #ffffff;
+      outline: 1px solid #000000;
+    }
+
+    .outset-shallow {
+      border: 1px solid;
+      border-color: #ffffff #ece9d8 #ece9d8 #ffffff;
+    }
+
+    .inset-deep {
+      border: 2px solid;
+      border-color: #ece9d8 #ffffff #ffffff #ece9d8;
+      outline: 1px solid #000000;
+    }
+
+    .inset-shallow {
+      border: 1px solid;
+      border-color: #ece9d8 #ffffff #ffffff #ece9d8;
+    }
+
+
+    /* Main Window Layout */
+    .win95-window {
+      width: 100vw;
+      height: 100vh;
+      background-color: #d4d0c8;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Menu Bar */
+    .menu-bar {
+      display: flex;
+      background-color: #d4d0c8;
+      padding: 2px 6px;
+      gap: 12px;
+      border-bottom: 1px solid #ece9d8;
+      position: relative;
+    }
+
+    .menu-item {
+      cursor: pointer;
+      padding: 2px 4px;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      background-color: #000080;
+      color: #ffffff;
+    }
+
+    .menu-item span.underline {
+      text-decoration: underline;
+    }
+
+    /* Menu Dropdowns */
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #d4d0c8;
+      min-width: 140px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+      z-index: 100;
+      padding: 2px;
+    }
+
+    .menu-item:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-row {
+      padding: 4px 10px;
+      color: #000000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .dropdown-row:hover {
+      background-color: #000080;
+      color: #ffffff;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: #ece9d8;
+      border-bottom: 1px solid #ffffff;
+      margin: 4px 2px;
+    }
+
+    /* Address Bar Zone */
+    .address-bar {
+      display: flex;
+      align-items: center;
+      padding: 4px 6px;
+      background-color: #d4d0c8;
+      gap: 6px;
+      border-bottom: 2px solid #ece9d8;
+    }
+
+    .address-label {
+      color: #404040;
+      font-weight: bold;
+    }
+
+    .address-box {
+      flex: 1;
+      height: 20px;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .address-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    /* Main Window Workspace Splitter */
+    .workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      background-color: #ece9d8;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    /* Left pane - Folder Tree sidebar */
+    .sidebar-tree {
+      width: 200px;
+      background-color: #ffffff;
+      overflow-y: auto;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .tree-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tree-row {
+      display: flex;
+      align-items: center;
+      padding: 2px 0;
+      cursor: pointer;
+      gap: 4px;
+      white-space: nowrap;
+      color: #000000;
+    }
+
+    .tree-row:hover {
+      background-color: #f0f0f0;
+    }
+
+    .tree-row.active {
+      background-color: #000080;
+      color: #ffffff;
+    }
+
+    .tree-toggle {
+      width: 9px;
+      height: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #808080;
+      background-color: #ffffff;
+      font-size: 8px;
+      line-height: 8px;
+      color: #000;
+      cursor: pointer;
+    }
+
+    .tree-toggle.empty {
+      border-color: transparent;
+      background-color: transparent;
+      cursor: default;
+      width: 9px;
+      height: 9px;
+    }
+
+    .tree-children {
+      margin-left: 12px;
+      border-left: 1px dotted #808080;
+      padding-left: 4px;
+      display: none;
+    }
+
+    .tree-children.expanded {
+      display: block;
+    }
+
+    .tree-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Right pane - Files Area Grid */
+    .main-pane {
+      flex: 1;
+      background-color: #ffffff;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* Marquee Selection Area Box */
+    .marquee {
+      position: absolute;
+      border: 1px dotted #000080;
+      background-color: rgba(0, 0, 128, 0.08);
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* View States styling */
+    .files-container {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      content-visibility: auto;
+    }
+
+    /* 1. Large Icons/Thumbnails Grid */
+    .files-container.view-large {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 75px);
+      grid-auto-rows: 75px;
+      gap: 16px 14px;
+    }
+
+    .files-container.view-large .file-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 75px;
+      height: 75px;
+      cursor: pointer;
+      padding: 4px 2px;
+      justify-content: flex-start;
+    }
+
+    .files-container.view-large .file-icon {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 4px;
+      flex-shrink: 0;
+    }
+
+    .files-container.view-large .file-label {
+      word-break: break-all;
+      line-height: 11px;
+      max-height: 24px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      padding: 1px 2px;
+    }
+
+    /* 2. Small Icons view */
+    .files-container.view-small {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 130px);
+      grid-auto-rows: 22px;
+      gap: 4px 8px;
+    }
+
+    .files-container.view-small .file-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 2px 4px;
+      gap: 6px;
+      width: 130px;
+      height: 22px;
+    }
+
+    .files-container.view-small .file-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .files-container.view-small .file-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 1px 2px;
+    }
+
+    /* 3. List view */
+    .files-container.view-list {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      height: 100%;
+      gap: 4px;
+    }
+
+    .files-container.view-list .file-item {
+      display: flex;
+      align-items: center;
+      width: 160px;
+      cursor: pointer;
+      padding: 2px 4px;
+      gap: 6px;
+    }
+
+    .files-container.view-list .file-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* 4. Details view table style */
+    .files-container.view-details {
+      display: block;
+    }
+
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .details-table th {
+      background-color: #d4d0c8;
+      color: #000000;
+      padding: 4px 8px;
+      font-weight: normal;
+      border: 1px solid;
+      border-color: #ffffff #ece9d8 #ece9d8 #ffffff;
+      cursor: pointer;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .details-table th:active {
+      border-color: #ece9d8 #ffffff #ffffff #ece9d8;
+      padding: 5px 7px 3px 9px;
+    }
+
+    .details-table td {
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    .details-table tr.file-item {
+      cursor: pointer;
+    }
+
+    .details-table tr.file-item:hover td {
+      background-color: #f0f0f0;
+    }
+
+    .details-table tr.file-item.selected td {
+      background-color: #000080 !important;
+      color: #ffffff !important;
+    }
+
+    /* General Selection highlighting */
+    .file-item.selected {
+      outline: 1px dotted #808080;
+    }
+
+    .file-item.selected .file-label {
+      background-color: #000080;
+      color: #ffffff;
+    }
+
+    .file-item.selected .file-icon {
+      filter: drop-shadow(0 0 1px #000080) brightness(0.85);
+    }
+
+    /* Status Bar Styling */
+    .status-bar {
+      height: 18px;
+      background-color: #d4d0c8;
+      display: flex;
+      padding: 2px;
+      gap: 2px;
+      border-top: 1px solid #ece9d8;
+    }
+
+    .status-panel {
+      padding: 0 6px;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-panel:nth-child(1) {
+      flex: 3;
+    }
+
+    .status-panel:nth-child(2) {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .status-panel:nth-child(3) {
+      width: 140px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Custom Windows 95 Dialogs */
+    .win95-dialog {
+      position: absolute;
+      background-color: #d4d0c8;
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: none;
+    }
+
+    .dialog-header {
+      background-color: #000080;
+      color: #ffffff;
+      padding: 2px 4px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dialog-body {
+      padding: 12px;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 8px 12px;
+      background-color: #d4d0c8;
+    }
+
+    .win95-btn {
+      padding: 4px 14px;
+      background-color: #d4d0c8;
+      color: #000000;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .win95-btn:active {
+      border-color: #ece9d8 #ffffff #ffffff #ece9d8;
+      padding: 5px 13px 3px 15px;
+    }
+
+    /* Tab Controls (Used in properties dialog) */
+    .dialog-tabs {
+      display: flex;
+      margin-bottom: -1px;
+      padding-left: 4px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .dialog-tab {
+      padding: 4px 8px;
+      background-color: #c0c0c0;
+      border: 1px solid;
+      border-color: #ffffff #ece9d8 transparent #ffffff;
+      border-top-left-radius: 2px;
+      border-top-right-radius: 2px;
+      cursor: pointer;
+      margin-right: 2px;
+    }
+
+    .dialog-tab.active {
+      font-weight: bold;
+      border-bottom: 1px solid #d4d0c8;
+      padding-bottom: 5px;
+      margin-bottom: -1px;
+    }
+
+    .tab-content {
+      background-color: #d4d0c8;
+      padding: 12px;
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Style Form Inputs & Layout inside dialogs */
+    .dialog-row-layout {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .dialog-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .dialog-form-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .dialog-form-label {
+      width: 70px;
+      color: #555;
+    }
+
+    .dialog-form-val {
+      font-weight: bold;
+    }
+
+    /* Desktop Icon/Thumbnail Custom Drawings */
+    .thumbnail-img-box {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Progress bar helper */
+    .progress-bar-container {
+      width: 100%;
+      height: 16px;
+      background-color: #ece9d8;
+      padding: 1px;
+      margin-top: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #000080;
+    }
+
+    /* Help & Support Elements */
+    .help-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+
+
+  <!-- Retro Window Container -->
+  <div class="win95-window" id="explorerWindow">
+    
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+      <div class="menu-item"><span class="underline">F</span>ile
+        <div class="dropdown-content outset-deep">
+          <div class="dropdown-row" onclick="triggerProperties()">Properties <span style="color:#666">Alt+Enter</span></div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-row" onclick="resetExplorerState()">Close</div>
+        </div>
+      </div>
+      <div class="menu-item"><span class="underline">E</span>dit
+        <div class="dropdown-content outset-deep">
+          <div class="dropdown-row" onclick="selectAllItems()">Select All <span style="color:#666">Ctrl+A</span></div>
+          <div class="dropdown-row" onclick="deselectAllItems()">Deselect All</div>
+        </div>
+      </div>
+      <div class="menu-item"><span class="underline">V</span>iew
+        <div class="dropdown-content outset-deep">
+          <div class="dropdown-row" onclick="setViewMode('large')">✓ Large Icons</div>
+          <div class="dropdown-row" onclick="setViewMode('small')">Small Icons</div>
+          <div class="dropdown-row" onclick="setViewMode('list')">List</div>
+          <div class="dropdown-row" onclick="setViewMode('details')">Details</div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-row" onclick="refreshCurrentDirectory()">Refresh <span style="color:#666">F5</span></div>
+        </div>
+      </div>
+      <div class="menu-item"><span class="underline">H</span>elp
+        <div class="dropdown-content outset-deep">
+          <div class="dropdown-row" onclick="showAboutDialog()">About TingOS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Bar -->
+    <div class="address-bar">
+      <span class="address-label">Address</span>
+      <div class="address-box inset-deep">
+        <input type="text" class="address-input" id="addressInput" value="C:\" onkeydown="handleAddressKeydown(event)">
+      </div>
+    </div>
+
+    <!-- Workspace Panel Area -->
+    <div class="workspace inset-deep">
+      
+      <!-- Left Folder Tree Sidebar Panel -->
+      <div class="sidebar-tree inset-deep" id="sidebarTree">
+        <!-- Root Hard Disk C:\ Node -->
+        <div class="tree-item">
+          <div class="tree-row active" id="treeNodeC" onclick="selectTreeFolder('C:\\', this)">
+            <span class="tree-toggle" onclick="toggleTreeChildren(event, this)">-</span>
+            <!-- Hard disk driver SVG -->
+            <svg class="tree-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="4" width="12" height="8" fill="#c0c0c0" stroke="#000" stroke-width="1"/>
+              <rect x="11" y="8" width="2" height="2" fill="#0f0"/>
+            </svg>
+            <span>Hard Disk (C:)</span>
+          </div>
+          
+          <div class="tree-children expanded" id="treeChildrenC">
+            <!-- Technical Skills Folder -->
+            <div class="tree-item">
+              <div class="tree-row" id="treeNodeTechnical" onclick="selectTreeFolder('C:\\Technical Skills', this)">
+                <span class="tree-toggle empty"></span>
+                <div style="width:16px; height:16px; flex-shrink:0;">
+                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+                    <path d="M1 2C1 1.45 1.45 1 2 1H6L8 3H14C14.55 3 15 3.45 15 4V14C15 14.55 14.55 15 14 15H2C1.45 15 1 14.55 1 14V2Z" fill="#ffcc00" stroke="#8a6d00" stroke-width="1"/>
+                  </svg>
+                </div>
+                <span>Technical Skills</span>
+              </div>
+            </div>
+
+            <!-- Soft Skills Folder -->
+            <div class="tree-item">
+              <div class="tree-row" id="treeNodeSoft" onclick="selectTreeFolder('C:\\Soft Skills', this)">
+                <span class="tree-toggle empty"></span>
+                <div style="width:16px; height:16px; flex-shrink:0;">
+                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+                    <path d="M1 2C1 1.45 1.45 1 2 1H6L8 3H14C14.55 3 15 3.45 15 4V14C15 14.55 14.55 15 14 15H2C1.45 15 1 14.55 1 14V2Z" fill="#ffcc00" stroke="#8a6d00" stroke-width="1"/>
+                  </svg>
+                </div>
+                <span>Soft Skills</span>
+              </div>
+            </div>
+
+            <!-- Design Skills Folder -->
+            <div class="tree-item">
+              <div class="tree-row" id="treeNodeDesign" onclick="selectTreeFolder('C:\\Design Skills', this)">
+                <span class="tree-toggle empty"></span>
+                <div style="width:16px; height:16px; flex-shrink:0;">
+                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+                    <path d="M1 2C1 1.45 1.45 1 2 1H6L8 3H14C14.55 3 15 3.45 15 4V14C15 14.55 14.55 15 14 15H2C1.45 15 1 14.55 1 14V2Z" fill="#ffcc00" stroke="#8a6d00" stroke-width="1"/>
+                  </svg>
+                </div>
+                <span>Design Skills</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        
+      <!-- Right Main Workspace File grid Panel -->
+      <div class="main-pane" id="mainPane" onmousedown="onPaneMouseDown(event)">
+        <!-- Container matching the selected view mode -->
+        <div class="files-container view-large" id="filesContainer">
+          <!-- Dynamically populated via JS -->
+        </div>
+        <!-- Selector Box element for drawing the marquee selection box -->
+        <div class="marquee" id="marqueeBox" style="display: none;"></div>
+      </div>
+
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-panel inset-shallow" id="statusCount">3 object(s)</div>
+      <div class="status-panel inset-shallow" id="statusDiskSize">0.00MB</div>
+      <div class="status-panel inset-shallow" id="statusMyComputer">
+        <svg style="width:12px; height:12px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="12" height="8" fill="#9bf" stroke="#000" stroke-width="1"/>
+          <rect x="5" y="10" width="6" height="4" fill="#c0c0c0" stroke="#000" stroke-width="1"/>
+        </svg>
+        <span>My Computer</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- DIALOG POPUPS (Windows 95 Classic Panels) -->
+
+  <!-- 1. Properties Dialog Modal overlay -->
+  <div class="win95-dialog outset-deep" id="propertiesDialog" style="width: 320px;">
+    <div class="dialog-header">
+      <span id="propertiesTitle">Properties</span>
+      <button class="title-btn" onclick="closeDialog('propertiesDialog')">X</button>
+    </div>
+    <div class="dialog-body">
+      <!-- Tabs header section -->
+      <div class="dialog-tabs">
+        <div class="dialog-tab active" id="tabGeneralBtn" onclick="switchDialogTab('General')">General</div>
+        <div class="dialog-tab" id="tabDetailsBtn" onclick="switchDialogTab('Details')">Details</div>
+      </div>
+      
+      <!-- Container border framing tabs -->
+      <div class="inset-deep" style="background-color: #c0c0c0; border-top: none; padding: 10px; height: 260px;">
+        
+        <!-- General tab pane content -->
+        <div class="tab-content active" id="tabGeneral">
+          <div class="dialog-row-layout">
+            <div id="propIconContainer" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;"></div>
+            <div>
+              <div class="dialog-form-row">
+                <input type="text" id="propNameInput" class="inset-shallow" style="width: 180px; padding: 2px;" value="App.exe">
+              </div>
+            </div>
+          </div>
+          <div style="height:1px; background-color:#808080; border-bottom:1px solid #fff; margin:10px 0;"></div>
+          
+          <div class="dialog-form-group">
+            <div class="dialog-form-row">
+              <span class="dialog-form-label">Type:</span>
+              <span class="dialog-form-val" id="propType">Application</span>
+            </div>
+            <div class="dialog-form-row">
+              <span class="dialog-form-label">Location:</span>
+              <span class="dialog-form-val" id="propLocation">C:\Program Files</span>
+            </div>
+            <div class="dialog-form-row">
+              <span class="dialog-form-label">Size:</span>
+              <span class="dialog-form-val" id="propSize">1.24 MB (1,300,240 bytes)</span>
+            </div>
+          </div>
+          <div style="height:1px; background-color:#808080; border-bottom:1px solid #fff; margin:10px 0;"></div>
+          
+          <div class="dialog-form-group">
+            <span style="font-weight: bold; margin-bottom: 4px;">Attributes:</span>
+            <div class="dialog-form-row">
+              <label style="display:flex; align-items:center; gap:4px; cursor:pointer;">
+                <input type="checkbox" id="propReadonly" checked> <span>Read-only</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:4px; margin-left: 20px; cursor:pointer;">
+                <input type="checkbox" id="propArchive"> <span>Archive</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details/Version tab pane content -->
+        <div class="tab-content" id="tabDetails">
+          <div class="dialog-form-group">
+            <div class="dialog-form-row">
+              <span class="dialog-form-label">Company:</span>
+              <span class="dialog-form-val" id="propCompany">Classic Developers</span>
+            </div>
+            <div class="dialog-form-row">
+              <span class="dialog-form-label">Version:</span>
+              <span class="dialog-form-val" id="propVersion">95.12.300</span>
+            </div>
+            <div class="dialog-form-row">
+              <span class="dialog-form-label">Language:</span>
+              <span class="dialog-form-val">English (United States)</span>
+            </div>
+            <div style="margin-top: 20px;">
+              <p style="line-height: 14px; color:#333;">This binary represents high-fidelity retro application shortcuts simulated fully on modern web rendering standards.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- Footer dialog control buttons -->
+    <div class="dialog-footer">
+      <button class="win95-btn outset-deep" onclick="applyProperties()">OK</button>
+      <button class="win95-btn outset-deep" onclick="closeDialog('propertiesDialog')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 2. Launch Program / Loading Simulation Dialog -->
+  <div class="win95-dialog outset-deep" id="launchDialog" style="width: 300px;">
+    <div class="dialog-header">
+      <span id="launchTitle">Running Application...</span>
+      <button class="title-btn" onclick="closeDialog('launchDialog')">X</button>
+    </div>
+    <div class="dialog-body">
+      <div class="help-box">
+        <svg style="width:32px; height:32px; flex-shrink:0;" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" fill="#000080"/>
+          <path d="M14 9H18V13H14V9ZM14 15H18V23H14V15Z" fill="#ffffff"/>
+        </svg>
+        <div>
+          <p id="launchText" style="line-height: 14px; margin-bottom: 6px;">Configuring conventional memory space. Please hold...</p>
+          <div class="progress-bar-container inset-deep">
+            <div class="progress-bar-fill" id="launchProgressBar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="win95-btn outset-deep" id="launchCancelBtn" onclick="closeDialog('launchDialog')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 3. Classic System Illegal Action Warning Dialog -->
+  <div class="win95-dialog outset-deep" id="errorDialog" style="width: 340px;">
+    <div class="dialog-header">
+      <span>Illegal Operation Warning</span>
+      <button class="title-btn" onclick="closeDialog('errorDialog')">X</button>
+    </div>
+    <div class="dialog-body">
+      <div class="help-box" style="align-items: center;">
+        <!-- Retro Warning / Error icon yellow triangle -->
+        <svg style="width:40px; height:40px; flex-shrink:0;" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="16,2 30,28 2,28" fill="#ffcc00" stroke="#000" stroke-width="2"/>
+          <rect x="14" y="10" width="4" height="8" fill="#000"/>
+          <rect x="14" y="20" width="4" height="4" fill="#000"/>
+        </svg>
+        <div>
+          <p style="font-weight: bold; margin-bottom: 4px;">Explorer Executable Error</p>
+          <p id="errorDescription" style="line-height: 14px;">An exception 0xE06D7363 has occurred at location 0x0040F2D1 in current system workspace.</p>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="win95-btn outset-deep" onclick="closeDialog('errorDialog')">Close</button>
+    </div>
+  </div>
+
+  <!-- 4. About Explorer Dialog Window -->
+  <div class="win95-dialog outset-deep" id="aboutDialog" style="width: 360px;">
+    <div class="dialog-header">
+      <span>About TingOS</span>
+      <button class="title-btn" onclick="closeDialog('aboutDialog')">X</button>
+    </div>
+    <div class="dialog-body">
+      <div class="help-box">
+        <!-- Windows Classic Winged logo stylized SVG -->
+        <svg style="width:48px; height:48px; flex-shrink:0;" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="40" height="40" fill="#018281" rx="4"/>
+          <path d="M10 24C10 18 16 14 24 14C32 14 38 18 38 24C38 30 32 34 24 34C16 34 10 30 10 24Z" fill="#ff3300"/>
+          <path d="M12 26C12 21 17 18 24 18C31 18 36 21 36 26C36 31 31 34 24 34C17 34 12 31 12 26Z" fill="#02A5FF"/>
+          <rect x="18" y="22" width="12" height="6" fill="#66CC33" transform="rotate(15 24 25)"/>
+          <text x="14" y="40" fill="#ffcc00" font-weight="bold" font-size="10">TingOS</text>
+        </svg>
+        <div>
+          <h4 class="brand-title">TingOS Explorer</h4>
+          <p style="color:#555; margin-bottom: 10px;">Version 4.00.950 (Retro Edition)</p>
+          <p style="line-height: 14px; margin-bottom: 12px;">This file manager simulation replicates standard visual styles, and directory structures of early desktop environments.</p>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="win95-btn outset-deep" onclick="closeDialog('aboutDialog')">OK</button>
+    </div>
+  </div>
+
+
+  <!-- SCRIPT BLOCK FOR INTERACTIVE APPLICATION BEHAVIORS -->
+  <script>
+    // ==========================================
+    // 1. PNG IMAGE PATH CONFIGURATION
+    // Modify these strings to point to your custom .png paths!
+    // ==========================================
+    const IconPaths = {
+      blender: "assets/img/icons/icons8-blender-96.png",
+      unity: "assets/img/icons/icons8-unity-96.png",
+      unreal: "assets/img/icons/icons8-unreal-engine-96.png",
+      touchdesigner: "assets/img/icons/TouchDesigner_logo.png",
+      photoshop: "assets/img/icons/icons8-photoshop-96.png",
+      illustrator: "assets/img/icons/icons8-ai-96.png",
+      aftereffect: "assets/img/icons/icons8-adobe-after-effects-96.png",
+      sketchup: "assets/img/icons/icons8-google-sketchup-96.png",
+      rhinoceros: "assets/img/icons/icons8-rhinoceros-6-96.png",
+      word: "assets/img/icons/icons8-word-96.png",
+      excel: "assets/img/icons/icons8-excel-96.png",
+      html5: "assets/img/icons/icons8-html5-96.png",
+      css: "assets/img/icons/icons8-css-96.png",
+      javascript: "assets/img/icons/icons8-javascript-96.png",
+      python: "assets/img/icons/icons8-python-96.png",
+      react: "assets/img/icons/icons8-react-native-96.png",
+      next: "assets/img/icons/icons8-next.js-96.png",
+      projectmanage: "https://win98icons.alexmeub.com/icons/png/appwizard-5.png",
+      teamleader: "https://win98icons.alexmeub.com/icons/png/users-2.png",
+      english: "https://img.icons8.com/?size=100&id=t3NE3BsOAQwq&format=png&color=000000",
+      mandarin: "https://img.icons8.com/?size=100&id=Ej50Oe3crXwF&format=png&color=000000",
+      cantonese: "https://img.icons8.com/?size=100&id=WQgynbTLjuXX&format=png&color=000000",
+      chieng: "https://img.icons8.com/?size=100&id=31016&format=png&color=000000",
+      designskills: "https://win98icons.alexmeub.com/icons/png/directory_fonts-0.png",
+      technicalskills: "https://win98icons.alexmeub.com/icons/png/directory_control_panel-3.png",
+      softskills: "https://win98icons.alexmeub.com/icons/png/directory_net_web-4.png",
+      txt: "icons/txt.png"
+    };
+
+
+    // Helper to generate the image tag with custom PNG source
+    function getIconHTML(iconKey) {
+      const path = IconPaths[iconKey] || IconPaths.txt;
+      return `<img class="thumbnail-img-box" src="${path}" alt="${iconKey}" style="width: 100%; height: 100%; object-fit: contain;">`;
+    }
+
+    // System File structure representation containing skill folders
+    const Directories = {
+      "C:\\": [
+        { name: "Technical Skills", type: "Directory Folder", size: "N/A", date: "07/12/1996", icon: "technicalskills" },
+        { name: "Soft Skills", type: "Directory Folder", size: "N/A", date: "07/12/1996", icon: "softskills" },
+        { name: "Design Skills", type: "Directory Folder", size: "N/A", date: "07/12/1996", icon: "designskills" }
+      ],
+      "C:\\Technical Skills": [
+        { name: "Python", type: "Application", size: "3,120 KB", date: "05/14/1996", icon: "python"},
+        { name: "HTML5", type: "Excel Sheet", size: "124 KB", date: "09/04/1995", icon: "html5" },
+        { name: "CSS", type: "Text Document", size: "12 KB", date: "02/11/1996", icon: "css" },
+        { name: "Javascript", type: "Excel Sheet", size: "124 KB", date: "09/04/1995", icon: "javascript" },
+        { name: "React.js", type: "Text Document", size: "12 KB", date: "02/11/1996", icon: "react" },
+        { name: "Next.js", type: "Excel Sheet", size: "124 KB", date: "09/04/1995", icon: "next" },
+      ],
+      "C:\\Soft Skills": [
+        { name: "Project Management.doc", type: "Word Document", size: "45 KB", date: "03/10/1996", icon: "projectmanage", company: "Corporate Training" },
+        { name: "Team Leadership.lnk", type: "Shortcut Link", size: "1 KB", date: "06/20/1996", icon: "teamleader" },
+        { name: "Chi/Eng", type: "Text Document", size: "8 KB", date: "04/04/1996", icon: "chieng" },
+      ],
+      "C:\\Design Skills": [
+        { name: "Illustrator.exe", type: "Application", size: "8,920 KB", date: "05/19/1996", icon: "illustrator", company: "Adobe Systems", version: "4.1" },
+        { name: "Photoshop.exe", type: "Application", size: "15,200 KB", date: "02/20/1996", icon: "photoshop", company: "Adobe Systems", version: "3.0.5" },
+        { name: "AfterEffect.exe", type: "Application", size: "430 KB", date: "08/11/1996", icon: "aftereffect", company: "Adobe Systems" },
+        { name: "Blender.exe", type: "Application", size: "8,920 KB", date: "05/19/1996", icon: "blender", company: "Blender Foundation"},
+        { name: "Rhinoceros.exe", type: "Application", size: "15,200 KB", date: "02/20/1996", icon: "rhinoceros", company: "Adobe Systems", version: "3.0.5" },
+        { name: "Sketchup.blend", type: "Application", size: "430 KB", date: "08/11/1996", icon: "sketchup", company: "Google" },
+        { name: "Touchdesigner.exe", type: "Application", size: "8,920 KB", date: "05/19/1996", icon: "touchdesigner", company: "derivative", version: "4.1" },
+        { name: "Word.exe", type: "Application", size: "15,200 KB", date: "02/20/1996", icon: "word", company: "Microsoft", version: "3.0.5" },
+        { name: "Excel.exe", type: "Application", size: "430 KB", date: "08/11/1996", icon: "excel", company: "Microsoft" }
+      ]
+    };
+
+    // Global App States - Start directly at the root C:\
+    let currentPath = "C:\\";
+    let selectedItems = new Set();
+    let viewMode = "large"; // large, small, list, details
+    let itemsClipboard = null;
+    let clipboardAction = null; // 'cut' or 'copy'
+    let folderContents = [];
+
+    // Marquee dragging calculation coordinates
+    let isDraggingMarquee = false;
+    let marqueeStartX = 0;
+    let marqueeStartY = 0;
+
+    // Window dragging calculations
+    let isDraggingWindow = false;
+    let windowDragStartX = 0;
+    let windowDragStartY = 0;
+
+    // Run setup on startup load event
+    window.onload = function() {
+      setViewMode("large");
+      loadDirectory(currentPath);
+    };
+
+    // Helper functions for Directory Load
+    function loadDirectory(path) {
+      currentPath = path;
+      document.getElementById("addressInput").value = path;
+      
+      const titleLabel = document.getElementById("titleLabel");
+      if (titleLabel) {
+        titleLabel.innerText = `Exploring - ${path}`;
+      }
+      
+      // Load and apply list
+      folderContents = Directories[path] ? [...Directories[path]] : [];
+      renderFiles(folderContents);
+      deselectAllItems();
+      updateSidebarActiveNode(path);
+    }
+
+
+    // Function to re-render Right File Contents Frame based on current selections
+    function renderFiles(items) {
+      const container = document.getElementById("filesContainer");
+      container.innerHTML = "";
+      
+      // Update items count in Status Bar
+      const totalSize = items.reduce((sum, item) => {
+        const num = parseInt(item.size.replace(/[^0-9]/g, '')) || 0;
+        return sum + num;
+      }, 0);
+      document.getElementById("statusCount").innerText = `${items.length} object(s)`;
+      document.getElementById("statusDiskSize").innerText = totalSize > 0 ? `${(totalSize / 1024).toFixed(2)} MB` : "0 KB";
+
+      if (items.length === 0) {
+        container.innerHTML = `<div style="padding: 20px; color: #808080; font-style: italic;">This folder is empty.</div>`;
+        return;
+      }
+
+      // Check current view layouts
+      if (viewMode === "details") {
+        container.className = "files-container view-details";
+        
+        let tableHTML = `
+          <table class="details-table">
+            <thead>
+              <tr>
+                <th onclick="sortFiles('name')">Name</th>
+                <th onclick="sortFiles('size')">Size</th>
+                <th onclick="sortFiles('type')">Type</th>
+                <th onclick="sortFiles('date')">Modified</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        items.forEach((item, index) => {
+          const iconMarkup = getIconHTML(item.icon);
+          tableHTML += `
+            <tr class="file-item" data-index="${index}" onclick="handleFileClick(event, ${index})" ondblclick="handleFileDoubleClick(${index})">
+              <td style="display:flex; align-items:center; gap:6px;">
+                <div style="width:16px; height:16px; display:flex; align-items:center; justify-content:center;">${iconMarkup}</div>
+                <span class="file-label">${item.name}</span>
+              </td>
+              <td>${item.size}</td>
+              <td>${item.type}</td>
+              <td>${item.date}</td>
+            </tr>
+          `;
+        });
+
+        tableHTML += `</tbody></table>`;
+        container.innerHTML = tableHTML;
+      } else {
+        // Adjust container classes for large icons, small icons, list view modes
+        container.className = `files-container view-${viewMode}`;
+        
+        items.forEach((item, index) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "file-item";
+          itemDiv.setAttribute("data-index", index);
+          itemDiv.onclick = (e) => handleFileClick(e, index);
+          itemDiv.ondblclick = () => handleFileDoubleClick(index);
+
+          const iconContainer = document.createElement("div");
+          iconContainer.className = "file-icon";
+          iconContainer.innerHTML = getIconHTML(item.icon);
+
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "file-label";
+          labelSpan.innerText = item.name;
+
+          itemDiv.appendChild(iconContainer);
+          itemDiv.appendChild(labelSpan);
+          container.appendChild(itemDiv);
+        });
+      }
+    }
+
+    // Handles Click highlighting logic (supports multiselect via Ctrl key)
+    function handleFileClick(event, index) {
+      event.stopPropagation();
+      const items = document.querySelectorAll(".file-item");
+
+      if (event.ctrlKey) {
+        if (selectedItems.has(index)) {
+          selectedItems.delete(index);
+          items[index].classList.remove("selected");
+        } else {
+          selectedItems.add(index);
+          items[index].classList.add("selected");
+        }
+      } else {
+        selectedItems.clear();
+        items.forEach(el => el.classList.remove("selected"));
+        selectedItems.add(index);
+        items[index].classList.add("selected");
+      }
+    }
+
+    // Double clicking launches simulated popup/warning or folder travel
+    function handleFileDoubleClick(index) {
+      const item = folderContents[index];
+      if (!item) return;
+
+      if (item.type.includes("Folder") || item.type.includes("Drive")) {
+        // Handle folder travel navigation
+        let targetPath = currentPath;
+        if (currentPath === "C:\\") {
+          targetPath += item.name;
+        } else {
+          targetPath += "\\" + item.name;
+        }
+        
+        loadDirectory(targetPath);
+      } else {
+        // Trigger retro execution dialogue
+        showLaunchSimulatedApp(item);
+      }
+    }
+
+    // Navigates folder path level upwards (Standard Backspacing / Folder up behavior)
+    function navigateUpDirectory() {
+      if (currentPath.startsWith("C:\\") && currentPath !== "C:\\") {
+        loadDirectory("C:\\");
+      }
+    }
+
+    // Views selector mode toggling
+    function setViewMode(mode) {
+      viewMode = mode;
+      
+      // Safe checks to avoid errors when UI buttons are removed
+      const btns = ["viewBtnLarge", "viewBtnSmall", "viewBtnList", "viewBtnDetails"];
+      btns.forEach(b => {
+        const btn = document.getElementById(b);
+        if (btn) btn.classList.remove("active");
+      });
+      
+      const activeId = mode === "large" ? "viewBtnLarge" : 
+                       mode === "small" ? "viewBtnSmall" : 
+                       mode === "list" ? "viewBtnList" : "viewBtnDetails";
+      const activeBtn = document.getElementById(activeId);
+      if (activeBtn) activeBtn.classList.add("active");
+
+      renderFiles(folderContents);
+    }
+
+    // Select all items helper
+    function selectAllItems() {
+      selectedItems.clear();
+      const fileElements = document.querySelectorAll(".file-item");
+      fileElements.forEach((el, index) => {
+        selectedItems.add(index);
+        el.classList.add("selected");
+      });
+    }
+
+    // Clear highlight selections
+    function deselectAllItems() {
+      selectedItems.clear();
+      const fileElements = document.querySelectorAll(".file-item");
+      fileElements.forEach(el => el.classList.remove("selected"));
+    }
+
+    // Keyboard address redirection handler
+    function handleAddressKeydown(event) {
+      if (event.key === "Enter") {
+        const val = event.target.value.trim();
+        if (Directories[val]) {
+          loadDirectory(val);
+        } else {
+          showErrorDialog(`The path "${val}" does not exist in conventional memory registers.`);
+        }
+      }
+    }
+
+    function refreshCurrentDirectory() {
+      loadDirectory(currentPath);
+    }
+
+    // Simulated actions and Clipboard controls
+    function triggerCut() {
+      if (selectedItems.size === 0) return;
+      itemsClipboard = [...selectedItems].map(index => folderContents[index]);
+      clipboardAction = 'cut';
+    }
+
+    // Clipboard triggers
+    function triggerCopy() {
+      if (selectedItems.size === 0) return;
+      itemsClipboard = [...selectedItems].map(index => folderContents[index]);
+      clipboardAction = 'copy';
+    }
+
+    function triggerPaste() {
+      if (!itemsClipboard) return;
+      
+      itemsClipboard.forEach(item => {
+        let newItem = { ...item, name: item.name + " Copy" };
+        Directories[currentPath].push(newItem);
+      });
+      
+      loadDirectory(currentPath);
+    }
+
+    function deleteSelectedItems() {
+      if (selectedItems.size === 0) return;
+      
+      // Filter out deleted items from directories storage mapping
+      const toDeleteNames = [...selectedItems].map(index => folderContents[index].name);
+      Directories[currentPath] = Directories[currentPath].filter(item => !toDeleteNames.includes(item.name));
+      
+      loadDirectory(currentPath);
+    }
+
+    // Interactive Details mode column sorting logic
+    let lastSortDir = 1;
+    function sortFiles(column) {
+      lastSortDir = -lastSortDir;
+      folderContents.sort((a, b) => {
+        if (a[column] < b[column]) return -lastSortDir;
+        if (a[column] > b[column]) return lastSortDir;
+        return 0;
+      });
+      renderFiles(folderContents);
+    }
+
+
+    /* DRAGGABLE MARQUEE SELECTION BOX LOGIC */
+    function onPaneMouseDown(e) {
+      // Clear selections if clicking background
+      if (e.target === document.getElementById("mainPane") || e.target === document.getElementById("filesContainer")) {
+        deselectAllItems();
+        
+        isDraggingMarquee = true;
+        const rect = document.getElementById("mainPane").getBoundingClientRect();
+        marqueeStartX = e.clientX - rect.left + document.getElementById("mainPane").scrollLeft;
+        marqueeStartY = e.clientY - rect.top + document.getElementById("mainPane").scrollTop;
+        
+        const box = document.getElementById("marqueeBox");
+        box.style.left = `${marqueeStartX}px`;
+        box.style.top = `${marqueeStartY}px`;
+        box.style.width = `0px`;
+        box.style.height = `0px`;
+        box.style.display = "block";
+
+        document.addEventListener("mousemove", onPaneMouseMove);
+        document.addEventListener("mouseup", onPaneMouseUp);
+      }
+    }
+
+    function onPaneMouseMove(e) {
+      if (!isDraggingMarquee) return;
+      
+      const rect = document.getElementById("mainPane").getBoundingClientRect();
+      const currentX = e.clientX - rect.left + document.getElementById("mainPane").scrollLeft;
+      const currentY = e.clientY - rect.top + document.getElementById("mainPane").scrollTop;
+      
+      const x = Math.min(marqueeStartX, currentX);
+      const y = Math.min(marqueeStartY, currentY);
+      const w = Math.abs(marqueeStartX - currentX);
+      const h = Math.abs(marqueeStartY - currentY);
+      
+      const box = document.getElementById("marqueeBox");
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+      box.style.width = `${w}px`;
+      box.style.height = `${h}px`;
+
+      // Check collision with all item nodes to select them in real-time
+      const fileNodes = document.querySelectorAll(".file-item");
+      fileNodes.forEach((node, index) => {
+        const itemRect = node.getBoundingClientRect();
+        const relativeItemLeft = itemRect.left - rect.left + document.getElementById("mainPane").scrollLeft;
+        const relativeItemTop = itemRect.top - rect.top + document.getElementById("mainPane").scrollTop;
+        
+        if (
+          relativeItemLeft < x + w &&
+          relativeItemLeft + itemRect.width > x &&
+          relativeItemTop < y + h &&
+          relativeItemTop + itemRect.height > y
+        ) {
+          selectedItems.add(index);
+          node.classList.add("selected");
+        } else {
+          selectedItems.delete(index);
+          node.classList.remove("selected");
+        }
+      });
+    }
+
+    function onPaneMouseUp() {
+      isDraggingMarquee = false;
+      document.getElementById("marqueeBox").style.display = "none";
+      document.removeEventListener("mousemove", onPaneMouseMove);
+      document.removeEventListener("mouseup", onPaneMouseUp);
+    }
+
+
+    /* RETRO DRAGGING FRAMEWORK FOR DIALOGS */
+    function makeDialogDraggable(dialogId) {
+      const dialog = document.getElementById(dialogId);
+      const header = dialog.querySelector(".dialog-header");
+      
+      let dStartX = 0, dStartY = 0;
+      
+      header.onmousedown = function(e) {
+        dStartX = e.clientX - dialog.offsetLeft;
+        dStartY = e.clientY - dialog.offsetTop;
+        
+        document.onmousemove = function(ev) {
+          dialog.style.left = `${ev.clientX - dStartX}px`;
+          dialog.style.top = `${ev.clientY - dStartY}px`;
+        };
+        
+        document.onmouseup = function() {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
+    }
+
+
+    /* CUSTOM RETRO MODALS TRIGGERS */
+    function showAboutDialog() {
+      const dlg = document.getElementById("aboutDialog");
+      dlg.style.display = "block";
+      centerElement(dlg);
+      makeDialogDraggable("aboutDialog");
+    }
+
+    function triggerProperties() {
+      if (selectedItems.size === 0) {
+        showErrorDialog("Please select a program or file first to view standard attributes.");
+        return;
+      }
+      
+      const firstSelectedIndex = [...selectedItems][0];
+      const file = folderContents[firstSelectedIndex];
+      
+      document.getElementById("propIconContainer").innerHTML = getIconHTML(file.icon);
+      document.getElementById("propNameInput").value = file.name;
+      document.getElementById("propType").innerText = file.type;
+      document.getElementById("propLocation").innerText = currentPath;
+      document.getElementById("propSize").innerText = file.size;
+      document.getElementById("propCompany").innerText = file.company || "Classic Windows developer";
+      document.getElementById("propVersion").innerText = file.version || "1.0.0";
+      
+      const dlg = document.getElementById("propertiesDialog");
+      dlg.style.display = "block";
+      centerElement(dlg);
+      makeDialogDraggable("propertiesDialog");
+    }
+
+    function applyProperties() {
+      const index = [...selectedItems][0];
+      if (index !== undefined && folderContents[index]) {
+        const newName = document.getElementById("propNameInput").value.trim();
+        if (newName) {
+          folderContents[index].name = newName;
+          renderFiles(folderContents);
+        }
+      }
+      closeDialog('propertiesDialog');
+    }
+
+    function showLaunchSimulatedApp(item) {
+      const dlg = document.getElementById("launchDialog");
+      dlg.style.display = "block";
+      centerElement(dlg);
+      makeDialogDraggable("launchDialog");
+      
+      document.getElementById("launchTitle").innerText = `Launching - ${item.name}`;
+      document.getElementById("launchText").innerText = `Warming system registry... allocating high upper memory blocks for ${item.name}...`;
+      
+      const progressFill = document.getElementById("launchProgressBar");
+      progressFill.style.width = "0%";
+      
+      let step = 0;
+      const interval = setInterval(() => {
+        step += 10;
+        progressFill.style.width = `${step}%`;
+        
+        if (step === 30) {
+          document.getElementById("launchText").innerText = "Loading virtual graphical coordinates & libraries...";
+        } else if (step === 70) {
+          document.getElementById("launchText").innerText = "Success. Swapping CPU priorities to application tasks.";
+        } else if (step >= 100) {
+          clearInterval(interval);
+          closeDialog("launchDialog");
+          
+          setTimeout(() => {
+            showErrorDialog(`It seems that ${item.name}! ate up all your RAM. Surrender everything to your local datacenter instead.`);
+          }, 400);
+        }
+      }, 300);
+
+      // Save interval reference on dialog cancellation
+      dlg.dataset.intervalId = interval;
+    }
+
+    // Helper utility to show warning/error message modal
+    function showErrorDialog(customMessage) {
+      const dlg = document.getElementById("errorDialog");
+      document.getElementById("errorDescription").innerText = customMessage;
+      dlg.style.display = "block";
+      centerElement(dlg);
+      makeDialogDraggable("errorDialog");
+    }
+
+    function switchDialogTab(tabName) {
+      document.getElementById("tabGeneralBtn").classList.remove("active");
+      document.getElementById("tabDetailsBtn").classList.remove("active");
+      document.getElementById("tabGeneral").classList.remove("active");
+      document.getElementById("tabDetails").classList.remove("active");
+      
+      if (tabName === "General") {
+        document.getElementById("tabGeneralBtn").classList.add("active");
+        document.getElementById("tabGeneral").classList.add("active");
+      } else {
+        document.getElementById("tabDetailsBtn").classList.add("active");
+        document.getElementById("tabDetails").classList.add("active");
+      }
+    }
+
+    function closeDialog(dialogId) {
+      const dlg = document.getElementById(dialogId);
+      dlg.style.display = "none";
+      if (dlg.dataset.intervalId) {
+        clearInterval(parseInt(dlg.dataset.intervalId));
+      }
+    }
+
+    // Resets Explorer workspace state
+    function resetExplorerState() {
+      showErrorDialog("Explorer shell has refreshed conventional workspace parameters.");
+    }
+
+    // Helper utilities for alignment
+    function centerElement(el) {
+      el.style.left = `${(window.innerWidth - el.offsetWidth) / 2}px`;
+      el.style.top = `${(window.innerHeight - el.offsetHeight) / 2}px`;
+    }
+
+    // Tree navigation folder selectors
+    function selectTreeFolder(path, element) {
+      const rows = document.querySelectorAll(".tree-row");
+      rows.forEach(r => r.classList.remove("active"));
+      element.classList.add("active");
+      
+      loadDirectory(path);
+    }
+
+    // Folder branch collapse/expand triggers
+    function toggleTreeChildren(event, toggleElement) {
+      event.stopPropagation();
+      const parentTreeItem = toggleElement.closest(".tree-item");
+      const childTree = parentTreeItem.querySelector(".tree-children");
+      
+      if (childTree.classList.contains("expanded")) {
+        childTree.classList.remove("expanded");
+        toggleElement.innerText = "+";
+      } else {
+        childTree.classList.add("expanded");
+        toggleElement.innerText = "-";
+      }
+    }
+
+    // Active Highlight visual states syncer for tree sidebar
+    function updateSidebarActiveNode(path) {
+      const rows = document.querySelectorAll(".tree-row");
+      rows.forEach(r => r.classList.remove("active"));
+      
+      let targetNode = null;
+      if (path === "C:\\") targetNode = document.getElementById("treeNodeC");
+      else if (path === "C:\\Technical Skills") targetNode = document.getElementById("treeNodeTechnical");
+      else if (path === "C:\\Soft Skills") targetNode = document.getElementById("treeNodeSoft");
+      else if (path === "C:\\Design Skills") targetNode = document.getElementById("treeNodeDesign");
+      
+      if (targetNode) {
+        targetNode.classList.add("active");
+      }
+    }
+  </script>
+</body>
+</html>
