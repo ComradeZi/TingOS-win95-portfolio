@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tyranitar 3D Holo-Deck 95</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #d1d5db; /* Clean light gray background replacing teal */
+      user-select: none;
+      font-family: 'Tahoma', 'Geneva', 'Verdana', sans-serif;
+    }
+
+    /* Fallback height scroll rules on smaller mobile devices */
+    @media (max-width: 768px) {
+      html, body {
+        overflow-y: auto;
+        height: auto;
+      }
+    }
+
+    /* Classic Windows 95 Outset/Inset Bevel Effects */
+    .win95-outset {
+      background-color: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #808080 #808080 #ffffff;
+      box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #0a0a0a;
+    }
+
+    .win95-inset {
+      background-color: #ffffff;
+      border: 2px solid;
+      border-color: #808080 #ffffff #ffffff #808080;
+      box-shadow: inset 1px 1px 0px #0a0a0a;
+    }
+
+    .win95-window {
+      background-color: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+      box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #808080;
+    }
+
+    .win95-button {
+      background-color: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+      box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #808080;
+      font-size: 12px;
+      font-weight: bold;
+      color: #000000;
+      outline: none;
+    }
+
+    .win95-button:active, .win95-button.active-foil-btn {
+      border-color: #0a0a0a #ffffff #ffffff #0a0a0a;
+      box-shadow: inset 1px 1px 0px #808080;
+      padding: 3px 1px 1px 3px !important;
+    }
+
+    /* Standard Select Dropdown Styling */
+    .win95-select {
+      background-color: #ffffff;
+      border: 2px solid;
+      border-color: #808080 #ffffff #ffffff #808080;
+      box-shadow: inset 1px 1px 0px #0a0a0a;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 4px center;
+      padding-right: 24px;
+    }
+
+    /* Retro Sliders */
+    input[type="range"].win95-slider {
+      -webkit-appearance: none;
+      background: transparent;
+      outline: none;
+    }
+
+    input[type="range"].win95-slider::-webkit-slider-runnable-track {
+      height: 4px;
+      background: #808080;
+      border-bottom: 1px solid #ffffff;
+      border-right: 1px solid #ffffff;
+    }
+
+    input[type="range"].win95-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 10px;
+      background: #c0c0c0;
+      border: 2px solid;
+      border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
+      box-shadow: inset 1px 1px 0px #dfdfdf;
+      cursor: pointer;
+      margin-top: -7px;
+    }
+
+    /* Interactive Holographic Card Base Styling */
+    .card-container {
+      perspective: 1200px;
+    }
+
+    .pokemon-card {
+      position: relative;
+      width: 290px;
+      height: 404px; /* standard card ratio 1 : 1.39 scaled */
+      border-radius: 12px;
+      transform-style: preserve-3d;
+      transform: rotateY(var(--rx, 0deg)) rotateX(var(--ry, 0deg)) scale(var(--s, 1));
+      transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.5s ease;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .pokemon-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 13px;
+      padding: 2px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(0,0,0,0.8), rgba(16, 185, 129, 0.4));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .pokemon-card.is-moving {
+      transition: none;
+    }
+
+    /* Card Artwork Layer */
+    .card-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      border-radius: 12px;
+      z-index: 1;
+      background-color: #090d16;
+    }
+
+    /* Shine & Glare Overlays */
+    .card-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      z-index: 4;
+      opacity: var(--o, 0);
+      mix-blend-mode: overlay;
+      background: radial-gradient(
+        circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0) 60%
+      );
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .pokemon-card.is-moving .card-glare {
+      transition: none;
+    }
+
+    /* 1. COSMOS HOLO PATTERN */
+    .holo-cosmos {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      z-index: 3;
+      opacity: calc(var(--o, 0) * var(--foil-intensity, 1));
+      mix-blend-mode: color-dodge;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      background-image: 
+        radial-gradient(
+          circle at var(--mx, 50%) var(--my, 50%),
+          rgba(255, 255, 255, 0.8) 10%,
+          rgba(16, 185, 129, 0.6) 30%,
+          rgba(99, 102, 241, 0.6) 50%,
+          rgba(239, 68, 68, 0.5) 70%,
+          rgba(0, 0, 0, 0.9) 100%
+        ),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cstyle%3E.s%7Bfill:%23fff;opacity:0.6%7D%3C/style%3E%3Ccircle cx='15' cy='15' r='1.5' class='s'/%3E%3Ccircle cx='85' cy='25' r='1' class='s'/%3E%3Ccircle cx='45' cy='75' r='2' class='s'/%3E%3Ccircle cx='105' cy='95' r='1.2' class='s'/%3E%3Cpath d='M40,20 L42,25 L47,27 L42,29 L40,34 L38,29 L33,27 L38,25 Z' class='s'/%3E%3Cpath d='M90,70 L91,73 L94,74 L91,75 L90,78 L89,75 L86,74 L89,73 Z' class='s'/%3E%3C/svg%3E");
+      background-position: center, calc(var(--mx, 50%) * 1.5) calc(var(--my, 50%) * 1.5);
+      background-size: 150% 150%, 180px 180px;
+    }
+
+    /* 2. RAINBOW PRISMATIC PATTERN */
+    .holo-rainbow {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      z-index: 3;
+      opacity: calc(var(--o, 0) * var(--foil-intensity, 1));
+      mix-blend-mode: color-dodge;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      background-image: 
+        linear-gradient(
+          calc(var(--rx, 0deg) * 4 + 135deg),
+          rgba(255, 0, 0, 0.5) 0%,
+          rgba(255, 255, 0, 0.4) 15%,
+          rgba(0, 255, 0, 0.4) 30%,
+          rgba(0, 255, 255, 0.4) 45%,
+          rgba(0, 0, 255, 0.4) 60%,
+          rgba(255, 0, 255, 0.4) 75%,
+          rgba(255, 0, 0, 0.5) 100%
+        ),
+        radial-gradient(
+          circle at var(--mx, 50%) var(--my, 50%),
+          rgba(255, 255, 255, 0.7) 10%,
+          transparent 60%
+        );
+      background-size: 200% 200%, 120% 120%;
+      background-position: calc(var(--mx, 50%) * 2 - 50%) calc(var(--my, 50%) * 2 - 50%), center;
+    }
+
+    /* 3. GOLD SECRET RARE PATTERN */
+    .holo-gold {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      z-index: 3;
+      opacity: calc(var(--o, 0) * var(--foil-intensity, 1));
+      mix-blend-mode: color-dodge;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      background-image: 
+        radial-gradient(
+          circle at var(--mx, 50%) var(--my, 50%),
+          rgba(255, 223, 0, 0.9) 5%,
+          rgba(212, 175, 55, 0.5) 25%,
+          rgba(139, 115, 85, 0.2) 50%,
+          rgba(0, 0, 0, 0.95) 100%
+        ),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0 L32 28 L60 30 L32 32 L30 60 L28 32 L0 30 L28 28 Z' fill='%23ffd700' opacity='0.5'/%3E%3C/svg%3E");
+      background-position: center, calc(var(--mx, 50%) * 0.8) calc(var(--my, 50%) * 0.8);
+      background-size: 140% 140%, 80px 80px;
+    }
+
+    .pokemon-card.is-moving .holo-cosmos,
+    .pokemon-card.is-moving .holo-rainbow,
+    .pokemon-card.is-moving .holo-gold {
+      transition: none;
+    }
+
+    /* Ambient card shadow glow */
+    .glow-shadow {
+      position: absolute;
+      inset: 20px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, transparent 70%);
+      filter: blur(35px);
+      z-index: -1;
+      opacity: var(--o, 0.3);
+      transition: opacity 0.5s ease;
+    }
+
+    /* Pure Immersive Expanded Backdrop (No Windows Chrome) */
+    .expanded-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.96);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .expanded-backdrop.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-2 md:p-4">
+
+  <!-- Main Windows 95 Workspace Frame -->
+  <div class="w-full max-w-4xl flex items-center justify-center z-10 p-2 h-full md:h-auto max-h-full">
+    
+    <!-- Application Window Container -->
+    <div class="win95-window w-full flex flex-col shadow-2xl overflow-hidden md:overflow-visible">
+
+      <!-- Window Workspace Area (Utilizing mobile-first custom orders & responsive grid row placements) -->
+      <div class="p-4 flex flex-col md:grid md:grid-cols-12 gap-6 bg-[#d6d6d6] overflow-y-auto md:overflow-visible max-h-[90vh] md:max-h-none">
+        
+        <!-- 1. System Information Dialog Box -->
+        <!-- Appears FIRST on mobile (order-1), top-left on desktop -->
+        <div class="col-span-1 md:col-span-5 md:row-start-1 md:col-start-1 order-1 win95-outset p-3 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="px-1.5 py-0.5 bg-black text-[#00ff00] font-mono text-[10px] rounded border border-gray-600">ID: 888</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-800">barton ting</span>
+            </div>
+            <p class="text-[11px] text-black leading-relaxed">
+              A multimedia designer bridging the gap between old-school aesthetics and modern tech mediums.
+              <br class="hidden md:inline"><br class="hidden md:inline">
+              Last Seen: Currently works and lives in Hong Kong.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. Interactive Card Display Screen -->
+        <!-- Appears SECOND on mobile (order-2), right-side spanning both rows on desktop -->
+        <!-- FLOAT DIRECTLY ON TOP OF GREY BACKGROUND (No black inset, scanlines or borders) -->
+        <section class="col-span-1 md:col-span-7 md:row-span-2 md:col-start-6 md:row-start-1 order-2 flex flex-col items-center justify-center p-4 min-h-[440px] relative">
+          
+          <!-- Glow spotlight behind card -->
+          <div id="card-glow" class="glow-shadow"></div>
+
+          <!-- Interacting Hologram deck -->
+          <div class="card-container" id="interactive-container">
+            <div class="pokemon-card" id="interactive-card" role="button" aria-label="Interactive Tyranitar card, click to expand">
+              <!-- Main Card Illustration Texture -->
+              <div class="card-image" id="card-art"></div>
+              <!-- Shimmering overlays loaded dynamically by code -->
+              <div class="holo-cosmos" id="holo-foil-layer"></div>
+              <!-- Light reflect shine layer -->
+              <div class="card-glare" id="card-glare-layer"></div>
+            </div>
+          </div>
+
+          <!-- Direction telemetry instructions helper bar -->
+          <div class="mt-6 text-center z-10 bg-[#c0c0c0] px-3 py-1 win95-outset text-[10px] uppercase font-bold tracking-wider select-none text-black max-w-xs w-full">
+            <span class="hidden md:inline">Click card to expand • Move pointer to tilt</span>
+            <span class="md:hidden">Tap card to expand • Swipe screen to tilt</span>
+          </div>
+        </section>
+
+        <!-- 3. Diagnostic Parameters -->
+        <!-- Appears THIRD on mobile (order-3), bottom-left on desktop -->
+        <div class="col-span-1 md:col-span-5 md:row-start-2 md:col-start-1 order-3 win95-outset p-4 flex flex-col gap-4">
+          <h3 class="text-xs uppercase tracking-widest text-black font-extrabold border-b border-white pb-1 flex items-center gap-1.5">
+            <span>🎛️ Diagnostic Parameters</span>
+          </h3>
+          
+          <!-- Selector: Foil Style (Cosmos, Prismatic, Secret Rare) -->
+          <div>
+            <label class="block text-[11px] text-black uppercase font-bold mb-2">Select Foil Texture</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button id="btn-cosmos" class="win95-button px-2 py-1.5 text-xs font-bold active-foil-btn">Cosmos</button>
+              <button id="btn-rainbow" class="win95-button px-2 py-1.5 text-xs font-bold">Prismatic</button>
+              <button id="btn-gold" class="win95-button px-2 py-1.5 text-xs font-bold">Secret</button>
+            </div>
+          </div>
+
+          <!-- Selector: Card Graphic -->
+          <div>
+            <label class="block text-[11px] text-black uppercase font-bold mb-1.5">Load Artwork File</label>
+            <select id="card-art-select" class="win95-select w-full px-2.5 py-1.5 text-xs font-bold text-black cursor-pointer">
+              <option value="sleepy">Cool Glasses Dude</option>
+              <option value="obsidian" selected>Cool Glasses ex (Illustration Rare)</option>
+              <option value="retro">Neo Discovery Classic (Retro 2001)</option>
+            </select>
+          </div>
+
+          <!-- Interactive physics calibration slider controls -->
+          <div class="flex flex-col gap-3">
+            <div>
+              <div class="flex justify-between text-xs text-black font-bold mb-1">
+                <span>Foil Luminescence:</span>
+                <span id="intensity-val">100%</span>
+              </div>
+              <input id="slider-intensity" type="range" min="0" max="150" value="100" class="win95-slider w-full cursor-pointer">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-black font-bold mb-1">
+                <span>Tilt Axis Sensitivity:</span>
+                <span id="sensitivity-val">100%</span>
+              </div>
+              <input id="slider-sensitivity" type="range" min="50" max="180" value="100" class="win95-slider w-full cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Action panel: System helpers -->
+          <div class="border-t border-white/60 pt-3.5 flex justify-between items-center">
+            
+            <!-- Audio button with Win95 styling -->
+            <button id="audio-toggle" class="win95-button px-3 py-1.5 text-xs font-bold flex items-center gap-2 active-foil-btn">
+              <span class="text-xs uppercase">Sound FX</span>
+              <div class="relative w-4 h-4 flex items-center justify-center">
+                <svg id="sound-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+                <svg id="sound-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm10.707-8.293a1 1 0 00-1.414 1.414L16.586 10l-1.714 1.714a1 1 0 101.414 1.414L18 11.414l1.707 1.707a1 1 0 001.414-1.414L19.414 10l1.707-1.707a1 1 0 00-1.414-1.414L18 8.586l-1.707-1.707z" />
+                </svg>
+              </div>
+            </button>
+
+            <!-- Center system action trigger -->
+            <button id="reset-card-btn" class="win95-button px-3 py-1.5 text-xs font-bold flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" />
+              </svg> Recenter
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Immersive Frameless Fullscreen Click-to-Expand Portal Overlay -->
+  <div class="expanded-backdrop" id="fullscreen-overlay">
+    <!-- Clean Minimalistic Close Button -->
+    <button class="absolute top-6 right-6 p-3 bg-slate-900/80 border border-slate-800 rounded-full text-slate-400 hover:text-white transition-all z-50 shadow-lg" id="close-overlay-btn" aria-label="Close fullscreen view">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    
+    <!-- Centered Card Workspace inside Portal -->
+    <div class="flex flex-col items-center justify-center p-4">
+      <div id="expanded-portal-target" class="card-container"></div>
+      <p class="mt-8 text-xs text-slate-400 uppercase tracking-widest font-sans bg-slate-900/60 border border-slate-800/80 px-4 py-2 rounded-full pointer-events-none">
+        Auto-shimmer active • Tap card or backdrop to exit
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Configuration Map containing preferred local assets + highly resilient web fallback mirrors
+    const CARDS = {
+      sleepy: {
+        local: 'assets/img/cooleyes.webp',
+    
+      },
+      obsidian: {
+        local: 'assets/img/cooleyes.webp',
+        
+      },
+      retro: {
+        local: 'assets/img/Artworks/cooleyestradingcard2.webp',
+        
+      }
+    };
+
+    // State parameters
+    let foilStyle = 'cosmos'; // cosmos, rainbow, gold
+    let foilIntensity = 1.0;
+    let sensitivity = 1.0;
+    let soundEnabled = true;
+    let isExpanded = false;
+    let autoShimmerTimer = null;
+
+    // Web Audio Synthesizer Controller
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      playDraw() {
+        if (!soundEnabled) return;
+        this.init();
+        const ctx = this.ctx;
+        
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(750, ctx.currentTime + 0.18);
+        
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.18);
+      },
+      playChime() {
+        if (!soundEnabled) return;
+        this.init();
+        const ctx = this.ctx;
+        
+        const playTone = (freq, delay) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+          
+          gain.gain.setValueAtTime(0.04, ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.4);
+          
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.45);
+        };
+        
+        playTone(1100, 0);
+        playTone(1650, 0.04);
+        playTone(2200, 0.08);
+      }
+    };
+
+    // DOM selectors
+    const card = document.getElementById('interactive-card');
+    const container = document.getElementById('interactive-container');
+    const glow = document.getElementById('card-glow');
+    const cardArt = document.getElementById('card-art');
+    const foilLayer = document.getElementById('holo-foil-layer');
+
+    // Controls
+    const btnCosmos = document.getElementById('btn-cosmos');
+    const btnRainbow = document.getElementById('btn-rainbow');
+    const btnGold = document.getElementById('btn-gold');
+    const cardArtSelect = document.getElementById('card-art-select');
+    const sliderIntensity = document.getElementById('slider-intensity');
+    const intensityVal = document.getElementById('intensity-val');
+    const sliderSensitivity = document.getElementById('slider-sensitivity');
+    const sensitivityVal = document.getElementById('sensitivity-val');
+    const resetBtn = document.getElementById('reset-card-btn');
+    const audioToggle = document.getElementById('audio-toggle');
+    const soundOnIcon = document.getElementById('sound-on-icon');
+    const soundOffIcon = document.getElementById('sound-off-icon');
+
+    // Portal targets
+    const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    const portalTarget = document.getElementById('expanded-portal-target');
+
+    // Safe dynamic background-image loading with robust backup support
+    function applyCardArtwork(artKey) {
+      const artConfig = CARDS[artKey];
+      if (!artConfig) return;
+
+      const primaryImg = new Image();
+      primaryImg.src = artConfig.local;
+
+      primaryImg.onload = function() {
+        cardArt.style.backgroundImage = `url('${artConfig.local}')`;
+      };
+
+      primaryImg.onerror = function() {
+        // Fallback gracefully to Web PokemonTCG image if local path isn't loaded
+        cardArt.style.backgroundImage = `url('${artConfig.webFallback}')`;
+      };
+    }
+
+    // Event Handlers
+    function handleFoilSwitch(style) {
+      foilStyle = style;
+      foilLayer.className = `holo-${style}`;
+      
+      [btnCosmos, btnRainbow, btnGold].forEach(btn => {
+        btn.classList.remove('active-foil-btn');
+      });
+
+      const activeBtn = document.getElementById(`btn-${style}`);
+      activeBtn.classList.add('active-foil-btn');
+      
+      AudioEngine.playChime();
+    }
+
+    function calculateInteractiveMove(clientX, clientY) {
+      const rect = card.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      // Bound positions to standard coordinate space percentages
+      const px = Math.min(Math.max(x / rect.width, 0), 1);
+      const py = Math.min(Math.max(y / rect.height, 0), 1);
+
+      const mx = px * 100;
+      const my = py * 100;
+
+      // Custom Tilt rotation bounds
+      const maxRot = 24 * sensitivity;
+      const rx = (px - 0.5) * maxRot * 2;
+      const ry = (py - 0.5) * maxRot * 2;
+
+      // Determine holo glare intensity based on distance from center of the card
+      const distance = Math.sqrt(Math.pow(px - 0.5, 2) + Math.pow(py - 0.5, 2));
+      const opacity = Math.min(distance * 2.8, 1.0);
+
+      // Apply coordinates dynamically to card CSS variables
+      card.style.setProperty('--mx', `${mx}%`);
+      card.style.setProperty('--my', `${my}%`);
+      card.style.setProperty('--rx', `${rx}deg`);
+      card.style.setProperty('--ry', `${-ry}deg`);
+      card.style.setProperty('--o', opacity);
+
+      // Dynamic ambient shadow follow
+      if (glow) {
+        glow.style.setProperty('--o', opacity * 0.7);
+        glow.style.transform = `translate(${rx * 0.4}px, ${ry * 0.4}px)`;
+      }
+    }
+
+    function applyMovementTracking(e) {
+      if (isExpanded) return; // Prevent manual tracking conflicting with idle auto-shimmer
+      card.classList.add('is-moving');
+      calculateInteractiveMove(e.clientX, e.clientY);
+    }
+
+    function resetCard() {
+      if (isExpanded) return;
+      card.classList.remove('is-moving');
+      card.style.setProperty('--mx', '50%');
+      card.style.setProperty('--my', '50%');
+      card.style.setProperty('--rx', '0deg');
+      card.style.setProperty('--ry', '0deg');
+      card.style.setProperty('--o', '0');
+      
+      if (glow) {
+        glow.style.setProperty('--o', '0.3');
+        glow.style.transform = 'none';
+      }
+    }
+
+    // Touch Support for Mobile Drag Integration
+    function handleTouchMove(e) {
+      if (isExpanded) return;
+      if (e.touches.length > 0) {
+        // Prevent continuous browser pull-to-refresh swipe interaction
+        e.preventDefault(); 
+        card.classList.add('is-moving');
+        const touch = e.touches[0];
+        calculateInteractiveMove(touch.clientX, touch.clientY);
+      }
+    }
+
+    // Automated Shimmer Animation for idle expanded mode
+    function runAutoShimmer() {
+      if (!isExpanded) return;
+      const time = Date.now() * 0.0015;
+      
+      // Infinite smooth wave math mapping
+      const rx = Math.sin(time) * 14;
+      const ry = Math.cos(time) * 14;
+      const mx = 50 + Math.sin(time * 0.7) * 35;
+      const my = 50 + Math.cos(time * 0.7) * 35;
+      const opacity = 0.5 + Math.sin(time) * 0.3;
+
+      card.style.setProperty('--mx', `${mx}%`);
+      card.style.setProperty('--my', `${my}%`);
+      card.style.setProperty('--rx', `${rx}deg`);
+      card.style.setProperty('--ry', `${ry}deg`);
+      card.style.setProperty('--o', opacity);
+
+      autoShimmerTimer = requestAnimationFrame(runAutoShimmer);
+    }
+
+    // Portal transport logic (No win95 window wrappers added to expanded backdrop)
+    function togglePortalExpand(expandState) {
+      isExpanded = expandState;
+      if (expandState) {
+        AudioEngine.playDraw();
+        portalTarget.appendChild(card);
+        fullscreenOverlay.classList.add('is-active');
+        card.style.setProperty('--s', '1.25');
+        autoShimmerTimer = requestAnimationFrame(runAutoShimmer);
+      } else {
+        cancelAnimationFrame(autoShimmerTimer);
+        container.appendChild(card);
+        fullscreenOverlay.classList.remove('is-active');
+        card.style.setProperty('--s', '1.0');
+        resetCard();
+      }
+    }
+
+    // Assign Listeners
+    container.addEventListener('mousemove', applyMovementTracking);
+    container.addEventListener('mouseleave', resetCard);
+
+    // Expand on click
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePortalExpand(!isExpanded);
+    });
+
+    // Close when clicking the portal background anywhere
+    fullscreenOverlay.addEventListener('click', () => {
+      togglePortalExpand(false);
+    });
+
+    closeOverlayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePortalExpand(false);
+    });
+
+    // Touch Swipe Interactions for dynamic mobile tilting
+    card.addEventListener('touchstart', (e) => {
+      AudioEngine.init();
+      if (!isExpanded) {
+        card.classList.add('is-moving');
+        const touch = e.touches[0];
+        calculateInteractiveMove(touch.clientX, touch.clientY);
+      }
+    }, { passive: true });
+
+    card.addEventListener('touchmove', handleTouchMove, { passive: false });
+    card.addEventListener('touchend', resetCard);
+
+    // Audio Initialization on hover trigger
+    container.addEventListener('mouseenter', () => {
+      AudioEngine.init();
+    });
+
+    // Control parameters bindings
+    btnCosmos.addEventListener('click', () => handleFoilSwitch('cosmos'));
+    btnRainbow.addEventListener('click', () => handleFoilSwitch('rainbow'));
+    btnGold.addEventListener('click', () => handleFoilSwitch('gold'));
+
+    cardArtSelect.addEventListener('change', (e) => {
+      applyCardArtwork(e.target.value);
+      AudioEngine.playDraw();
+    });
+
+    sliderIntensity.addEventListener('input', (e) => {
+      foilIntensity = parseFloat(e.target.value) / 100;
+      intensityVal.textContent = `${e.target.value}%`;
+      card.style.setProperty('--foil-intensity', foilIntensity);
+    });
+
+    sliderSensitivity.addEventListener('input', (e) => {
+      sensitivity = parseFloat(e.target.value) / 100;
+      sensitivityVal.textContent = `${e.target.value}%`;
+    });
+
+    resetBtn.addEventListener('click', () => {
+      resetCard();
+      AudioEngine.playChime();
+    });
+
+    // Toggle Sound Engine State
+    audioToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      soundEnabled = !soundEnabled;
+      if (soundEnabled) {
+        soundOnIcon.classList.remove('hidden');
+        soundOffIcon.classList.add('hidden');
+        audioToggle.classList.add('active-foil-btn');
+        AudioEngine.init();
+        AudioEngine.playChime();
+      } else {
+        soundOnIcon.classList.add('hidden');
+        soundOffIcon.classList.remove('hidden');
+        audioToggle.classList.remove('active-foil-btn');
+      }
+    });
+
+    // Initialize animation loops on window load
+    window.onload = function() {
+      // Load current selection card
+      applyCardArtwork(cardArtSelect.value);
+      resetCard();
+    };
+  </script>
+</body>
+</html>
