@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tyranitar 3D Holo-Deck 95</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -17,14 +17,6 @@
       background-color: #d1d5db; /* Clean light gray background replacing teal */
       user-select: none;
       font-family: 'Tahoma', 'Geneva', 'Verdana', sans-serif;
-    }
-
-    /* Fallback height scroll rules on smaller mobile devices */
-    @media (max-width: 768px) {
-      html, body {
-        overflow-y: auto;
-        height: auto;
-      }
     }
 
     /* Classic Windows 95 Outset/Inset Bevel Effects */
@@ -54,7 +46,7 @@
       border: 2px solid;
       border-color: #ffffff #0a0a0a #0a0a0a #ffffff;
       box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #808080;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
       color: #000000;
       outline: none;
@@ -253,9 +245,47 @@
       background-size: 140% 140%, 80px 80px;
     }
 
+    /* 4. GALAXY SPARKLES OVERLAY PATTERN (USING EXTERNAL TEXTURE IMAGES) */
+    .holo-galaxy {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      z-index: 3;
+      opacity: calc(var(--o, 0) * var(--foil-intensity, 20));
+      mix-blend-mode: color-dodge;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      background-image: 
+        url("https://assets.codepen.io/13471/sparkles.gif"),
+
+        linear-gradient(
+          calc(var(--rx, 0deg) * 4 + 135deg),
+          rgba(255, 0, 0, 0.5) 0%,
+          rgba(255, 255, 0, 0.4) 15%,
+          rgba(0, 255, 0, 0.4) 30%,
+          rgba(0, 255, 255, 0.4) 45%,
+          rgba(0, 0, 255, 0.4) 60%,
+          rgba(255, 0, 255, 0.4) 75%,
+          rgba(255, 0, 0, 0.5) 100%
+        ),
+        radial-gradient(
+          circle at var(--mx, 50%) var(--my, 50%),
+          rgba(255, 255, 255, 0.7) 10%,
+          transparent 40%
+        );
+        
+        background-blend-mode: exclusion, hue, hard-light, exclusion;
+        background-size: var(--text-size), 200% 400%, 195%, 200%;
+        background-position: center, 0% var(--posy),
+          calc(var(--posx) * -1) calc(var(--posy) * -1), var(--posx) var(--posy);
+        filter: brightness(calc((var(--hyp) * 0.5) + 0.8)) contrast(1.6)
+          saturate(1.4);
+    }
+
     .pokemon-card.is-moving .holo-cosmos,
     .pokemon-card.is-moving .holo-rainbow,
-    .pokemon-card.is-moving .holo-gold {
+    .pokemon-card.is-moving .holo-gold,
+    .pokemon-card.is-moving .holo-galaxy {
       transition: none;
     }
 
@@ -292,16 +322,16 @@
     }
   </style>
 </head>
-<body class="flex items-center justify-center p-2 md:p-4">
+<body class="flex items-stretch justify-stretch">
 
-  <!-- Main Windows 95 Workspace Frame -->
-  <div class="w-full max-w-4xl flex items-center justify-center z-10 p-2 h-full md:h-auto max-h-full">
+  <!-- Main Windows 95 Workspace Frame (Edge-to-Edge Fullscreen wrapper) -->
+  <div class="w-full h-full flex flex-col z-10">
     
     <!-- Application Window Container -->
-    <div class="win95-window w-full flex flex-col shadow-2xl overflow-hidden md:overflow-visible">
+    <div class="win95-window w-full h-full flex flex-col shadow-none border-none">
 
-      <!-- Window Workspace Area (Utilizing mobile-first custom orders & responsive grid row placements) -->
-      <div class="p-4 flex flex-col md:grid md:grid-cols-12 gap-6 bg-[#d6d6d6] overflow-y-auto md:overflow-visible max-h-[90vh] md:max-h-none">
+      <!-- Window Workspace Area -->
+      <div class="p-4 flex flex-col md:grid md:grid-cols-12 gap-6 bg-[#d6d6d6] flex-grow overflow-y-auto h-full max-h-screen">
         
         <!-- 1. System Information Dialog Box -->
         <!-- Appears FIRST on mobile (order-1), top-left on desktop -->
@@ -309,27 +339,24 @@
           <div>
             <div class="flex items-center gap-2 mb-2">
               <span class="px-1.5 py-0.5 bg-black text-[#00ff00] font-mono text-[10px] rounded border border-gray-600">ID: 888</span>
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-800">barton ting</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-800">WELCOME TO MY LITTLE SITE!</span>
             </div>
             <p class="text-[11px] text-black leading-relaxed">
-              A multimedia designer bridging the gap between old-school aesthetics and modern tech mediums.
-              <br class="hidden md:inline"><br class="hidden md:inline">
-              Last Seen: Currently works and lives in Hong Kong.
-            </p>
+              I'm Barton Ting, a multimedia designer that loves fiddling around with anything fun and creative. Here's my little corner of the web. Feel free to browse around, click anywhere, have fun!</p>
+            <p class="text-[11px] text-black leading-relaxed">Last Seen: Currently works and lives in Hong Kong.</p>
           </div>
         </div>
 
         <!-- 2. Interactive Card Display Screen -->
         <!-- Appears SECOND on mobile (order-2), right-side spanning both rows on desktop -->
-        <!-- FLOAT DIRECTLY ON TOP OF GREY BACKGROUND (No black inset, scanlines or borders) -->
-        <section class="col-span-1 md:col-span-7 md:row-span-2 md:col-start-6 md:row-start-1 order-2 flex flex-col items-center justify-center p-4 min-h-[440px] relative">
+        <section class="col-span-1 md:col-span-7 md:row-span-2 md:col-start-6 md:row-start-1 order-2 flex flex-col items-center justify-center p-4 min-h-[440px] md:min-h-0 md:h-full relative">
           
           <!-- Glow spotlight behind card -->
           <div id="card-glow" class="glow-shadow"></div>
 
           <!-- Interacting Hologram deck -->
           <div class="card-container" id="interactive-container">
-            <div class="pokemon-card" id="interactive-card" role="button" aria-label="Interactive Tyranitar card, click to expand">
+            <div class="pokemon-card" id="interactive-card" role="button" aria-label="Interactive Trading card, click to expand">
               <!-- Main Card Illustration Texture -->
               <div class="card-image" id="card-art"></div>
               <!-- Shimmering overlays loaded dynamically by code -->
@@ -337,12 +364,6 @@
               <!-- Light reflect shine layer -->
               <div class="card-glare" id="card-glare-layer"></div>
             </div>
-          </div>
-
-          <!-- Direction telemetry instructions helper bar -->
-          <div class="mt-6 text-center z-10 bg-[#c0c0c0] px-3 py-1 win95-outset text-[10px] uppercase font-bold tracking-wider select-none text-black max-w-xs w-full">
-            <span class="hidden md:inline">Click card to expand • Move pointer to tilt</span>
-            <span class="md:hidden">Tap card to expand • Swipe screen to tilt</span>
           </div>
         </section>
 
@@ -353,13 +374,14 @@
             <span>🎛️ Diagnostic Parameters</span>
           </h3>
           
-          <!-- Selector: Foil Style (Cosmos, Prismatic, Secret Rare) -->
+          <!-- Selector: Foil Style (Cosmos, Prismatic, Secret Rare, Galaxy Sparkles) -->
           <div>
             <label class="block text-[11px] text-black uppercase font-bold mb-2">Select Foil Texture</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button id="btn-cosmos" class="win95-button px-2 py-1.5 text-xs font-bold active-foil-btn">Cosmos</button>
-              <button id="btn-rainbow" class="win95-button px-2 py-1.5 text-xs font-bold">Prismatic</button>
-              <button id="btn-gold" class="win95-button px-2 py-1.5 text-xs font-bold">Secret</button>
+            <div class="grid grid-cols-4 gap-2">
+              <button id="btn-cosmos" class="win95-button px-1 py-1.5 text-[11px] font-bold active-foil-btn">Cosmos</button>
+              <button id="btn-rainbow" class="win95-button px-1 py-1.5 text-[11px] font-bold">Prism</button>
+              <button id="btn-gold" class="win95-button px-1 py-1.5 text-[11px] font-bold">Secret</button>
+              <button id="btn-galaxy" class="win95-button px-1 py-1.5 text-[11px] font-bold">Galaxy</button>
             </div>
           </div>
 
@@ -367,9 +389,9 @@
           <div>
             <label class="block text-[11px] text-black uppercase font-bold mb-1.5">Load Artwork File</label>
             <select id="card-art-select" class="win95-select w-full px-2.5 py-1.5 text-xs font-bold text-black cursor-pointer">
-              <option value="sleepy">Cool Glasses Dude</option>
-              <option value="obsidian" selected>Cool Glasses ex (Illustration Rare)</option>
-              <option value="retro">Neo Discovery Classic (Retro 2001)</option>
+              <option value="sleepy">Cool Glasses ex (Rare)</option>
+              <option value="obsidian" selected>Rare One</option>
+              <option value="retro">Adventure Duo (Rare Pro Max)</option>
             </select>
           </div>
 
@@ -392,26 +414,34 @@
           </div>
 
           <!-- Action panel: System helpers -->
-          <div class="border-t border-white/60 pt-3.5 flex justify-between items-center">
+          <div class="border-t border-white/60 pt-3.5 flex flex-wrap justify-between items-center gap-2">
             
             <!-- Audio button with Win95 styling -->
-            <button id="audio-toggle" class="win95-button px-3 py-1.5 text-xs font-bold flex items-center gap-2 active-foil-btn">
-              <span class="text-xs uppercase">Sound FX</span>
+            <button id="audio-toggle" class="win95-button px-2.5 py-1.5 text-xs font-bold flex items-center gap-1.5 active-foil-btn">
+              <span class="text-[10px] uppercase">Sound</span>
               <div class="relative w-4 h-4 flex items-center justify-center">
-                <svg id="sound-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg id="sound-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 </svg>
-                <svg id="sound-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg id="sound-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm10.707-8.293a1 1 0 00-1.414 1.414L16.586 10l-1.714 1.714a1 1 0 101.414 1.414L18 11.414l1.707 1.707a1 1 0 001.414-1.414L19.414 10l1.707-1.707a1 1 0 00-1.414-1.414L18 8.586l-1.707-1.707z" />
                 </svg>
               </div>
             </button>
 
+            <!-- Gyro Tilt Toggle Button -->
+            <button id="gyro-toggle" class="win95-button px-2.5 py-1.5 text-xs font-bold flex items-center gap-1.5">
+              <span class="text-[10px] uppercase">Gyro</span>
+              <div class="relative w-4 h-4 flex items-center justify-center font-mono text-[10px] text-gray-800">
+                <span id="gyro-status">OFF</span>
+              </div>
+            </button>
+
             <!-- Center system action trigger -->
-            <button id="reset-card-btn" class="win95-button px-3 py-1.5 text-xs font-bold flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="reset-card-btn" class="win95-button px-2.5 py-1.5 text-xs font-bold flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" />
-              </svg> Recenter
+              </svg> Center
             </button>
           </div>
         </div>
@@ -432,9 +462,6 @@
     <!-- Centered Card Workspace inside Portal -->
     <div class="flex flex-col items-center justify-center p-4">
       <div id="expanded-portal-target" class="card-container"></div>
-      <p class="mt-8 text-xs text-slate-400 uppercase tracking-widest font-sans bg-slate-900/60 border border-slate-800/80 px-4 py-2 rounded-full pointer-events-none">
-        Auto-shimmer active • Tap card or backdrop to exit
-      </p>
     </div>
   </div>
 
@@ -442,26 +469,31 @@
     // Configuration Map containing preferred local assets + highly resilient web fallback mirrors
     const CARDS = {
       sleepy: {
-        local: 'assets/img/cooleyes.webp',
-    
+        local: 'assets/img/Artworks/cooleyestradingcard2.webp',
+        webFallback: 'https://images.pokemontcg.io/swsh5/154_hires.png'
       },
       obsidian: {
-        local: 'assets/img/cooleyes.webp',
-        
+        local: 'assets/img/Artworks/card1.webp',
+        webFallback: 'https://images.pokemontcg.io/sv3/222_hires.png'
       },
       retro: {
-        local: 'assets/img/Artworks/cooleyestradingcard2.webp',
-        
+        local: 'assets/img/Artworks/card2.webp',
+        webFallback: 'https://images.pokemontcg.io/neo2/12_hires.png'
       }
     };
 
     // State parameters
-    let foilStyle = 'cosmos'; // cosmos, rainbow, gold
+    let foilStyle = 'cosmos'; // cosmos, rainbow, gold, galaxy
     let foilIntensity = 1.0;
     let sensitivity = 1.0;
     let soundEnabled = true;
     let isExpanded = false;
-    let autoShimmerTimer = null;
+    let isInteracting = false; // Tracks mouse hover or screen tap/swipe interactions
+    
+    // Gyroscope tracking parameters
+    let gyroEnabled = false;
+    let baselineBeta = null;
+    let baselineGamma = null;
 
     // Web Audio Synthesizer Controller
     const AudioEngine = {
@@ -529,6 +561,7 @@
     const btnCosmos = document.getElementById('btn-cosmos');
     const btnRainbow = document.getElementById('btn-rainbow');
     const btnGold = document.getElementById('btn-gold');
+    const btnGalaxy = document.getElementById('btn-galaxy');
     const cardArtSelect = document.getElementById('card-art-select');
     const sliderIntensity = document.getElementById('slider-intensity');
     const intensityVal = document.getElementById('intensity-val');
@@ -538,6 +571,8 @@
     const audioToggle = document.getElementById('audio-toggle');
     const soundOnIcon = document.getElementById('sound-on-icon');
     const soundOffIcon = document.getElementById('sound-off-icon');
+    const gyroToggle = document.getElementById('gyro-toggle');
+    const gyroStatus = document.getElementById('gyro-status');
 
     // Portal targets
     const fullscreenOverlay = document.getElementById('fullscreen-overlay');
@@ -562,12 +597,108 @@
       };
     }
 
+    // Orientation update callback
+    function handleOrientation(event) {
+      if (!gyroEnabled || isExpanded) return;
+
+      const beta = event.beta;   // front/back tilt [-180, 180]
+      const gamma = event.gamma; // left/right tilt [-90, 90]
+
+      if (beta === null || gamma === null) return;
+
+      // Auto-initialize baseline coordinates on first streaming read
+      if (baselineBeta === null || baselineGamma === null) {
+        baselineBeta = beta;
+        baselineGamma = gamma;
+        return;
+      }
+
+      // Compute offset delta compared to initial hold stance
+      let dBeta = beta - baselineBeta;
+      let dGamma = gamma - baselineGamma;
+
+      // Bound delta shifts to comfortable tracking ranges
+      const range = 18; // Degrees corresponding to complete side-to-side glare shifts
+      dBeta = Math.min(Math.max(dBeta, -range), range);
+      dGamma = Math.min(Math.max(dGamma, -range), range);
+
+      // Map offset directly into normalized [0, 1] relative coordinates
+      const px = (dGamma + range) / (range * 2);
+      const py = (dBeta + range) / (range * 2);
+
+      const mx = px * 100;
+      const my = py * 100;
+
+      const maxRot = 24 * sensitivity;
+      const rx = (px - 0.5) * maxRot * 2;
+      const ry = (py - 0.5) * maxRot * 2;
+
+      const distance = Math.sqrt(Math.pow(px - 0.5, 2) + Math.pow(py - 0.5, 2));
+      const opacity = Math.min(distance * 2.8, 1.0);
+
+      // Apply coordinate variables instantly to custom holographic sheets
+      card.style.setProperty('--mx', `${mx}%`);
+      card.style.setProperty('--my', `${my}%`);
+      card.style.setProperty('--rx', `${rx}deg`);
+      card.style.setProperty('--ry', `${-ry}deg`);
+      card.style.setProperty('--o', opacity);
+
+      if (glow) {
+        glow.style.setProperty('--o', opacity * 0.7);
+        glow.style.transform = `translate(${rx * 0.4}px, ${ry * 0.4}px)`;
+      }
+    }
+
+    // Toggle Device Orientation Listener
+    function toggleGyroscope() {
+      AudioEngine.init();
+      if (gyroEnabled) {
+        gyroEnabled = false;
+        gyroStatus.textContent = 'OFF';
+        gyroToggle.classList.remove('active-foil-btn');
+        window.removeEventListener('deviceorientation', handleOrientation);
+        resetBaselineGyro();
+        resetCard();
+      } else {
+        // Request Permission for iOS 13+ devices
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          DeviceOrientationEvent.requestPermission()
+            .then(permissionState => {
+              if (permissionState === 'granted') {
+                activateGyro();
+              } else {
+                gyroStatus.textContent = 'ERR';
+              }
+            })
+            .catch(() => {
+              gyroStatus.textContent = 'ERR';
+            });
+        } else {
+          activateGyro();
+        }
+      }
+    }
+
+    function activateGyro() {
+      gyroEnabled = true;
+      gyroStatus.textContent = 'ON';
+      gyroToggle.classList.add('active-foil-btn');
+      resetBaselineGyro();
+      window.addEventListener('deviceorientation', handleOrientation);
+      AudioEngine.playChime();
+    }
+
+    function resetBaselineGyro() {
+      baselineBeta = null;
+      baselineGamma = null;
+    }
+
     // Event Handlers
     function handleFoilSwitch(style) {
       foilStyle = style;
       foilLayer.className = `holo-${style}`;
       
-      [btnCosmos, btnRainbow, btnGold].forEach(btn => {
+      [btnCosmos, btnRainbow, btnGold, btnGalaxy].forEach(btn => {
         btn.classList.remove('active-foil-btn');
       });
 
@@ -613,57 +744,72 @@
     }
 
     function applyMovementTracking(e) {
-      if (isExpanded) return; // Prevent manual tracking conflicting with idle auto-shimmer
+      if (isExpanded) return;
+      isInteracting = true; // Pause auto-shimmer immediately on interaction
       card.classList.add('is-moving');
       calculateInteractiveMove(e.clientX, e.clientY);
     }
 
     function resetCard() {
       if (isExpanded) return;
+      isInteracting = false; // Allow auto-shimmer to resume on idle
       card.classList.remove('is-moving');
-      card.style.setProperty('--mx', '50%');
-      card.style.setProperty('--my', '50%');
-      card.style.setProperty('--rx', '0deg');
-      card.style.setProperty('--ry', '0deg');
-      card.style.setProperty('--o', '0');
-      
-      if (glow) {
-        glow.style.setProperty('--o', '0.3');
-        glow.style.transform = 'none';
-      }
     }
 
     // Touch Support for Mobile Drag Integration
     function handleTouchMove(e) {
       if (isExpanded) return;
       if (e.touches.length > 0) {
-        // Prevent continuous browser pull-to-refresh swipe interaction
-        e.preventDefault(); 
+        e.preventDefault(); // Prevent scroll dragging conflicts
+        isInteracting = true;
         card.classList.add('is-moving');
         const touch = e.touches[0];
         calculateInteractiveMove(touch.clientX, touch.clientY);
       }
     }
 
-    // Automated Shimmer Animation for idle expanded mode
-    function runAutoShimmer() {
-      if (!isExpanded) return;
-      const time = Date.now() * 0.0015;
+    // Single Global Animation Frame Loop
+    function animationLoop() {
+      // Shimmer calculation runs ONLY when idle AND not using hardware orientation features
+      if (!isExpanded && !isInteracting && !gyroEnabled) {
+        const time = Date.now() * 0.0012; // Controls overall shimmer cycle speed
+        
+        // Compute smooth wave values for beautiful holographic reflections on idle
+        const rx = Math.sin(time) * 11;
+        const ry = Math.cos(time) * 11;
+        const mx = 50 + Math.sin(time * 0.7) * 32;
+        const my = 50 + Math.cos(time * 0.7) * 32;
+        const opacity = 0.55 + Math.sin(time * 1.3) * 0.35; // Rhythmic shimmer light pulsing
+
+        card.style.setProperty('--mx', `${mx}%`);
+        card.style.setProperty('--my', `${my}%`);
+        card.style.setProperty('--rx', `${rx}deg`);
+        card.style.setProperty('--ry', `${ry}deg`);
+        card.style.setProperty('--o', opacity);
+
+        if (glow) {
+          glow.style.setProperty('--o', opacity * 0.5);
+          glow.style.transform = `translate(${rx * 0.3}px, ${ry * 0.3}px)`;
+        }
+      }
       
-      // Infinite smooth wave math mapping
-      const rx = Math.sin(time) * 14;
-      const ry = Math.cos(time) * 14;
-      const mx = 50 + Math.sin(time * 0.7) * 35;
-      const my = 50 + Math.cos(time * 0.7) * 35;
-      const opacity = 0.5 + Math.sin(time) * 0.3;
+      // If expanded in portal mode, perform independent shimmering
+      if (isExpanded) {
+        const time = Date.now() * 0.0015;
+        const rx = Math.sin(time) * 14;
+        const ry = Math.cos(time) * 14;
+        const mx = 50 + Math.sin(time * 0.7) * 35;
+        const my = 50 + Math.cos(time * 0.7) * 35;
+        const opacity = 0.5 + Math.sin(time) * 0.3;
 
-      card.style.setProperty('--mx', `${mx}%`);
-      card.style.setProperty('--my', `${my}%`);
-      card.style.setProperty('--rx', `${rx}deg`);
-      card.style.setProperty('--ry', `${ry}deg`);
-      card.style.setProperty('--o', opacity);
+        card.style.setProperty('--mx', `${mx}%`);
+        card.style.setProperty('--my', `${my}%`);
+        card.style.setProperty('--rx', `${rx}deg`);
+        card.style.setProperty('--ry', `${ry}deg`);
+        card.style.setProperty('--o', opacity);
+      }
 
-      autoShimmerTimer = requestAnimationFrame(runAutoShimmer);
+      requestAnimationFrame(animationLoop);
     }
 
     // Portal transport logic (No win95 window wrappers added to expanded backdrop)
@@ -674,9 +820,7 @@
         portalTarget.appendChild(card);
         fullscreenOverlay.classList.add('is-active');
         card.style.setProperty('--s', '1.25');
-        autoShimmerTimer = requestAnimationFrame(runAutoShimmer);
       } else {
-        cancelAnimationFrame(autoShimmerTimer);
         container.appendChild(card);
         fullscreenOverlay.classList.remove('is-active');
         card.style.setProperty('--s', '1.0');
@@ -708,6 +852,7 @@
     card.addEventListener('touchstart', (e) => {
       AudioEngine.init();
       if (!isExpanded) {
+        isInteracting = true; // Pause idle shimmer on touch
         card.classList.add('is-moving');
         const touch = e.touches[0];
         calculateInteractiveMove(touch.clientX, touch.clientY);
@@ -716,6 +861,7 @@
 
     card.addEventListener('touchmove', handleTouchMove, { passive: false });
     card.addEventListener('touchend', resetCard);
+    card.addEventListener('touchcancel', resetCard);
 
     // Audio Initialization on hover trigger
     container.addEventListener('mouseenter', () => {
@@ -726,6 +872,7 @@
     btnCosmos.addEventListener('click', () => handleFoilSwitch('cosmos'));
     btnRainbow.addEventListener('click', () => handleFoilSwitch('rainbow'));
     btnGold.addEventListener('click', () => handleFoilSwitch('gold'));
+    btnGalaxy.addEventListener('click', () => handleFoilSwitch('galaxy'));
 
     cardArtSelect.addEventListener('change', (e) => {
       applyCardArtwork(e.target.value);
@@ -743,9 +890,17 @@
       sensitivityVal.textContent = `${e.target.value}%`;
     });
 
+    // Recenter resets coordinates as well as hardware baseline zero-points
     resetBtn.addEventListener('click', () => {
+      resetBaselineGyro();
       resetCard();
       AudioEngine.playChime();
+    });
+
+    // Hardware gyroscope toggle hook
+    gyroToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleGyroscope();
     });
 
     // Toggle Sound Engine State
@@ -765,11 +920,12 @@
       }
     });
 
-    // Initialize animation loops on window load
+    // Initialize layout and begin continuous animation loops on load
     window.onload = function() {
-      // Load current selection card
       applyCardArtwork(cardArtSelect.value);
       resetCard();
+      // Start the central auto-shimmer engine
+      requestAnimationFrame(animationLoop);
     };
   </script>
 </body>
