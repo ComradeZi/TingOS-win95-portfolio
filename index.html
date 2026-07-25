@@ -1781,7 +1781,7 @@
 <iframe src="mission_control_game.html" width="100%" height="100%" loading="lazy"></iframe>
             </div>  
 
-<div id="worm" class="window" style="max-width: 100%; height: 85%;">
+<div id="worm" class="window" style="max-width: 100%; height: 200px;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
                     <div class="title-text">
                         <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" width="16">Worm II</div>
@@ -1793,6 +1793,19 @@
                 </div>
 <iframe src="snake.html" width="100%" height="100%" loading="lazy"></iframe>
 </div>  
+
+<div id="sequencer" class="window" style="max-width: 100%; height: 65%;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://images.emojiterra.com/google/android-11/512px/1f3b9.png" width="16">Pattern Sequencer</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('sequencer')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('sequencer')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('sequencer')">X</div>
+                    </div>
+                </div>
+<iframe src="pattern_sequencer.html" width="100%" height="100%" loading="lazy"></iframe>
+</div> 
           
 <div id="display-properties-win" class="window" style="max-width: 400px; height: 430px;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
@@ -1903,6 +1916,9 @@
         <div class="start-menu-divider"></div>
 
         <!-- System & General Utilities -->
+        <button class="start-menu-item" onclick="openWindow('sequencer'); hideStartMenu();">
+            <img src="https://images.emojiterra.com/google/android-11/512px/1f3b9.png" alt="Icon"> Sequencer
+        </button>
         <button class="start-menu-item" onclick="openWindow('chatbox'); hideStartMenu();">
             <img src="https://win98icons.alexmeub.com/icons/png/mailbox_world-0.png" alt="Icon"> ChatBox
         </button>

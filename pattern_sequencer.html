@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Tracker.exe - Navi-OS</title>
+  <style>
+    :root {
+      --bg-dark: #070c0a;
+      --grid-bg: #030605;
+      --cell-border: #0f1c17;
+      --beat-border: #00ff73;
+      --beat-bg-tint: rgba(0, 255, 115, 0.03);
+      --text-green: #2e624d;
+      --active-green: #d1fae5;
+      --active-glow: #00ff73;
+      --active-drum: #ffffff;
+      --drum-glow: #ffaa00;
+      --border-accent: #2d5846;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-dark);
+      color: #e0f2fe;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .tracker-app {
+      background-color: var(--grid-bg);
+      border: 1px solid var(--border-accent);
+      padding: 16px;
+      border-radius: 2px;
+      box-shadow: 0 0 25px rgba(0, 255, 115, 0.05);
+      width: 780px;
+      max-width: 100%;
+    }
+
+    /* Top Toolbar Header */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid var(--border-accent);
+      color: #bbf7d0;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 12px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.1s ease;
+    }
+
+    .btn:hover {
+      background: var(--border-accent);
+      color: #fff;
+    }
+
+    .btn-play {
+      border-color: #4ade80;
+    }
+
+    /* Theme Select Menu */
+    .theme-select {
+      background: #020403;
+      border: 1px solid var(--border-accent);
+      color: #00ff73;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 6px 8px;
+      cursor: pointer;
+      outline: none;
+      letter-spacing: 0.5px;
+    }
+
+    .theme-select:hover {
+      border-color: #00ff73;
+    }
+
+    /* BPM Controller */
+    .bpm-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--text-green);
+    }
+
+    .bpm-btn {
+      background: transparent;
+      border: 1px solid var(--border-accent);
+      color: #fff;
+      font-family: inherit;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .bpm-val {
+      color: #ffffff;
+      font-size: 15px;
+      padding: 0 4px;
+    }
+
+    /* Grid Layout Matrix */
+    .grid-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background-color: var(--cell-border);
+      border: 1px solid var(--border-accent);
+      touch-action: none;
+    }
+
+    .grid-row {
+      display: flex;
+      height: 36px;
+      background-color: var(--grid-bg);
+    }
+
+    .row-label {
+      width: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text-green);
+      background-color: #020403;
+      border-right: 1px solid var(--border-accent);
+      flex-shrink: 0;
+    }
+
+    .step-cell {
+      flex: 1;
+      border-right: 1px solid var(--cell-border);
+      cursor: pointer;
+      position: relative;
+      transition: background 0.05s;
+    }
+
+    .step-cell:last-child {
+      border-right: none;
+    }
+
+    /* Rhythm Separators */
+    .step-cell.beat-marker {
+      border-right: 1.5px solid var(--beat-border);
+      box-shadow: 1px 0 3px rgba(0, 255, 115, 0.2);
+    }
+
+    .step-cell.beat-column {
+      background-color: var(--beat-bg-tint);
+    }
+
+    /* Cell states */
+    .step-cell.active-synth {
+      background-color: var(--active-green) !important;
+      box-shadow: inset 0 0 8px var(--active-glow), 0 0 6px rgba(0, 255, 115, 0.4);
+    }
+
+    .step-cell.active-drum {
+      background-color: var(--active-drum) !important;
+      box-shadow: inset 0 0 8px var(--drum-glow), 0 0 6px rgba(255, 170, 0, 0.4);
+    }
+
+    /* Playhead Indicator Highlight */
+    .step-cell.playing-step::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+    }
+
+    .drum-divider {
+      border-top: 2px solid var(--border-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tracker-app">
+    <!-- Top Action Bar -->
+    <div class="toolbar">
+      <div class="btn-group">
+        <button class="btn btn-play" id="playBtn">[ PLAY ]</button>
+        <button class="btn" id="clearBtn">CLEAR</button>
+        <button class="btn" id="randomBtn">RANDOM</button>
+        
+        <!-- Sound Theme Dropdown Selector -->
+        <select class="theme-select" id="soundThemeSelect">
+          <option value="chiptune">SOUND: CHIPTUNE</option>
+          <option value="synthwave">SOUND: SYNTHWAVE</option>
+          <option value="hiphop808">SOUND: 808 HIP HOP</option>
+          <option value="ambient">SOUND: LO-FI AMBIENT</option>
+        </select>
+      </div>
+
+      <div class="bpm-control">
+        <span>BPM</span>
+        <button class="bpm-btn" id="bpmMinus">-</button>
+        <span class="bpm-val" id="bpmVal">120</span>
+        <button class="bpm-btn" id="bpmPlus">+</button>
+      </div>
+    </div>
+
+    <!-- Matrix Sequencer Grid -->
+    <div class="grid-container" id="gridMatrix"></div>
+  </div>
+
+  <script>
+    // Grid Rows Setup
+    const ROWS = [
+      { id: 'E5', type: 'synth', freq: 659.25 },
+      { id: 'D5', type: 'synth', freq: 587.33 },
+      { id: 'C5', type: 'synth', freq: 523.25 },
+      { id: 'A4', type: 'synth', freq: 440.00 },
+      { id: 'G4', type: 'synth', freq: 392.00 },
+      { id: 'E4', type: 'synth', freq: 329.63 },
+      { id: 'D4', type: 'synth', freq: 293.66 },
+      { id: 'C4', type: 'synth', freq: 261.63 },
+      { id: 'HAT', type: 'drum', sound: 'hihat' },
+      { id: 'SNR', type: 'drum', sound: 'snare' },
+      { id: 'KCK', type: 'drum', sound: 'kick' }
+    ];
+
+    const TOTAL_STEPS = 16;
+    let gridData = {}; 
+    let bpm = 120;
+    let isPlaying = false;
+    let currentStep = 0;
+    let timerId = null;
+    let audioCtx = null;
+    let currentTheme = 'chiptune';
+
+    // Drag / Touch Painting State
+    let isDragging = false;
+    let dragTargetValue = 1;
+
+    const presetPattern = {
+      'E5':  [1,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0],
+      'D5':  [0,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0],
+      'C5':  [0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0],
+      'A4':  [0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,1],
+      'G4':  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      'E4':  [0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1],
+      'D4':  [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
+      'C4':  [0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1],
+      'HAT': [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+      'SNR': [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+      'KCK': [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]
+    };
+
+    function initMatrixData() {
+      ROWS.forEach(row => {
+        gridData[row.id] = presetPattern[row.id] ? [...presetPattern[row.id]] : new Array(TOTAL_STEPS).fill(0);
+      });
+    }
+
+    // Render HTML Grid Elements
+    function renderGrid() {
+      const container = document.getElementById('gridMatrix');
+      container.innerHTML = '';
+
+      ROWS.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = `grid-row ${row.id === 'HAT' ? 'drum-divider' : ''}`;
+
+        // Label
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'row-label';
+        labelDiv.textContent = row.id;
+        rowDiv.appendChild(labelDiv);
+
+        // 16 Step Cells
+        for (let s = 0; s < TOTAL_STEPS; s++) {
+          const cell = document.createElement('div');
+          cell.dataset.row = row.id;
+          cell.dataset.step = s;
+          cell.dataset.type = row.type;
+          cell.className = 'step-cell';
+
+          if ((s + 1) % 4 === 0 && s !== TOTAL_STEPS - 1) {
+            cell.classList.add('beat-marker');
+          }
+          if (Math.floor(s / 4) % 2 === 1) {
+            cell.classList.add('beat-column');
+          }
+
+          if (gridData[row.id][s]) {
+            cell.classList.add(row.type === 'synth' ? 'active-synth' : 'active-drum');
+          }
+
+          // Desktop Mouse Drag Events
+          cell.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isDragging = true;
+            dragTargetValue = gridData[row.id][s] ? 0 : 1;
+            applyCellState(row.id, s, row.type, dragTargetValue);
+          });
+
+          cell.addEventListener('mouseenter', () => {
+            if (isDragging) {
+              applyCellState(row.id, s, row.type, dragTargetValue);
+            }
+          });
+
+          rowDiv.appendChild(cell);
+        }
+
+        container.appendChild(rowDiv);
+      });
+    }
+
+    function applyCellState(rowId, stepIdx, type, targetState) {
+      if (gridData[rowId][stepIdx] !== targetState) {
+        gridData[rowId][stepIdx] = targetState;
+        const cell = document.querySelector(`.step-cell[data-row="${rowId}"][data-step="${stepIdx}"]`);
+        if (cell) {
+          const activeClass = type === 'synth' ? 'active-synth' : 'active-drum';
+          if (targetState === 1) {
+            cell.classList.add(activeClass);
+          } else {
+            cell.classList.remove('active-synth', 'active-drum');
+          }
+        }
+      }
+    }
+
+    // Global drag release
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Touch events for mobile
+    const gridContainer = document.getElementById('gridMatrix');
+
+    gridContainer.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (target && target.classList.contains('step-cell')) {
+        isDragging = true;
+        const rowId = target.dataset.row;
+        const stepIdx = parseInt(target.dataset.step, 10);
+        const type = target.dataset.type;
+
+        dragTargetValue = gridData[rowId][stepIdx] ? 0 : 1;
+        applyCellState(rowId, stepIdx, type, dragTargetValue);
+      }
+    }, { passive: false });
+
+    gridContainer.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+      if (target && target.classList.contains('step-cell')) {
+        const rowId = target.dataset.row;
+        const stepIdx = parseInt(target.dataset.step, 10);
+        const type = target.dataset.type;
+        applyCellState(rowId, stepIdx, type, dragTargetValue);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    // Audio Engine Setup
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    // --- Dynamic Sound Engine Profiles ---
+    function playSynth(freq) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+
+      if (currentTheme === 'chiptune') {
+        osc.type = 'triangle';
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } 
+      else if (currentTheme === 'synthwave') {
+        osc.type = 'sawtooth';
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1200, now);
+        
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } 
+      else if (currentTheme === 'hiphop808') {
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } 
+      else if (currentTheme === 'ambient') {
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.08); // Soft attack
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc.connect(gain);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      }
+
+      osc.frequency.setValueAtTime(freq, now);
+      gain.connect(audioCtx.destination);
+    }
+
+    function playDrum(type) {
+      const now = audioCtx.currentTime;
+
+      if (type === 'kick') {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+
+        if (currentTheme === 'hiphop808') {
+          // Deep 808 Sub Kick
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+          gain.gain.setValueAtTime(0.8, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (currentTheme === 'synthwave') {
+          // Punchy Electronic Kick
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.15);
+          gain.gain.setValueAtTime(0.7, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (currentTheme === 'ambient') {
+          // Soft Thump Kick
+          osc.frequency.setValueAtTime(90, now);
+          osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.2);
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else {
+          // Standard Chiptune Kick
+          osc.frequency.setValueAtTime(130, now);
+          osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.12);
+          gain.gain.setValueAtTime(0.6, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        }
+      } else if (type === 'snare' || type === 'hihat') {
+        const dur = (type === 'snare') ? (currentTheme === 'hiphop808' ? 0.2 : 0.1) : 0.03;
+        const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const gain = audioCtx.createGain();
+
+        let gainLevel = (type === 'snare') ? 0.3 : 0.12;
+        if (currentTheme === 'ambient') gainLevel *= 0.5;
+
+        gain.gain.setValueAtTime(gainLevel, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+        noise.connect(gain);
+        gain.connect(audioCtx.destination);
+        noise.start(now);
+      }
+    }
+
+    // Step Execution Cycle
+    function stepTick() {
+      ROWS.forEach(row => {
+        if (gridData[row.id][currentStep]) {
+          if (row.type === 'synth') playSynth(row.freq);
+          if (row.type === 'drum') playDrum(row.sound);
+        }
+      });
+
+      highlightStep(currentStep);
+      currentStep = (currentStep + 1) % TOTAL_STEPS;
+    }
+
+    function highlightStep(stepIndex) {
+      document.querySelectorAll('.step-cell').forEach(cell => {
+        if (parseInt(cell.dataset.step, 10) === stepIndex) {
+          cell.classList.add('playing-step');
+        } else {
+          cell.classList.remove('playing-step');
+        }
+      });
+    }
+
+    // Play/Pause Control
+    function togglePlay() {
+      initAudio();
+      const playBtn = document.getElementById('playBtn');
+
+      if (isPlaying) {
+        clearInterval(timerId);
+        isPlaying = false;
+        playBtn.textContent = '[ PLAY ]';
+        document.querySelectorAll('.step-cell').forEach(c => c.classList.remove('playing-step'));
+        currentStep = 0;
+      } else {
+        isPlaying = true;
+        playBtn.textContent = '[ PAUSE ]';
+        stepTick();
+        const intervalMs = (60 / bpm / 4) * 1000;
+        timerId = setInterval(stepTick, intervalMs);
+      }
+    }
+
+    // Event Listeners
+    document.getElementById('playBtn').addEventListener('click', togglePlay);
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      ROWS.forEach(row => gridData[row.id] = new Array(TOTAL_STEPS).fill(0));
+      renderGrid();
+    });
+
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      ROWS.forEach(row => {
+        gridData[row.id] = Array.from({ length: TOTAL_STEPS }, () => Math.random() > 0.8 ? 1 : 0);
+      });
+      renderGrid();
+    });
+
+    document.getElementById('soundThemeSelect').addEventListener('change', (e) => {
+      currentTheme = e.target.value;
+      initAudio();
+    });
+
+    // BPM Controls
+    document.getElementById('bpmMinus').addEventListener('click', () => {
+      if (bpm > 50) {
+        bpm -= 5;
+        document.getElementById('bpmVal').textContent = bpm;
+        if (isPlaying) { togglePlay(); togglePlay(); }
+      }
+    });
+
+    document.getElementById('bpmPlus').addEventListener('click', () => {
+      if (bpm < 240) {
+        bpm += 5;
+        document.getElementById('bpmVal').textContent = bpm;
+        if (isPlaying) { togglePlay(); togglePlay(); }
+      }
+    });
+
+    // Startup initialization
+    initMatrixData();
+    renderGrid();
+  </script>
+</body>
+</html>
