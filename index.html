@@ -505,6 +505,49 @@
             color: #000;
         }
 
+/* --- Nested Start Menu Sub-Categories --- */
+.start-menu-item.has-submenu {
+    position: relative;
+    justify-content: space-between;
+}
+
+/* Classic Windows 98 flyout arrow indicator */
+.start-menu-item.has-submenu::after {
+    content: "";
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid black;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.start-menu-item.has-submenu:hover::after {
+    border-left-color: white;
+}
+
+/* Hidden sub-menu container */
+.start-submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -2px;
+    width: 200px;
+    background: var(--w98-bg);
+    border-top: 2px solid var(--w98-edge-light);
+    border-left: 2px solid var(--w98-edge-light);
+    border-right: 2px solid var(--w98-edge-dark);
+    border-bottom: 2px solid var(--w98-edge-dark);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+    padding: 2px;
+    z-index: 3001;
+}
+
+/* Display flyout sub-menu on hover */
+.start-menu-item.has-submenu:hover .start-submenu {
+    display: flex;
+    flex-direction: column;
+}
+
         /* --- Windows 98 Image Viewer & Media Player Shared Custom Styles --- */
         .w98-image-viewer-body {
             background: #d4d0c8 !important;
@@ -1738,7 +1781,7 @@
 <iframe src="mission_control_game.html" width="100%" height="100%" loading="lazy"></iframe>
             </div>  
 
-<div id="worm" class="window" style="max-width: 200px; height: 90dvh;">
+<div id="worm" class="window" style="max-width: 100%; height: 85%;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
                     <div class="title-text">
                         <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" width="16">Worm II</div>
@@ -1796,10 +1839,25 @@
         </main>
 
 <div id="start-menu" class="w98-start-menu">
-            <div class="start-menu-sidebar">
-                <span> </span>
+    <div class="start-menu-sidebar">
+        <span> </span>
+    </div>
+    <div class="start-menu-links">
+
+        <!-- System & General Utilities -->
+        <button class="start-menu-item" onclick="openWindow('aboutme_tradingcard'); hideStartMenu();">
+            <img src="https://win98icons.alexmeub.com/icons/png/users-2.png" alt="Icon"> About Me
+        </button>
+        <button class="start-menu-item" onclick="openWindow('resume-win'); hideStartMenu();">
+            <img src="https://win98icons.alexmeub.com/icons/png/printer-2.png" alt="Icon"> Resume
+        </button>
+                        <div class="start-menu-divider"></div>
+        <!-- Projects Sub-Menu -->
+        <div class="start-menu-item has-submenu">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://win98icons.alexmeub.com/icons/png/directory_open_cabinet_fc-2.png" alt="Projects Icon"> Projects
             </div>
-            <div class="start-menu-links">
+            <div class="start-submenu">
                 <button class="start-menu-item" onclick="openWindow('proj-murakami'); hideStartMenu();">
                     <img src="https://www.kaikaikiki.com/favicon.ico" alt="Icon"> Murakami
                 </button>
@@ -1815,30 +1873,44 @@
                 <button class="start-menu-item" onclick="openWindow('proj-animation'); hideStartMenu();">
                     <img src="https://win98icons.alexmeub.com/icons/png/movie_maker-1.png" alt="Icon"> Animations
                 </button>
-                <div class="start-menu-divider"></div>
-                <button class="start-menu-item" onclick="openWindow('chatbox'); hideStartMenu();">
-                    <img src="https://win98icons.alexmeub.com/icons/png/mailbox_world-0.png" alt="Icon"> ChatBox
-                </button>
+            </div>
+        </div>
+
+        <!-- Games Sub-Menu -->
+        <div class="start-menu-item has-submenu">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://win98icons.alexmeub.com/icons/png/joystick-2.png" alt="Games Icon"> Games
+            </div>
+            <div class="start-submenu">
                 <button class="start-menu-item" onclick="openWindow('minesweeper-win'); hideStartMenu();">
                     <img src="assets/img/Microsoft_Minesweeper_(1990).svg" alt="Icon"> Minesweeper
                 </button>
                 <button class="start-menu-item" onclick="openWindow('banana'); hideStartMenu();">
-                    <p width="15">🍌 </p> Banana Clicker
+                    <span style="font-size: 14px;">🍌</span> Banana Clicker
                 </button>
                 <button class="start-menu-item" onclick="openWindow('game-doom'); hideStartMenu();">
                     <img src="https://user-images.githubusercontent.com/63191757/107875047-8c7bed80-6eb5-11eb-92b0-5580b2a4ec51.png" alt="Doom"> DOOM (PC Only)
                 </button>
                 <button class="start-menu-item" onclick="openWindow('mission_control'); hideStartMenu();">
-                    <img src="https://win98icons.alexmeub.com/icons/png/channels-2.png" alt="MissionControl"> Mission Control
+                    <img src="https://win98icons.alexmeub.com/icons/png/channels-2.png" alt="Mission Control"> Mission Control
                 </button>
                 <button class="start-menu-item" onclick="openWindow('worm'); hideStartMenu();">
                     <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" alt="Worm II"> Worm II
                 </button>
-                <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
-                    <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
-                </button>
             </div>
         </div>
+
+        <div class="start-menu-divider"></div>
+
+        <!-- System & General Utilities -->
+        <button class="start-menu-item" onclick="openWindow('chatbox'); hideStartMenu();">
+            <img src="https://win98icons.alexmeub.com/icons/png/mailbox_world-0.png" alt="Icon"> ChatBox
+        </button>
+        <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
+            <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
+        </button>
+    </div>
+</div>
 
 <footer class="w98-taskbar">
             <div class="w98-start-btn" id="start-btn" onclick="toggleStartMenu(event)">
@@ -1868,13 +1940,13 @@
     </div>
 
     <div id="desktop-context-menu" class="w98-context-menu">
-        <div class="context-menu-item" onclick="openWindow('about-win')"><span>About Me</span></div>
-        <div class="context-menu-item" onclick="openWindow('work-win')"><span>My Work</span></div>
-        <div class="context-menu-item" onclick="openWindow('minesweeper-win')"><span>Minesweeper</span></div>
+        <div class="context-menu-item" onclick="openWindow('aboutme_tradingcard'); hideContextMenu()"><span>About Me</span></div>
+        <div class="context-menu-item" onclick="openWindow('work-win'); hideContextMenu()"><span>My Work</span></div>
+        <div class="context-menu-item" onclick="openWindow('minesweeper-win'); hideContextMenu()"><span>Minesweeper</span></div>
         <div class="context-menu-divider"></div>
-        <div class="context-menu-item" onclick="window.location.reload();"><span>Refresh</span></div>
+        <div class="context-menu-item" onclick="window.location.reload(); hideContextMenu()"><span>Refresh</span></div>
         <div class="context-menu-divider"></div>
-        <div class="context-menu-item" onclick="openWindow('display-properties-win')"><span>Properties</span></div>
+        <div class="context-menu-item" onclick="openWindow('display-properties-win'); hideContextMenu()"><span>Properties</span></div>
     </div>
 
     <div id="bsod-screen" class="bsod-overlay">
