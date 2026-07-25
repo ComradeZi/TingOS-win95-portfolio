@@ -1737,6 +1737,19 @@
                 </div>
 <iframe src="mission_control_game.html" width="100%" height="100%" loading="lazy"></iframe>
             </div>  
+
+<div id="worm" class="window" style="max-width: 400px; height: 660px;">
+                <div class="title-bar" onpointerdown="dragStart(event)">
+                    <div class="title-text">
+                        <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" width="16">Worm II</div>
+                    <div class="title-controls">
+                        <div class="win-ctrl-btn" onclick="minimizeWindow('worm')">_</div>
+                        <div class="win-ctrl-btn max-btn" onclick="toggleMaximize('worm')">⛶</div>
+                        <div class="win-ctrl-btn close-btn" onclick="closeWindow('worm')">X</div>
+                    </div>
+                </div>
+<iframe src="snake.html" width="100%" height="100%" loading="lazy"></iframe>
+</div>  
           
 <div id="display-properties-win" class="window" style="max-width: 400px; height: 430px;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
@@ -1817,6 +1830,9 @@
                 </button>
                 <button class="start-menu-item" onclick="openWindow('mission_control'); hideStartMenu();">
                     <img src="https://win98icons.alexmeub.com/icons/png/channels-2.png" alt="MissionControl"> Mission Control
+                </button>
+                <button class="start-menu-item" onclick="openWindow('worm'); hideStartMenu();">
+                    <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" alt="Worm II"> Worm II
                 </button>
                 <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
                     <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
