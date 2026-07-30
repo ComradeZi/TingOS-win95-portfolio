@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Nokia SVG - Snake II</title>
+  <title>Nokia SVG - Fixed 3D Wireframe Snake II</title>
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -41,9 +43,9 @@
     .phone-wrapper {
       position: relative;
       width: 125%; 
-      max-width: 480px;
+      max-width: 430px;
       aspect-ratio: 128.4 / 300;
-      transform: translateY(-22%);
+      transform: translateY(-17%);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -61,13 +63,13 @@
     .lcd-display {
       width: 100%;
       height: 100%;
-      background-color: #6abf81;
+      background-color: #0a0a0a;
       display: flex;
       flex-direction: column;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
-      border: 1.5px solid #2d5237;
+      border: 1.5px solid #1a1a1a;
       font-family: monospace;
     }
     
@@ -76,40 +78,54 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #5ea872;
+      background-color: #1a1a1a;
       padding: 2px 4px;
       font-size: 7px;
       font-weight: bold;
-      color: #0d2613;
-      border-bottom: 1.5px solid #2d5237;
+      color: #72db85;
+      border-bottom: 1.5px solid #222222;
       height: 12px;
       box-sizing: border-box;
       flex-shrink: 0;
+      z-index: 2;
     }
 
-    #sound-toggle {
-      cursor: pointer;
-      font-size: 8px;
+    /* Bonus Progress Timer Line */
+    #bonus-timer-bar {
+      position: absolute;
+      top: 12px;
+      left: 0;
+      height: 2px;
+      background-color: #ffd700;
+      width: 0%;
+      z-index: 3;
+      transition: width 0.1s linear;
     }
 
-    /* Dedicated Playable Canvas Area below the HUD */
-    canvas {
+    /* Dedicated 3D Canvas Host Container */
+    #canvas-container {
       width: 100%;
       flex-grow: 1;
-      image-rendering: pixelated;
-      background-color: #6abf81;
+      background-color: #0a0a0a;
+      display: block;
+      position: relative;
+    }
+
+    #canvas-container canvas {
+      width: 100% !important;
+      height: 100% !important;
       display: block;
     }
 
     .screen-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #6abf81;
+      background-color: #0a0a0a;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: #0d2613;
+      color: #72db85;
       text-align: center;
       z-index: 5;
     }
@@ -154,7 +170,6 @@
       transform: scale(0.92);
     }
     
-    /* Dynamic font sizing for key labels */
     .key-target .num {
       font-size: clamp(10px, 4.2cqw, 15px);
       font-weight: 800;
@@ -208,52 +223,33 @@
           <g id="g2981">
             <g id="g4323">
               <g id="g3410">
-                <!-- Outer Case Backing -->
                 <path id="path2424" class="st3" d="M99.27,299.7c6.28-.27,18.03-3.77,20.82-27.79,3.13-26.99,7.26-91.72,7.96-137.03.22-16.76.57-33.54.19-50.29-.81-20.33-2.59-40.6-5.57-60.7C119.01-.62,104.71.51,64.19.11,22.85-.3,9.38-.75,5.73,23.75,2.74,43.86.98,64.13.17,84.46c-.38,16.75-.03,33.52.19,50.29.7,45.31,4.83,110.04,7.96,137.03,2.78,24.02,14.52,27.51,20.8,27.78,23.38.49,46.77.65,70.16.15h0Z"/>
-                
-                <!-- Top Case Panel Logo -->
                 <text x="64.2" y="75" text-anchor="middle" class="nokia-case-logo">KNOCKOFF</text>
-
-                <!-- Front Bezel Plate -->
                 <path id="path3270" class="st1" d="M63.83,2.7c-9.8,0-32.22.9-34.37,1.19-2.9.39-13.94.19-16.65,14.51-2.71,14.32-5.52,32.23-6.39,49.75-2.11,37.76-2.24,69.82,11.23,97.76,5.28,10.95,19.03,31.1,46.1,31.1s43.72-19.87,49-30.83c13.47-27.95,10.58-60.27,8.47-98.03-.86-17.51-3.68-35.42-6.39-49.75-2.71-14.32-13.75-14.13-16.65-14.51-2.14-.29-24.56-1.19-34.37-1.19h0ZM64.2,6.14c8.34-.1,27.5,1.23,30.81,1.59,6.19.68,12.88,1.38,14.77,13.55,6.66,38.74,8.6,79.76.56,118.53-3.95,13.41-13.88,21.52-15.82,22.14l-4.23-.14c-1.37,2.61-10.07,10.26-26.08,10.26s-24.72-7.65-26.08-10.26l-4.23.14c-1.94-.62-11.85-8.72-15.8-22.14-8.04-38.77-6.12-79.78.54-118.53,1.89-12.17,8.6-12.87,14.79-13.55,8.23-.73,22.45-1.5,30.79-1.59h0Z"/>
-                
-                <!-- Numpad Keys Base -->
                 <path id="path2429" class="st5" d="M21.39,196.7c-3.19.03-5.54,1.04-6.33,3.61-1.28,4.1,2.57,9.68,9.2,11.26s14.26,1.82,14.97-2.42-5.09-10.05-11.36-11.55c-2.35-.56-4.56-.91-6.47-.9h0ZM107.03,196.7c-1.91-.02-4.13.33-6.49.9-6.28,1.5-12.06,7.31-11.35,11.55.71,4.24,8.33,4.01,14.96,2.42s10.49-7.16,9.21-11.26c-.8-2.56-3.15-3.58-6.33-3.61h0ZM64.21,201.76c-6.45,0-13.46,2.16-13.75,6.35-.3,4.38,6.93,8.59,13.75,8.59s14.06-4.19,13.77-8.57c-.28-4.2-7.31-6.37-13.77-6.37ZM22.9,217.84c-3.19.03-5.54,1.03-6.33,3.59-1.28,4.1,2.57,9.68,9.2,11.26s14.26,1.82,14.97-2.42c.71-4.24-5.09-10.05-11.36-11.55-2.35-.56-4.56-.9-6.47-.88h0ZM105.52,217.84c-1.91-.02-4.13.32-6.49.88-6.28,1.5-12.06,7.31-11.35,11.55.71,4.24,8.33,4.01,14.96,2.42,6.63-1.58,10.49-7.16,9.21-11.26-.8-2.56-3.15-3.56-6.33-3.59h0ZM64.21,223.09c-6.45,0-13.46,2.14-13.75,6.33-.3,4.38,6.93,8.6,13.75,8.6s14.06-4.21,13.77-8.59c-.28-4.2-7.31-6.35-13.77-6.35ZM24.14,238.96c-3.19.03-5.55,1.03-6.35,3.59-1.28,4.1,2.59,9.7,9.21,11.28s14.25,1.8,14.96-2.44-5.07-10.05-11.35-11.55c-2.35-.56-4.56-.9-6.47-.88h0ZM104.29,238.96c-1.91-.02-4.12.32-6.47.88-6.28,1.5-12.07,7.31-11.36,11.55s8.34,4.02,14.97,2.44,10.47-7.18,9.2-11.28c-.8-2.56-3.15-3.56-6.33-3.59h0ZM64.22,244.39c-6.45,0-13.46,2.16-13.75,6.35-.3,4.38,6.93,8.59,13.75,8.59s14.06-4.19,13.77-8.57c-.28-4.2-7.31-6.37-13.77-6.37ZM25.36,260.08c-3.19.03-5.54,1.03-6.33,3.59-1.28,4.1,2.59,9.7,9.21,11.28s14.25,1.82,14.96-2.42-5.07-10.07-11.35-11.57c-2.35-.56-4.57-.9-6.49-.88h0ZM103.06,260.08c-1.91-.02-4.12.32-6.47.88-6.28,1.5-12.06,7.33-11.35,11.57.71,4.24,8.33,4.01,14.96,2.42,6.63-1.58,10.49-7.18,9.21-11.28-.8-2.56-3.16-3.56-6.35-3.59h0ZM64.22,265.72c-6.45,0-13.46,2.16-13.75,6.35-.3,4.38,6.93,8.59,13.75,8.59s14.06-4.19,13.77-8.57c-.28-4.2-7.31-6.37-13.77-6.37Z"/>
-                
-                <!-- Earpiece Grill -->
                 <path id="path3232" d="M64.21,7.01c-.41,0-.79.21-1.12.54-.33.33-.62.81-.9,1.39-.55,1.17-1.03,2.82-1.44,4.84-.81,4.06-1.3,9.63-1.3,15.79s.49,11.73,1.3,15.79c.41,2.03.89,3.68,1.44,4.84.28.58.57,1.04.9,1.37.33.33.71.54,1.12.54s.79-.21,1.12-.54c.33-.33.62-.79.9-1.37.55-1.17,1.03-2.82,1.44-4.84.81-4.06,1.3-9.63,1.3-15.79s-.49-11.73-1.3-15.79c-.41-2.03-.89-3.68-1.44-4.84-.28-.58-.57-1.05-.9-1.39-.33-.33-.71-.54-1.12-.54ZM64.21,7.64c.2,0,.42.1.68.36.25.26.52.68.78,1.22.51,1.09.99,2.69,1.39,4.69.8,4,1.29,9.55,1.29,15.67s-.49,11.67-1.29,15.67c-.4,2-.88,3.61-1.39,4.69-.26.54-.53.94-.78,1.2-.25.26-.48.37-.68.37s-.42-.11-.68-.37c-.25-.26-.51-.66-.76-1.2-.51-1.09-.99-2.69-1.39-4.69-.8-4-1.3-9.55-1.3-15.67s.51-11.67,1.3-15.67c.4-2,.88-3.61,1.39-4.69.26-.54.51-.96.76-1.22.25-.26.48-.36.68-.36Z"/>
                 <path id="path3234" d="M64.21,12.26c-1.17,0-2.13.36-2.13.81s.96.83,2.13.83,2.12-.38,2.12-.83-.95-.81-2.12-.81ZM64.21,20.22c-1.17,0-2.13.38-2.13.83s.96.81,2.13.81,2.12-.36,2.12-.81-.95-.83-2.12-.83ZM64.21,28.2c-1.17,0-2.13.36-2.13.81s.96.83,2.13.83,2.12-.38,2.12-.83-.95-.81-2.12-.81ZM64.21,36.18c-1.17,0-2.13.36-2.13.81s.96.83,2.13.83,2.12-.38,2.12-.83-.95-.81-2.12-.81ZM64.21,44.14c-1.17,0-2.13.38-2.13.83s.96.81,2.13.81,2.12-.36,2.12-.81-.95-.83-2.12-.83Z"/>
-                
-                <!-- Upper Nav Buttons -->
                 <path id="path3245" class="st2" d="M101.39,163.7c-1.05.06-1.83.9-3.03,2.37-6.04,7.42-21.29,9.98-21.29,9.98-5.18.87-4.62,3.4-4.51,4.83.16,1.96.99,7.59,1.85,11.42.63,2.81,3.6,1.98,5.15,1.42,9.71-3.49,21.93-11.57,27.34-20.27,2.03-3.27,3.15-4.48.46-6.49-.73-.54-1.63-1.11-2.69-1.85-1.47-1.01-2.45-1.45-3.27-1.41h0ZM28.21,164.56c-1.47-.07-2.86,1.47-2.86,1.47l-3.51,2.81c-.41.87-.7,1.76.15,3-.32.6,8.49,10.93,10.94,12.6,1.15.79,3.19,3.11,5.35.63l4.91-5.62c.83-.95,3.7-3.49-.54-5.54-4.75-1.91-9.34-4.87-13.01-8.64-.46-.5-.95-.69-1.44-.71h0Z"/>
                 <path id="path3252" class="st2" d="M64.21,158.14c-7.75.06-15.06-.16-22.06,1.59-3.02,1.01-2.59,2.09-1.32,3.57,2.58,3.02,14.28,8.13,23.38,7.99s16.89-2.71,23.38-7.99c1.27-1.49,1.72-2.57-1.3-3.57-3.79-1.31-14.33-1.65-22.08-1.59h0Z"/>
                 <path id="rect3259" class="st4" d="M55.94,163.82h16.55c.68,0,1.23.55,1.23,1.23h0c0,.68-.55,1.23-1.23,1.23h-16.55c-.68,0-1.23-.55-1.23-1.23h0c0-.68.55-1.23,1.23-1.23Z"/>
-                
-                <!-- Screen Outer Green Area -->
                 <path id="path3263" class="st0" d="M64.21,145.07c9.51-.01,29.29-.31,38.3-1.06,1.54-.19,4.52-.42,5.23-5.22.72-4.84,2.42-44.12,1.93-51.3-.49-7.2-4.44-6.58-6.96-6.62-25.65-.76-51.31-.45-76.96,0-2.52.04-6.48-.57-6.96,6.62-.49,7.19,1.21,46.46,1.93,51.3.72,4.8,3.68,5.02,5.22,5.22,3.78.48,28.67,1.07,38.28,1.06h0Z"/>
-                
-                <!-- NOKIA Screen Bezel Logo -->
                 <text x="64.2" y="75" text-anchor="middle" class="nokia-logo-text">KNOCKOFF</text>
 
-                <!-- Embedded Active LCD Display Container -->
                 <foreignObject x="24" y="84" width="80" height="58">
                   <div class="lcd-display" xmlns="http://www.w3.org/1999/xhtml">
-                    <!-- HUD Top Bar -->
                     <div class="hud">
                       <span id="score-label">SCORE: 0000</span>
-                      <div>
-                        <span id="speed-label">Lv1</span>
-                      </div>
+                      <span id="speed-label">Lv1</span>
                     </div>
-                    
-                    <!-- Dedicated Canvas -->
-                    <canvas id="gameCanvas" width="120" height="68"></canvas>                  
+
+                    <div id="bonus-timer-bar"></div>
+                    <div id="canvas-container"></div>                  
                     
                     <div id="splash-screen" class="screen-overlay">
                       <h2>WORM II</h2>
                       <p>Press [2/Space]</p>
                       <p>to Play</p>
-                      <p style="font-size: 5px; margin-top: 4px; opacity: 0.8;">Keys: 2=▲ 8=▼ 4=◄ 6=►</p>
+                      <p style="font-size: 5px; margin-top: 4px; opacity: 0.8;">Keys: 2=▲ 5=▼ 4=◄ 6=►</p>
                     </div>
                     
                     <div id="gameover-screen" class="screen-overlay hidden">
@@ -272,7 +268,6 @@
       </g>
     </svg>
 
-    <!-- Keypad Overlay with Labels -->
     <div class="keypad-overlay">
       <div class="key-target" id="key-action" style="top: 52.5%; left: 32%; width: 36%; height: 6%;"></div>
 
@@ -290,7 +285,7 @@
         <span class="num">◄ 4</span><span class="sub">GHI</span>
       </div>
       <div class="key-target" id="key-5" style="top: 73.5%; left: 39%; width: 22%; height: 7%;">
-        <span class="num">5</span><span class="sub">JKL</span>
+        <span class="num">▼ 5</span><span class="sub">JKL</span>
       </div>
       <div class="key-target dir-highlight" id="key-6" style="top: 72%; left: 66%; width: 22%; height: 7%;">
         <span class="num">6 ►</span><span class="sub">MNO</span>
@@ -300,7 +295,7 @@
         <span class="num">7</span><span class="sub">PQRS</span>
       </div>
       <div class="key-target dir-highlight" id="key-8" style="top: 80.5%; left: 39%; width: 22%; height: 7%;">
-        <span class="num">▼ 8</span><span class="sub">TUV</span>
+        <span class="num">8</span><span class="sub">TUV</span>
       </div>
       <div class="key-target" id="key-9" style="top: 79%; left: 65%; width: 22%; height: 7%;">
         <span class="num">9</span><span class="sub">WXYZ</span>
@@ -320,9 +315,8 @@
 </div>
 
 <script>
-  // --- RETRO SOUND SYNTHESIZER (Web Audio API) ---
+  // --- RETRO SOUND SYNTHESIZER ---
   let audioCtx = null;
-  let isMuted = false;
 
   function initAudio() {
     if (!audioCtx) {
@@ -337,7 +331,7 @@
   }
 
   function playTone(freq, type, duration) {
-    if (isMuted || !audioCtx) return;
+    if (!audioCtx) return;
     try {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -363,6 +357,20 @@
     setTimeout(() => playTone(1200, 'square', 0.06), 50);
   }
 
+  function playBonusEatSound() {
+    initAudio();
+    [523, 659, 783, 1046].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'square', 0.08), i * 45);
+    });
+  }
+
+  function playLevelUpSound() {
+    initAudio();
+    [440, 554, 659, 880, 1108].forEach((f, i) => {
+      setTimeout(() => playTone(f, 'triangle', 0.1), i * 60);
+    });
+  }
+
   function playGameOverSound() {
     initAudio();
     const notes = [400, 300, 200, 150];
@@ -371,45 +379,275 @@
     });
   }
 
-  function toggleMute() {
-    isMuted = !isMuted;
-    document.getElementById('sound-toggle').innerText = isMuted ? ' 🔇' : ' 🔊';
+  // --- THREE.JS SCENE SETUP ---
+  const container = document.getElementById('canvas-container');
+  const cols = 22;
+  const rows = 14;
+
+  const scene = new THREE.Scene();
+  // BLACK BACKGROUND SKY
+  scene.background = new THREE.Color(0x0a0a0a);
+
+  const aspect = 240 / 136;
+  const camera = new THREE.PerspectiveCamera(40, aspect, .1, 1000); 
+  camera.position.set(0, 18, 14); 
+  camera.lookAt(0, -0.5, 0.6);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(240, 136);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.5));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+
+  const ambientLight = new THREE.AmbientLight(0x666666, 0.95);
+  scene.add(ambientLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
+  dirLight.position.set(8, 22, 10);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
+  scene.add(dirLight);
+
+  // --- MOVING 3D CLOUDS (DARKER GREY FOR BLACK SKY) ---
+  const cloudsGroup = new THREE.Group();
+  const cloudMat = new THREE.MeshLambertMaterial({ color: 0x444444, transparent: true, opacity: 0.6 });
+
+  function createCloud() {
+    const cloud = new THREE.Group();
+    const puffGeo = new THREE.DodecahedronGeometry(1, 0);
+    
+    for (let i = 0; i < 5; i++) {
+      const puff = new THREE.Mesh(puffGeo, cloudMat);
+      puff.position.set(
+        (Math.random() - 0.5) * 2,
+        (Math.random() - 0.5) * 0.5,
+        (Math.random() - 0.5) * 1.5
+      );
+      const s = 0.8 + Math.random() * 0.8;
+      puff.scale.set(s, s, s);
+      cloud.add(puff);
+    }
+    return cloud;
   }
 
-  // --- GAME ENGINE ---
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-  
-  const splashScreen = document.getElementById('splash-screen');
-  const gameoverScreen = document.getElementById('gameover-screen');
-  const scoreLabel = document.getElementById('score-label');
-  const speedLabel = document.getElementById('speed-label');
-  const finalScore = document.getElementById('final-score');
+  const cloudsList = [];
+  for (let i = 0; i < 6; i++) {
+    const c = createCloud();
+    c.position.set(
+      (Math.random() - 0.5) * 40,
+      8 + Math.random() * 4,
+      -10 - Math.random() * 20
+    );
+    cloudsGroup.add(c);
+    cloudsList.push(c);
+  }
+  scene.add(cloudsGroup);
 
-  const gridSize = 4; 
-  const cols = canvas.width / gridSize;  // 30
-  const rows = canvas.height / gridSize; // 17
-  
+  // --- GROUND & GRASSLAND ENVIRONMENT ---
+  function createProceduralTerrainTexture() {
+    const canvasTex = document.createElement('canvas');
+    canvasTex.width = 256;
+    canvasTex.height = 256;
+    const c = canvasTex.getContext('2d');
+
+    c.fillStyle = '#2b3d2b';
+    c.fillRect(0, 0, 256, 256);
+
+    c.fillStyle = '#223322';
+    for (let x = 0; x < 256; x += 16) {
+      for (let y = 0; y < 256; y += 16) {
+        if ((x + y) % 32 === 0) c.fillRect(x, y, 16, 16);
+      }
+    }
+
+    c.fillStyle = '#1c2b1c';
+    for (let i = 0; i < 150; i++) {
+      let px = Math.random() * 256;
+      let py = Math.random() * 256;
+      c.fillRect(px, py, 2, 2);
+    }
+
+    const texture = new THREE.CanvasTexture(canvasTex);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(1, 1);
+    return texture;
+  }
+
+  const terrainTex = createProceduralTerrainTexture();
+  const groundGeo = new THREE.BoxGeometry(cols + 2, 1.5, rows + 2);
+  const groundMat = new THREE.MeshLambertMaterial({ map: terrainTex, color: 0xffffff });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.position.set(0, -0.75, 0);
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  const cliffGeo = new THREE.BoxGeometry(cols + 2.2, 3, rows + 2.2);
+  const cliffMat = new THREE.MeshLambertMaterial({ color: 0x182618 });
+  const cliff = new THREE.Mesh(cliffGeo, cliffMat);
+  cliff.position.set(0, -2.25, 0);
+  scene.add(cliff);
+
+  // Surround Grassland Plane (Behind the main board)
+  const outerGrassGeo = new THREE.PlaneGeometry(80, 80);
+  const outerGrassMat = new THREE.MeshLambertMaterial({ color: 0x1c2b1c });
+  const outerGrass = new THREE.Mesh(outerGrassGeo, outerGrassMat);
+  outerGrass.rotation.x = -Math.PI / 2;
+  outerGrass.position.set(0, -1.5, 0);
+  outerGrass.receiveShadow = true;
+  scene.add(outerGrass);
+
+  // SWAYING GRASS TUFTS
+  const grassGroup = new THREE.Group();
+  const grassBlades = [];
+  const grassGeo = new THREE.ConeGeometry(0.12, 0.45, 3);
+  const grassMat = new THREE.MeshLambertMaterial({ color: 0x223322 });
+
+  for (let i = 0; i < 1000; i++) {
+    const blade = new THREE.Mesh(grassGeo, grassMat);
+    let rx = (Math.random() - 0.5) * (cols + 20);
+    let rz = (Math.random() - 0.5) * (rows + 20);
+    
+    if (Math.abs(rx) < cols / 2 && Math.abs(rz) < rows / 2) {
+      rx += (rx > 0 ? 3 : -3);
+    }
+    
+    blade.position.set(rx, -1.25, rz);
+    blade.rotation.x = (Math.random() - 0.5) * 0.2;
+    blade.rotation.z = (Math.random() - 0.5) * 0.2;
+    grassGroup.add(blade);
+    grassBlades.push(blade);
+  }
+  scene.add(grassGroup);
+
+  // Environment Border Trees
+  const envGroup = new THREE.Group();
+  function createLowPolyTree(x, z) {
+    const tree = new THREE.Group();
+    const trunk = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.2, 1.2, 5),
+      new THREE.MeshLambertMaterial({ color: 0x0f1a0f })
+    );
+    trunk.position.y = 0.6;
+    trunk.castShadow = true;
+    tree.add(trunk);
+
+    const leaves = new THREE.Mesh(
+      new THREE.ConeGeometry(0.75, 1.8, 5),
+      new THREE.MeshLambertMaterial({ color: 0x182618 })
+    );
+    leaves.position.y = 1.8;
+    leaves.castShadow = true;
+    tree.add(leaves);
+
+    tree.position.set(x, 0, z);
+    return tree;
+  }
+
+  const marginX = cols / 2 + 0.8;
+  const marginZ = rows / 2 + 0.8;
+
+  [-marginX, marginX].forEach(x => {
+    for (let z = -marginZ; z <= marginZ; z += 3.5) {
+      envGroup.add(createLowPolyTree(x, z + (Math.random() - 0.5)));
+    }
+  });
+  [-marginZ, marginZ].forEach(z => {
+    for (let x = -marginX + 2; x <= marginX - 2; x += 3.5) {
+      envGroup.add(createLowPolyTree(x + (Math.random() - 0.5), z));
+    }
+  });
+  scene.add(envGroup);
+
+  // --- MATERIALS ---
+  const snakeFillMat = new THREE.MeshLambertMaterial({ color: 0x053a18, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const snakeWireLineMat = new THREE.LineBasicMaterial({ color: 0x20ff55, linewidth: 1 });
+
+  const foodFillMat = new THREE.MeshLambertMaterial({ color: 0x661100, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const foodWireLineMat = new THREE.LineBasicMaterial({ color: 0xff8800, linewidth: 1 });
+
+  const bonusFillMat = new THREE.MeshLambertMaterial({ color: 0x553300, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const bonusWireLineMat = new THREE.LineBasicMaterial({ color: 0xffd700, linewidth: 1 });
+
+  const eyeVisorMat = new THREE.MeshBasicMaterial({ color: 0x20ff55 });
+
+  // 3D Wireframe Orange Food Cube
+  const foodGroup = new THREE.Group();
+  const foodGeo = new THREE.BoxGeometry(0.85, 0.85, 0.85);
+  const foodMeshInner = new THREE.Mesh(foodGeo, foodFillMat);
+  const foodMeshWire = new THREE.LineSegments(new THREE.EdgesGeometry(foodGeo), foodWireLineMat);
+  foodGroup.add(foodMeshInner);
+  foodGroup.add(foodMeshWire);
+  scene.add(foodGroup);
+
+  // 3D Bonus Item (Gold Diamond)
+  const bonusGroup = new THREE.Group();
+  const bonusGeo = new THREE.OctahedronGeometry(0.6, 0);
+  const bonusInner = new THREE.Mesh(bonusGeo, bonusFillMat);
+  const bonusWire = new THREE.LineSegments(new THREE.EdgesGeometry(bonusGeo), bonusWireLineMat);
+  bonusGroup.add(bonusInner);
+  bonusGroup.add(bonusWire);
+  bonusGroup.visible = false;
+  scene.add(bonusGroup);
+
+  // 3D Snake Group
+  const snakeGroup = new THREE.Group();
+  scene.add(snakeGroup);
+
+  // GAME ENGINE STATE
   let snake = [];
   let direction = { x: 1, y: 0 };
   let nextDirection = { x: 1, y: 0 };
   let food = { x: 0, y: 0 };
+  
+  let bonusActive = false;
+  let bonusPos = { x: -1, y: -1 };
+  let bonusTimer = 0;
+  let bonusMaxTime = 30; 
+  let foodsEatenCount = 0;
+
   let score = 0;
   let gameInterval = null;
   let isRunning = false;
   let currentSpeed = 100;
 
+  // Rainbow Glow Effect State on Level Up
+  let rainbowEffectTimer = 0;
+  let rainbowMaxDuration = 40;
+
+  const splashScreen = document.getElementById('splash-screen');
+  const gameoverScreen = document.getElementById('gameover-screen');
+  const scoreLabel = document.getElementById('score-label');
+  const speedLabel = document.getElementById('speed-label');
+  const finalScore = document.getElementById('final-score');
+  const bonusTimerBar = document.getElementById('bonus-timer-bar');
+
+  function gridToWorld(x, y) {
+    return {
+      x: x - cols / 2 + 0.5,
+      z: y - rows / 2 + 0.5
+    };
+  }
+
   function initGame() {
     initAudio();
     snake = [
-      { x: 8, y: 8, hasDot: false },
-      { x: 7, y: 8, hasDot: false },
-      { x: 6, y: 8, hasDot: false }
+      { x: 6, y: 7, hasDot: false },
+      { x: 5, y: 7, hasDot: false },
+      { x: 4, y: 7, hasDot: false }
     ];
     direction = { x: 1, y: 0 };
     nextDirection = { x: 1, y: 0 };
     score = 0;
     currentSpeed = 100;
+    foodsEatenCount = 0;
+    rainbowEffectTimer = 0;
+    bonusActive = false;
+    bonusGroup.visible = false;
+    bonusTimerBar.style.width = '0%';
+    
     updateHUD();
     spawnFood();
     
@@ -426,8 +664,26 @@
     while (!validPosition) {
       food.x = Math.floor(Math.random() * cols);
       food.y = Math.floor(Math.random() * rows);
-      validPosition = !snake.some(cell => cell.x === food.x && cell.y === food.y);
+      validPosition = !snake.some(cell => cell.x === food.x && cell.y === food.y) &&
+                      !(bonusActive && bonusPos.x === food.x && bonusPos.y === food.y);
     }
+    const pos = gridToWorld(food.x, food.y);
+    foodGroup.position.set(pos.x, 0.45, pos.z);
+  }
+
+  function spawnBonus() {
+    let validPosition = false;
+    while (!validPosition) {
+      bonusPos.x = Math.floor(Math.random() * cols);
+      bonusPos.y = Math.floor(Math.random() * rows);
+      validPosition = !snake.some(cell => cell.x === bonusPos.x && cell.y === bonusPos.y) &&
+                      !(food.x === bonusPos.x && food.y === bonusPos.y);
+    }
+    const pos = gridToWorld(bonusPos.x, bonusPos.y);
+    bonusGroup.position.set(pos.x, 0.6, pos.z);
+    bonusActive = true;
+    bonusGroup.visible = true;
+    bonusTimer = bonusMaxTime;
   }
 
   function gameLoop() {
@@ -447,72 +703,200 @@
     }
 
     let ateFood = (headX === food.x && headY === food.y);
+    let ateBonus = (bonusActive && headX === bonusPos.x && headY === bonusPos.y);
+
+    if (bonusActive) {
+      bonusTimer--;
+      let pct = (bonusTimer / bonusMaxTime) * 100;
+      bonusTimerBar.style.width = `${Math.max(0, pct)}%`;
+      if (bonusTimer <= 0) {
+        bonusActive = false;
+        bonusGroup.visible = false;
+        bonusTimerBar.style.width = '0%';
+      }
+    }
 
     for (let i = snake.length - 1; i > 0; i--) {
       snake[i].hasDot = snake[i - 1].hasDot;
     }
 
-    snake.unshift({ x: headX, y: headY, hasDot: ateFood });
+    snake.unshift({ x: headX, y: headY, hasDot: ateFood || ateBonus });
 
     if (ateFood) {
       playEatSound();
       score += 10;
+      foodsEatenCount++;
+      
+      // TRIGGER RAINBOW GLOW EFFECT ON LEVEL UP (Every 50 points)
+      if (score % 50 === 0) {
+        rainbowEffectTimer = rainbowMaxDuration;
+        playLevelUpSound();
+        if (currentSpeed > 40) {
+          currentSpeed -= 8;
+          clearInterval(gameInterval);
+          gameInterval = setInterval(gameLoop, currentSpeed);
+        }
+      }
+
       updateHUD();
       spawnFood();
-      
-      if (score % 50 === 0 && currentSpeed > 40) {
-        currentSpeed -= 8;
-        clearInterval(gameInterval);
-        gameInterval = setInterval(gameLoop, currentSpeed);
+
+      if (foodsEatenCount % 5 === 0 && !bonusActive) {
+        spawnBonus();
       }
+    } else if (ateBonus) {
+      playBonusEatSound();
+      score += 30;
+      
+      if (score % 50 === 0) {
+        rainbowEffectTimer = rainbowMaxDuration;
+        playLevelUpSound();
+      }
+
+      bonusActive = false;
+      bonusGroup.visible = false;
+      bonusTimerBar.style.width = '0%';
+      updateHUD();
     } else {
       snake.pop();
     }
 
-    render();
+    render3DSnake();
   }
 
-  function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#0d2613';
-    ctx.fillRect(food.x * gridSize + 1, food.y * gridSize + 1, gridSize - 2, gridSize - 2);
+  // --- RENDER DYNAMIC 3D SNAKE WITH RAINBOW GLOW ---
+  function render3DSnake() {
+    while (snakeGroup.children.length > 0) {
+      snakeGroup.remove(snakeGroup.children[0]);
+    }
 
     let head = snake[0];
     let nextX = (head.x + direction.x + cols) % cols;
     let nextY = (head.y + direction.y + rows) % rows;
-    let isNextToFood = (nextX === food.x && nextY === food.y);
+    
+    let isNextToTarget = (nextX === food.x && nextY === food.y) || 
+                         (bonusActive && nextX === bonusPos.x && nextY === bonusPos.y);
 
     snake.forEach((cell, index) => {
-      let px = cell.x * gridSize;
-      let py = cell.y * gridSize;
+      const pos = gridToWorld(cell.x, cell.y);
+      const segmentGroup = new THREE.Group();
 
-      ctx.fillStyle = '#0d2613';
+      let currentFillMat = snakeFillMat;
+      let currentWireMat = snakeWireLineMat;
+
+      // Rainbow Glow color calculation
+      if (rainbowEffectTimer > 0) {
+        let hue = ((Date.now() * 0.005) - (index / snake.length) * 0.8) % 1.0;
+        if (hue < 0) hue += 1.0;
+
+        currentFillMat = new THREE.MeshLambertMaterial({ 
+          color: new THREE.Color().setHSL(hue, 0.9, 0.4),
+          polygonOffset: true,
+          polygonOffsetFactor: 1,
+          polygonOffsetUnits: 1
+        });
+
+        currentWireMat = new THREE.LineBasicMaterial({ 
+          color: new THREE.Color().setHSL(hue, 1.0, 0.75), 
+          linewidth: 1.5 
+        });
+      }
 
       if (index === 0) {
-        if (isNextToFood) {
-          ctx.fillRect(px, py, gridSize, gridSize);
-          ctx.fillStyle = '#6abf81';
-          if (direction.x === 1) ctx.fillRect(px + 2, py + 1, 2, 2);
-          else if (direction.x === -1) ctx.fillRect(px, py + 1, 2, 2);
-          else if (direction.y === 1) ctx.fillRect(px + 1, py + 2, 2, 2);
-          else if (direction.y === -1) ctx.fillRect(px + 1, py, 2, 2);
+        // --- 3D SNAKE HEAD ---
+        const headPivot = new THREE.Group();
+
+        const upperJawGeo = new THREE.BoxGeometry(0.85, 0.4, 0.85);
+        const upperInner = new THREE.Mesh(upperJawGeo, currentFillMat);
+        const upperWire = new THREE.LineSegments(new THREE.EdgesGeometry(upperJawGeo), currentWireMat);
+        const upperJaw = new THREE.Group();
+        upperJaw.add(upperInner); upperJaw.add(upperWire);
+
+        const lowerJawGeo = new THREE.BoxGeometry(0.85, 0.35, 0.85);
+        const lowerInner = new THREE.Mesh(lowerJawGeo, currentFillMat);
+        const lowerWire = new THREE.LineSegments(new THREE.EdgesGeometry(lowerJawGeo), currentWireMat);
+        const lowerJaw = new THREE.Group();
+        lowerJaw.add(lowerInner); lowerJaw.add(lowerWire);
+
+        const eyeGeo = new THREE.BoxGeometry(0.88, 0.1, 0.2);
+        const eyes = new THREE.Mesh(eyeGeo, eyeVisorMat);
+        eyes.position.set(0, 0.1, -0.2);
+        upperJaw.add(eyes);
+
+        if (isNextToTarget) {
+          upperJaw.position.set(0, 0.3, 0);
+          lowerJaw.position.set(0, -0.2, 0);
         } else {
-          ctx.fillRect(px, py, gridSize, gridSize);
+          upperJaw.position.set(0, 0.2, 0);
+          lowerJaw.position.set(0, -0.15, 0);
         }
+
+        headPivot.add(upperJaw);
+        headPivot.add(lowerJaw);
+
+        let rotY = 0;
+        if (direction.x === 1) rotY = Math.PI / 2;
+        else if (direction.x === -1) rotY = -Math.PI / 2;
+        else if (direction.y === 1) rotY = Math.PI;
+        else if (direction.y === -1) rotY = 0;
+        
+        headPivot.rotation.y = rotY;
+
+        segmentGroup.add(headPivot);
+        segmentGroup.position.set(pos.x, 0.45, pos.z);
       } else {
+        let boxGeo;
         if (cell.hasDot) {
-          ctx.fillRect(px, py, gridSize, gridSize);
-          ctx.fillStyle = '#6abf81';
-          ctx.fillRect(px + 1, py + 1, gridSize - 2, gridSize - 2);
-          ctx.fillStyle = '#0d2613';
-          ctx.fillRect(px + 1, py + 1, gridSize - 2, gridSize - 2);
+          boxGeo = new THREE.BoxGeometry(1.05, 1.25, 1.05);
+          segmentGroup.position.set(pos.x, 0.55, pos.z);
         } else {
-          ctx.fillRect(px + 0.5, py + 0.5, gridSize - 1, gridSize - 1);
+          boxGeo = new THREE.BoxGeometry(0.85, 0.75, 0.85);
+          segmentGroup.position.set(pos.x, 0.38, pos.z);
         }
+
+        const innerFill = new THREE.Mesh(boxGeo, currentFillMat);
+        const thinWire = new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo), currentWireMat);
+        segmentGroup.add(innerFill);
+        segmentGroup.add(thinWire);
       }
+
+      snakeGroup.add(segmentGroup);
     });
   }
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Drifting Clouds
+    cloudsList.forEach(c => {
+      c.position.x += 0.02;
+      if (c.position.x > 25) c.position.x = -25;
+    });
+
+    // Swaying Grass Tufts Animation
+    const t = Date.now() * 0.003;
+    grassBlades.forEach((b, i) => {
+      b.rotation.z = Math.sin(t + i) * 0.12;
+    });
+
+    // Rainbow Effect Timer Countdown
+    if (rainbowEffectTimer > 0) {
+      rainbowEffectTimer--;
+      render3DSnake();
+    }
+
+    if (foodGroup) {
+      foodGroup.rotation.y += 0.05;
+      foodGroup.rotation.x += 0.02;
+      foodGroup.position.y = 0.5 + Math.sin(Date.now() * 0.006) * 0.12;
+    }
+    if (bonusActive && bonusGroup) {
+      bonusGroup.rotation.y += 0.08;
+      bonusGroup.position.y = 0.6 + Math.sin(Date.now() * 0.01) * 0.18;
+    }
+    renderer.render(scene, camera);
+  }
+  animate();
 
   function updateHUD() {
     scoreLabel.innerText = `SCORE: ${String(score).padStart(4, '0')}`;
@@ -525,6 +909,7 @@
     clearInterval(gameInterval);
     playGameOverSound();
     finalScore.innerText = score;
+    bonusTimerBar.style.width = '0%';
     gameoverScreen.classList.remove('hidden');
   }
 
@@ -553,14 +938,15 @@
     }
   }
 
+  // Keyboard Event Handlers
   window.addEventListener('keydown', (e) => {
     switch (e.key) {
       case 'ArrowUp':
       case '2':
         handleInput('UP'); triggerVisualFeedback('key-2'); break;
       case 'ArrowDown':
-      case '8':
-        handleInput('DOWN'); triggerVisualFeedback('key-8'); break;
+      case '5':
+        handleInput('DOWN'); triggerVisualFeedback('key-5'); break;
       case 'ArrowLeft':
       case '4':
         handleInput('LEFT'); triggerVisualFeedback('key-4'); break;
@@ -569,17 +955,18 @@
         handleInput('RIGHT'); triggerVisualFeedback('key-6'); break;
       case ' ':
       case 'Enter':
-      case '5':
+      case '8':
         handleInput('ACTION'); triggerVisualFeedback('key-action'); break;
     }
   });
 
+  // Mobile Touch Controls
   const mobileKeyMap = {
     'key-2': 'UP',
-    'key-8': 'DOWN',
+    'key-8': 'ACTION',
     'key-4': 'LEFT',
     'key-6': 'RIGHT',
-    'key-5': 'ACTION',
+    'key-5': 'DOWN',
     'key-action': 'ACTION'
   };
 
@@ -609,7 +996,7 @@
     }
   }
 
-  render();
+  render3DSnake();
 </script>
 
 </body>
