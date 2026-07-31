@@ -74,10 +74,19 @@
       z-index: 3;
       transition: width 0.1s linear;
     }
+    /* LCD content wrapper - applies the fisheye distortion */
+    .lcd-content {
+      width: 100%;
+      flex-grow: 1;
+      position: relative;
+      overflow: hidden;
+      filter: url(#fisheye);
+      z-index: 1;
+    }
     /* Dedicated 3D Canvas Host Container */
     #canvas-container {
       width: 100%;
-      flex-grow: 1;
+      height: 100%;
       background-color: #0a0a0a;
       display: block;
       position: relative;
@@ -86,6 +95,34 @@
       width: 100% !important;
       height: 100% !important;
       display: block;
+    }
+    /* Scanlines overlay */
+    .lcd-display::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.18) 0px,
+        rgba(0, 0, 0, 0.18) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 10;
+    }
+    /* Vignette overlay */
+    .lcd-display::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(0, 0, 0, 0.55) 100%
+      );
+      pointer-events: none;
+      z-index: 11;
     }
     .screen-overlay {
       position: absolute;
@@ -122,56 +159,72 @@
       background: #111;
       touch-action: none;
     }
-    .control-cluster {
+
+    /* Traditional keyboard-style arrow key cluster */
+    .dpad {
       position: absolute;
       top: 8%;
-      width: 38%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 66%;
       height: 60%;
-      display: flex;
-      flex-direction: column;
-      gap: 10%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 4%;
     }
-    .control-left {
-      left: 6%;
-    }
-    .control-right {
-      right: 6%;
-    }
-    .control-btn {
-      flex: 1;
+
+    .key-btn {
       width: 100%;
-      border: 2px solid #333;
-      border-radius: 18px;
-      background: #1a1a1a;
-      color: #72db85;
-      font-size: clamp(18px, 6vh, 36px);
+      height: 100%;
+      border: 4px solid;
+      border-radius: 4px;
+      background: #c0c0c0;
+      color: #ffffff;
+      font-size: clamp(22px, 9vh, 52px);
       font-weight: bold;
       font-family: Arial, Helvetica, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      transition: transform 0.05s ease, background-color 0.1s ease, border-color 0.1s ease;
       -webkit-tap-highlight-color: transparent;
       outline: none;
+      /* Classic Windows 95 beveled button look */
+      border-color: #ffffff #808080 #808080 #ffffff;
+      box-shadow:
+        0 4px 0 #404040,
+        0 5px 6px rgba(0, 0, 0, 0.35);
+      transition: transform 0.05s ease, box-shadow 0.05s ease, background-color 0.05s ease;
+      text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
     }
-    .control-btn:active, .control-btn.active-key {
-      background: #2a3a2a;
-      border-color: #72db85;
-      transform: scale(0.96);
+    .key-btn:active, .key-btn.active-key {
+      transform: translateY(3px);
+      background: #b0b0b0;
+      border-color: #808080 #ffffff #ffffff #808080;
+      box-shadow:
+        0 1px 0 #404040,
+        0 2px 3px rgba(0, 0, 0, 0.35);
     }
+
+    #btn-up { grid-column: 2; grid-row: 1; }
+    #btn-left { grid-column: 1; grid-row: 2; }
+    #btn-down { grid-column: 2; grid-row: 2; }
+    #btn-right { grid-column: 3; grid-row: 2; }
+
     .action-btn {
       position: absolute;
-      bottom: 10%;
+      bottom: 6%;
       left: 50%;
       transform: translateX(-50%);
-      width: 28%;
-      height: 18%;
-      font-size: clamp(14px, 5vh, 20px);
+      width: 36%;
+      height: 16%;
+      font-size: clamp(12px, 4.5vh, 24px);
     }
     .action-btn:active, .action-btn.active-key {
-      transform: translateX(-50%) scale(0.96);
+      transform: translateX(-50%) translateY(3px);
     }
+
     @media (max-height: 500px) {
       .lcd-display { height: 55%; }
       .controls { height: 45%; }
@@ -186,7 +239,9 @@
       <span id="speed-label">Lv1</span>
     </div>
     <div id="bonus-timer-bar"></div>
-    <div id="canvas-container"></div>
+    <div class="lcd-content">
+      <div id="canvas-container"></div>
+    </div>
     <div id="splash-screen" class="screen-overlay">
       <h2>WORM II</h2>
       <p>Press Space or ACTION</p>
@@ -207,15 +262,13 @@
     </div>
   </div>
   <div class="controls">
-    <div class="control-cluster control-left">
-      <button id="btn-left-left" class="control-btn" type="button">◄</button>
-      <button id="btn-left-right" class="control-btn" type="button">►</button>
+    <div class="dpad">
+      <button id="btn-up" class="key-btn" type="button">▲</button>
+      <button id="btn-left" class="key-btn" type="button">◄</button>
+      <button id="btn-down" class="key-btn" type="button">▼</button>
+      <button id="btn-right" class="key-btn" type="button">►</button>
     </div>
-    <div class="control-cluster control-right">
-      <button id="btn-right-up" class="control-btn" type="button">▲</button>
-      <button id="btn-right-down" class="control-btn" type="button">▼</button>
-    </div>
-    <button id="btn-action" class="control-btn action-btn" type="button">ACTION</button>
+    <button id="btn-action" class="key-btn action-btn" type="button">ACTION</button>
   </div>
 </div>
 <script>
@@ -319,6 +372,58 @@
   }
   window.addEventListener('resize', updateCameraAndRenderer);
   updateCameraAndRenderer();
+
+  // Generate a displacement map for the CSS fisheye SVG filter
+  function createFisheyeDisplacementMap(size) {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(size, size);
+    const data = imageData.data;
+
+    const cx = size / 2;
+    const cy = size / 2;
+    const maxDist = Math.sqrt(cx * cx + cy * cy);
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const norm = dist / maxDist;
+
+        // Barrel distortion: push pixels toward the edges from the center
+        const strength = 0.12;
+        const displacementX = -strength * dx * norm * norm;
+        const displacementY = -strength * dy * norm * norm;
+
+        // Clamp to [-1, 1] for the 0-255 map range
+        const clampedX = Math.max(-1, Math.min(1, displacementX));
+        const clampedY = Math.max(-1, Math.min(1, displacementY));
+
+        const idx = (y * size + x) * 4;
+        data[idx] = 128 + Math.floor(clampedX * 127);
+        data[idx + 1] = 128 + Math.floor(clampedY * 127);
+        data[idx + 2] = 128;
+        data[idx + 3] = 255;
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+    return canvas.toDataURL('image/png');
+  }
+
+  function applyFisheyeFilter() {
+    const mapImg = document.getElementById('fisheye-map');
+    if (mapImg) {
+      const dataUrl = createFisheyeDisplacementMap(128);
+      mapImg.setAttribute('href', dataUrl);
+      mapImg.setAttribute('xlink:href', dataUrl);
+    }
+  }
+  applyFisheyeFilter();
+
   const ambientLight = new THREE.AmbientLight(0x666666, 0.95);
   scene.add(ambientLight);
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
@@ -848,16 +953,16 @@
     switch (e.key) {
       case 'ArrowUp':
       case '2':
-        handleInput('UP'); triggerVisualFeedback('btn-right-up'); break;
+        handleInput('UP'); triggerVisualFeedback('btn-up'); break;
       case 'ArrowDown':
       case '5':
-        handleInput('DOWN'); triggerVisualFeedback('btn-right-down'); break;
+        handleInput('DOWN'); triggerVisualFeedback('btn-down'); break;
       case 'ArrowLeft':
       case '4':
-        handleInput('LEFT'); triggerVisualFeedback('btn-left-left'); break;
+        handleInput('LEFT'); triggerVisualFeedback('btn-left'); break;
       case 'ArrowRight':
       case '6':
-        handleInput('RIGHT'); triggerVisualFeedback('btn-left-right'); break;
+        handleInput('RIGHT'); triggerVisualFeedback('btn-right'); break;
       case ' ':
       case 'Enter':
       case '8':
@@ -866,10 +971,10 @@
   });
   // Mobile Touch Controls
   const mobileKeyMap = {
-    'btn-left-left': 'LEFT',
-    'btn-left-right': 'RIGHT',
-    'btn-right-up': 'UP',
-    'btn-right-down': 'DOWN',
+    'btn-up': 'UP',
+    'btn-left': 'LEFT',
+    'btn-down': 'DOWN',
+    'btn-right': 'RIGHT',
     'btn-action': 'ACTION'
   };
   Object.keys(mobileKeyMap).forEach(id => {
@@ -897,5 +1002,13 @@
   }
   render3DSnake();
 </script>
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none;" aria-hidden="true">
+  <defs>
+    <filter id="fisheye" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+      <feImage id="fisheye-map" result="map" width="100%" height="100%" preserveAspectRatio="none"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" scale="40" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
 </body>
 </html>
