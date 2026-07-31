@@ -208,12 +208,12 @@
   </div>
   <div class="controls">
     <div class="control-cluster control-left">
-      <button id="btn-left-up" class="control-btn" type="button">▲</button>
       <button id="btn-left-left" class="control-btn" type="button">◄</button>
+      <button id="btn-left-right" class="control-btn" type="button">►</button>
     </div>
     <div class="control-cluster control-right">
       <button id="btn-right-up" class="control-btn" type="button">▲</button>
-      <button id="btn-right-right" class="control-btn" type="button">►</button>
+      <button id="btn-right-down" class="control-btn" type="button">▼</button>
     </div>
     <button id="btn-action" class="control-btn action-btn" type="button">ACTION</button>
   </div>
@@ -848,16 +848,16 @@
     switch (e.key) {
       case 'ArrowUp':
       case '2':
-        handleInput('UP'); triggerVisualFeedback('btn-left-up'); break;
+        handleInput('UP'); triggerVisualFeedback('btn-right-up'); break;
       case 'ArrowDown':
       case '5':
-        handleInput('DOWN'); break;
+        handleInput('DOWN'); triggerVisualFeedback('btn-right-down'); break;
       case 'ArrowLeft':
       case '4':
         handleInput('LEFT'); triggerVisualFeedback('btn-left-left'); break;
       case 'ArrowRight':
       case '6':
-        handleInput('RIGHT'); triggerVisualFeedback('btn-right-right'); break;
+        handleInput('RIGHT'); triggerVisualFeedback('btn-left-right'); break;
       case ' ':
       case 'Enter':
       case '8':
@@ -866,10 +866,10 @@
   });
   // Mobile Touch Controls
   const mobileKeyMap = {
-    'btn-left-up': 'UP',
     'btn-left-left': 'LEFT',
+    'btn-left-right': 'RIGHT',
     'btn-right-up': 'UP',
-    'btn-right-right': 'RIGHT',
+    'btn-right-down': 'DOWN',
     'btn-action': 'ACTION'
   };
   Object.keys(mobileKeyMap).forEach(id => {
