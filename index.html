@@ -1781,7 +1781,7 @@
 <iframe src="mission_control_game.html" width="100%" height="100%" loading="lazy"></iframe>
             </div>  
 
-<div id="worm" class="window" style="max-width: 100%; height: 200px;">
+<div id="worm" class="window" style="max-width: 100%; height: 600px;">
                 <div class="title-bar" onpointerdown="dragStart(event)">
                     <div class="title-text">
                         <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" width="16">Worm II</div>
@@ -1991,12 +1991,16 @@
         async function startClippy() {
             try {
                 // Initialize Clippy with working asset paths
-                clippyAgent = await initAgent(agents.Rocky);
+                // (agents.Clippy has the "GoodBye" and "Idle1_1" animations)
+                clippyAgent = await initAgent(agents.Clippy);
 
-                const targetX = window.innerWidth - 300; 
+                const targetX = window.innerWidth - 150;
                 const targetY = window.innerHeight - 150;
-                clippyAgent.moveTo(targetX, targetY);
-                
+                // Place instantly (duration 0) so the "Show" appear animation
+                // plays right away instead of queuing behind a 1s slide
+                clippyAgent.moveTo(targetX, targetY, 0);
+
+                // show() (non-fast) plays the agent's "Show" appear animation
                 clippyAgent.show();
                 clippyAgent.speak("Click the Agent icon in the tray to hide me, or summon me back!");
 
@@ -2011,20 +2015,31 @@
                     "Don't worry, I am tracking all your inputs!"
                 ];
 
-                // Global event listener to capture clicks anywhere on the page
-                window.addEventListener('click', (event) => {
+                // Pool of animations safe to play at random: exclude the
+                // idle loops and the transitional ones (Show/Hide/GoodBye)
+                // that would blank or move the sprite
+                const animPool = clippyAgent.animations().filter(a =>
+                    !a.startsWith("Idle") && a !== "Show" && a !== "Hide" && a !== "GoodBye");
+
+                function playRandomAnimation() {
+                    if (!clippyAgent || !clippyVisible || !animPool.length) return;
+                    clippyAgent.play(animPool[Math.floor(Math.random() * animPool.length)]);
+                }
+
+                // Random animation every 10 seconds while Clippy is visible
+                setInterval(playRandomAnimation, 10000);
+
+                // Speak a random phrase and play a random animation only when
+                // Clippy itself is clicked/tapped. (clippyjs exposes its
+                // element as agent._el; clicks elsewhere should not trigger it.)
+                clippyAgent._el.addEventListener('click', (event) => {
                     if (!clippyAgent || !clippyVisible) return;
-                    
-                    // Prevent interacting/speaking if user clicked tray icon to close it
-                    if (event.target.closest('#clippy-tray-toggle')) return;
-                    if (event.target.closest('#desktop-context-menu')) return;
+                    event.stopPropagation();
 
                     // Pick a random phrase from our array
                     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-                    
-                    // Force Clippy to speak and trigger a random background animation
                     clippyAgent.speak(randomPhrase);
-                    clippyAgent.animate();
+                    playRandomAnimation();
                 });
 
             } catch (error) {
@@ -2037,11 +2052,22 @@
             if (!clippyAgent) return;
 
             if (clippyVisible) {
-                clippyAgent.hide();
                 clippyVisible = false;
+                // Wave goodbye first, then hide() (non-fast) plays the "Hide"
+                // leave animation and hides the element when it finishes.
+                // hide() clears the action queue, so it must run in the
+                // play() completion callback rather than right after it.
+                if (!clippyAgent.play("GoodBye", 5000, () => clippyAgent.hide())) {
+                    clippyAgent.hide();
+                }
             } else {
+                // Clear any stale queued actions so the "Show" appear
+                // animation plays immediately on resummon
+                clippyAgent.stop();
                 clippyAgent.show();
                 clippyVisible = true;
+                // Settle into the "Greeting" animation after appearing
+                clippyAgent.play("Greeting");
                 clippyAgent.speak("I have returned!");
             }
         }
