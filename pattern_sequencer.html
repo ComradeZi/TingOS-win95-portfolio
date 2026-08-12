@@ -143,7 +143,8 @@
       gap: 1px;
       background-color: var(--cell-border);
       border: 1px solid var(--border-accent);
-      touch-action: none;
+      overflow-x: auto;
+      touch-action: pan-x;
     }
 
     .grid-row {
@@ -172,6 +173,7 @@
       cursor: pointer;
       position: relative;
       transition: background 0.05s;
+      min-width: 40px;
     }
 
     .step-cell:last-child {
@@ -211,6 +213,35 @@
     .drum-divider {
       border-top: 2px solid var(--border-accent);
     }
+
+    /* Mobile-friendly sizing so cells are easy tap targets */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .tracker-app {
+        padding: 10px;
+      }
+      .grid-row {
+        height: 44px;
+      }
+      .row-label {
+        width: 44px;
+        padding-right: 8px;
+        font-size: 11px;
+      }
+      .step-cell {
+        min-width: 44px;
+      }
+      .btn, .theme-select {
+        font-size: 14px;
+        padding: 8px 10px;
+      }
+      .bpm-btn {
+        width: 32px;
+        height: 32px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -229,6 +260,19 @@
           <option value="synthwave">SOUND: SYNTHWAVE</option>
           <option value="hiphop808">SOUND: 808 HIP HOP</option>
           <option value="ambient">SOUND: LO-FI AMBIENT</option>
+        </select>
+        
+        <!-- Scale Template Dropdown Selector -->
+        <select class="theme-select" id="scaleTemplateSelect">
+          <option value="random">SCALE: RANDOM / ALL</option>
+          <option value="chinese">SCALE: CHINESE PENTATONIC</option>
+          <option value="hirajoshi">SCALE: JAPANESE HIRAJOSHI</option>
+          <option value="in">SCALE: JAPANESE IN</option>
+          <option value="yo">SCALE: JAPANESE YO</option>
+          <option value="ryukyu">SCALE: JAPANESE RYUKYU</option>
+          <option value="indian">SCALE: INDIAN HEPTATONIC</option>
+          <option value="dorian">SCALE: IRISH DORIAN</option>
+          <option value="scottish">SCALE: SCOTTISH PENTATONIC</option>
         </select>
       </div>
 
@@ -250,8 +294,10 @@
       { id: 'E5', type: 'synth', freq: 659.25 },
       { id: 'D5', type: 'synth', freq: 587.33 },
       { id: 'C5', type: 'synth', freq: 523.25 },
+      { id: 'B4', type: 'synth', freq: 493.88 },
       { id: 'A4', type: 'synth', freq: 440.00 },
       { id: 'G4', type: 'synth', freq: 392.00 },
+      { id: 'F4', type: 'synth', freq: 349.23 },
       { id: 'E4', type: 'synth', freq: 329.63 },
       { id: 'D4', type: 'synth', freq: 293.66 },
       { id: 'C4', type: 'synth', freq: 261.63 },
@@ -261,6 +307,22 @@
     ];
 
     const TOTAL_STEPS = 16;
+
+    // Cultural scale templates: weights per ROWS index for random generation.
+    // A weight of 0 means the row is not used; 1 is full weight; 0.5 is half weight.
+    // Rows are: E5, D5, C5, B4, A4, G4, F4, E4, D4, C4, HAT, SNR, KCK.
+    const SCALE_TEMPLATES = {
+      random: { name: 'Random / All', weights: null },
+      chinese: { name: 'Chinese Pentatonic', weights: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0] },
+      hirajoshi: { name: 'Japanese Hirajoshi', weights: [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0] },
+      in: { name: 'Japanese In', weights: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0] },
+      yo: { name: 'Japanese Yo', weights: [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0] },
+      ryukyu: { name: 'Japanese Ryukyu', weights: [1, 0, 1, 0.5, 0, 1, 1, 1, 0, 1, 0, 0, 0] },
+      indian: { name: 'Indian Heptatonic', weights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0] },
+      dorian: { name: 'Irish Dorian', weights: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0] },
+      scottish: { name: 'Scottish Pentatonic', weights: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0] }
+    };
+
     let gridData = {}; 
     let bpm = 120;
     let isPlaying = false;
@@ -277,8 +339,10 @@
       'E5':  [1,0,0,1,0,0,1,1,0,0,0,1,0,0,0,0],
       'D5':  [0,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0],
       'C5':  [0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0],
+      'B4':  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       'A4':  [0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,1],
       'G4':  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      'F4':  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       'E4':  [0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1],
       'D4':  [0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
       'C4':  [0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1],
@@ -327,8 +391,16 @@
             cell.classList.add(row.type === 'synth' ? 'active-synth' : 'active-drum');
           }
 
-          // Desktop Mouse Drag Events
+          // Mouse drag on desktop, tap to toggle on mobile
+          let touchJustToggled = false;
+          let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+          let touchMoved = false;
+
           cell.addEventListener('mousedown', (e) => {
+            if (touchJustToggled) {
+              touchJustToggled = false;
+              return;
+            }
             e.preventDefault();
             isDragging = true;
             dragTargetValue = gridData[row.id][s] ? 0 : 1;
@@ -340,6 +412,31 @@
               applyCellState(row.id, s, row.type, dragTargetValue);
             }
           });
+
+          cell.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+            touchMoved = false;
+          }, { passive: true });
+
+          cell.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            if (Math.abs(touch.clientX - touchStartX) > 10 || Math.abs(touch.clientY - touchStartY) > 10) {
+              touchMoved = true;
+            }
+          }, { passive: true });
+
+          cell.addEventListener('touchend', (e) => {
+            if (touchMoved) return;
+            const elapsed = Date.now() - touchStartTime;
+            if (elapsed < 300) {
+              const newValue = gridData[row.id][s] ? 0 : 1;
+              applyCellState(row.id, s, row.type, newValue);
+              touchJustToggled = true;
+            }
+          }, { passive: true });
 
           rowDiv.appendChild(cell);
         }
@@ -365,39 +462,6 @@
 
     // Global drag release
     window.addEventListener('mouseup', () => { isDragging = false; });
-
-    // Touch events for mobile
-    const gridContainer = document.getElementById('gridMatrix');
-
-    gridContainer.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      const target = document.elementFromPoint(touch.clientX, touch.clientY);
-      if (target && target.classList.contains('step-cell')) {
-        isDragging = true;
-        const rowId = target.dataset.row;
-        const stepIdx = parseInt(target.dataset.step, 10);
-        const type = target.dataset.type;
-
-        dragTargetValue = gridData[rowId][stepIdx] ? 0 : 1;
-        applyCellState(rowId, stepIdx, type, dragTargetValue);
-      }
-    }, { passive: false });
-
-    gridContainer.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const touch = e.touches[0];
-      const target = document.elementFromPoint(touch.clientX, touch.clientY);
-
-      if (target && target.classList.contains('step-cell')) {
-        const rowId = target.dataset.row;
-        const stepIdx = parseInt(target.dataset.step, 10);
-        const type = target.dataset.type;
-        applyCellState(rowId, stepIdx, type, dragTargetValue);
-      }
-    }, { passive: false });
-
-    window.addEventListener('touchend', () => { isDragging = false; });
 
     // Audio Engine Setup
     function initAudio() {
@@ -578,8 +642,21 @@
     });
 
     document.getElementById('randomBtn').addEventListener('click', () => {
-      ROWS.forEach(row => {
-        gridData[row.id] = Array.from({ length: TOTAL_STEPS }, () => Math.random() > 0.8 ? 1 : 0);
+      const templateName = document.getElementById('scaleTemplateSelect').value;
+      const template = SCALE_TEMPLATES[templateName] || SCALE_TEMPLATES.random;
+      const weights = template.weights;
+
+      ROWS.forEach((row, index) => {
+        if (row.type === 'drum') {
+          const drumProb = row.sound === 'kick' ? 0.25 : row.sound === 'snare' ? 0.2 : 0.35;
+          gridData[row.id] = Array.from({ length: TOTAL_STEPS }, () => Math.random() < drumProb ? 1 : 0);
+        } else if (weights) {
+          const weight = weights[index] || 0;
+          const probability = 0.25 * weight;
+          gridData[row.id] = Array.from({ length: TOTAL_STEPS }, () => Math.random() < probability ? 1 : 0);
+        } else {
+          gridData[row.id] = Array.from({ length: TOTAL_STEPS }, () => Math.random() > 0.8 ? 1 : 0);
+        }
       });
       renderGrid();
     });
