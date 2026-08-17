@@ -50,7 +50,7 @@
         /* --- Desktop Background --- */
         .desktop {
             height: calc(100vh - 56px); /* Account for 56px Windows 98 Taskbar */
-            background-image: url('assets/img/wallpaper/wallpaper_90sCG.webp');
+            background-image: url('assets/img/wallpaper/buddha_wallpaper_bitmap3.webp');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -1192,7 +1192,7 @@
 
                 <button class="folder-trigger" onclick="openInternetExplorer('https://www.myinstants.com/en/search/?name=meme'); event.stopPropagation();">
                     <img src="https://win98icons.alexmeub.com/icons/png/computer_sound-4.png" alt="ForFun icon">
-                    <span>for Fun</span>
+                    <span>Sound Board</span>
                 </button>
 
                 <button class="folder-trigger" onclick="openWindow('game-doom'); event.stopPropagation();">
@@ -1251,8 +1251,8 @@
                     </div>
                 </div>
                         <div class="viewer-toolbar">
-                        <div class="viewer-btn" onclick="downloadPDF('assets/img/20260628_Resume-Barton-Ting.pdf', 'BartonTing-Resume.pdf')">Download PDF</div>
-                        <div class="viewer-btn" onclick="openWindow('resume_software')">Skills</div>
+                        <div class="viewer-btn" onclick="downloadPDF('assets/img/20260628_Resume-Barton-Ting.pdf', 'BartonTing-Resume.pdf')"><img src="https://win98icons.alexmeub.com/icons/png/diskettes_copy-1.png" width="13"> Download Resume</div>
+                        <div class="viewer-btn" onclick="openWindow('resume_software')">Technical Skills</div>
                         <div class="viewer-btn" style="color:gray; cursor:default;">View</div>
                         <div class="viewer-btn" style="color:gray; cursor:default;">Favorites</div>
                         <div class="viewer-btn" style="color:gray; cursor:default;">Help</div>
@@ -1271,10 +1271,10 @@
                     <br>
                     <h3>Experience History</h3>
                     <hr><br>
-                    <p><strong>Multimedia Senior Art Director</strong> @ CASETiFY (2024 - Present)</p>
+                    <p><strong>Multimedia Senior Art Director</strong> @ CASETiFY (2021 - Present)</p>
                     <p>Retail VM, Animations, Activation and Popup concept and designs.</p>
                     <br>
-                    <p><strong>Digital Marketing Executive</strong> @ Lai Sun Group (2020 - 2022)</p>
+                    <p><strong>Digital Marketing Executive</strong> @ Lai Sun Group (2020 - 2021)</p>
                     <p>Content creation, copywriter, design and production, social media and website managements</p>
                     <br>
                     <p><strong>Graphic Designer, Illustrator</strong> @ Turipamwe Design (2018)</p>
@@ -1283,7 +1283,7 @@
                     <p><strong>Animation Assistant, Illustrator</strong> @ InTouch · Internship (2015)</p>
                     <p>Storyboard, touchups, animation keyframes</p>
                     <br>
-                    <h3>Technical Skills</h3>
+                    <a onclick="openWindow('resume_software')"><h3>Technical Skills</h3></a>
                     <hr><br>
                     <p>Web Design in HTML5, Next.JS, JavaScript. Interactive experience via Touchdesigner. Animation, Graphics, Typography and Layout designs in Adobe, opensource alternatives. 3D with CADs, and every other 3D softwares under the sun.</p>
                 </div>
@@ -1303,15 +1303,15 @@
                 </div>
                 <div class="window-body">
                     <div class="project-grid">
-                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami28.webp" alt="Mura1" onclick="openWindow('proj-murakami'); hideStartMenu(); openInternetExplorer('gsplat_murakami.html')">
+                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami28.webp" alt="Mura1" onclick="openWindow('proj-murakami'); hideStartMenu(); openInternetExplorer('gsplat_murakami.html'); toggleMaximize('gsplat_murakami.html')">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/evangelion/Evangelion15.webp" alt="Eva2" onclick="openWindow('proj-evangelion'); openInternetExplorer('gsplat_evangelion.html'); hideStartMenu();">
+                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/swc/swc2022_4.webp" alt="Star1" onclick="openWindow('proj-starwars'); openInternetExplorer('gsplat_starwars.html'); hideStartMenu();">
+                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/wonsoju/wonsoju8.webp" alt="WonsojuComplexCon" onclick="openWindow('proj-wonsoju'); openInternetExplorer('gsplat_complexcon2024.html'); hideStartMenu();">
+                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/piratagroup/PiciTruck_03.webp" alt="PiciTruck" onclick="openInternetExplorer('project_papertoytruck.html')">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/chinatangarfilter/Rabbit%20and%20Mooncake3_Cycles_Denoiser_ColorCorrect.webp" alt="ChinaTang" onclick="openInternetExplorer('project_chinatang.html')">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/piratagroup/191227_TPP_Opening-flyer_OffWhite.webp" alt="PirataPosters" onclick="openInternetExplorer('project_pirata.html')">
-                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/swc/swc2022_4.webp" alt="Star1" onclick="openWindow('proj-starwars'); openInternetExplorer('gsplat_starwars.html'); hideStartMenu();">
-                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/piratagroup/PiciTruck_03.webp" alt="PiciTruck" onclick="openInternetExplorer('project_papertoytruck.html')">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/prayground/Pray-ground_7.webp" alt="PrayGround" onclick="openInternetExplorer('project_prayground.html')">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/nuts/NUTSFebruary2017_Proof3_9thDecember2016-2.webp" alt="Nuts" onclick="openInternetExplorer('project_nuts.html')">
-                        <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/wonsoju/wonsoju8.webp" alt="WonsojuComplexCon" onclick="openWindow('proj-wonsoju'); openInternetExplorer('gsplat_complexcon2024.html'); hideStartMenu();">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/fire16/sandle%20cover_2.webp" alt="Fire16" onclick="openInternetExplorer('project_fire16.html')">
                     </div>
                 </div>
@@ -1369,9 +1369,6 @@
                 <div class="window-body">
                     <h2>Project Murakami 2025</h2>
                     <p>Project Murakami was a year long expansive collaboration project with CASETiFY, that spanned across 5 activations and major events throughout the year, sprawling between US, Hong Kong, Japan, Korea. As well as global retail takeovers. It was an ambitious and massive endeavor that reached phenomal coverage, sales and helped elevate CASETiFY to a new level of sophistication.</p>
-                  <div>
-                                    <iframe src="https://lumalabs.ai/embed/27ddd93d-a76f-4c47-9fc2-ef5086a3995e?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="300" title="luma embed" loading="lazy" style="border: none;"></iframe>
-                  </div>
                     <div class="project-grid">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami28.webp" alt="Mura1" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/murakami/murakami19.webp" alt="Mura2" onclick="openImageViewer(this.src)">
@@ -1420,9 +1417,6 @@
                 <div class="window-body">
                     <h2>Evangelion Shinjuku</h2>
                     <p>To celebrate the release of its highly-anticipated Evangelion “PROJECT-CSTF: PROTECTION from IMPACT” collaboration, global tech accessory brand CASETiFY recently put together the “IMPACT!” launch event. Ahead of the drop of the special range, CASETiFY and Japanese animation studio ©Khara unveiled a four-meter high, seven-meter-wide EVA-01 in the heart of Tokyo’s Shinjuku district. The impressive display also shows the iconic mecha holding a CASETiFY Impact Case featuring a design from the collaboration.</p>
-                  <div>
-                                    <iframe src="https://lumalabs.ai/embed/255a2a3c-2dd1-46a0-bd6f-6997175226be?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="320" title="luma embed" loading="lazy" style="border: none;"></iframe>
-                  </div>
                     <div class="project-grid">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/evangelion/Evangelion15.webp" alt="Eva 1" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/evangelion/Evangelion16.webp" alt="Eva 2" onclick="openImageViewer(this.src)">
@@ -1458,9 +1452,6 @@
                 <div class="window-body">
                     <h2>Star Wars Celebration 2022</h2>
                     <p>The booth was inspired by the interiors of the Millennium Falcon, to highlight the star of the CASETiFY x Star Wars collection. The setup was just in time for the Star Wars Celebration 2022, that's right after the pandemic, everyone is excited again for conventions and expos. So we put all our efforts together to make one of the coolest setup in the show!</p>
-                  <div>
-                                    <iframe src="https://lumalabs.ai/embed/47c54af0-3f6c-427e-a511-6002be43495c?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="320" frameborder="0" title="luma embed" loading="lazy" style="border: none;"></iframe>
-                  </div>
                     <div class="project-grid">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/swc/swc2022_18.webp" alt="Star1" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/swc/swc2022_24.webp" alt="Star2" onclick="openImageViewer(this.src)">
@@ -1577,9 +1568,6 @@
                 <div class="window-body">
                     <h2>Wonsoju @ComplexCon 2024</h2>
                     <p>A minimalist design for Wonsoju x Casetify colab booth @ComplexCon 2024, highlight of the booth are the archway LED and the Disco globe configured on auto-spin, drawing eyeballs and queues as photospot.</p>
-                    <div>
-                       <iframe src="https://lumalabs.ai/embed/e6a4d7a8-c404-4d07-adc9-a7a4d9aa1487?mode=sparkles&background=%23ffffff&color=%23000000&showTitle=true&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" width="100%" height="320" frameborder="0" title="luma embed" loading="lazy" style="border: none;"></iframe>
-                    </div>
                     <div class="project-grid">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/wonsoju/wonsoju25.webp" alt="Soju 1" onclick="openImageViewer(this.src)">
                         <img src="https://pub-0143ea8245794385b9160a3146a8360e.r2.dev/projects/casetify/wonsoju/wonsoju15.webp" alt="Soju 2" onclick="openImageViewer(this.src)">
@@ -1901,14 +1889,14 @@
                 <button class="start-menu-item" onclick="openWindow('banana'); hideStartMenu();">
                     <span style="font-size: 14px;">🍌</span> Banana Clicker
                 </button>
-                <button class="start-menu-item" onclick="openWindow('game-doom'); hideStartMenu();">
-                    <img src="https://user-images.githubusercontent.com/63191757/107875047-8c7bed80-6eb5-11eb-92b0-5580b2a4ec51.png" alt="Doom"> DOOM (PC Only)
-                </button>
-                <button class="start-menu-item" onclick="openWindow('mission_control'); hideStartMenu();">
+              <!--  <button class="start-menu-item" onclick="openWindow('mission_control'); hideStartMenu();">
                     <img src="https://win98icons.alexmeub.com/icons/png/channels-2.png" alt="Mission Control"> Mission Control
-                </button>
+                </button> -->
                 <button class="start-menu-item" onclick="openWindow('worm'); hideStartMenu();">
                     <img src="https://images.emojiterra.com/google/noto-emoji/animated-emoji/1f41b.gif" alt="Worm II"> Worm II
+                </button>
+                <button class="start-menu-item" onclick="openWindow('sequencer'); hideStartMenu();">
+                    <img src="https://images.emojiterra.com/google/android-11/512px/1f3b9.png" alt="Icon"> Sequencer
                 </button>
             </div>
         </div>
@@ -1916,11 +1904,11 @@
         <div class="start-menu-divider"></div>
 
         <!-- System & General Utilities -->
-        <button class="start-menu-item" onclick="openWindow('sequencer'); hideStartMenu();">
-            <img src="https://images.emojiterra.com/google/android-11/512px/1f3b9.png" alt="Icon"> Sequencer
-        </button>
         <button class="start-menu-item" onclick="openWindow('chatbox'); hideStartMenu();">
             <img src="https://win98icons.alexmeub.com/icons/png/mailbox_world-0.png" alt="Icon"> ChatBox
+        </button>
+        <button class="start-menu-item" id="clippy-tray-toggle" title="Summon/Unsummon Clippy">
+            <img src="assets/img/icons/clippy.png" alt="Clippy"> Call/Shoo Clippy
         </button>
         <button class="start-menu-item" onclick="openWindow('display-properties-win'); hideStartMenu();">
             <img src="https://win98icons.alexmeub.com/icons/png/display_properties-1.png" alt="Settings"> Display Properties
@@ -1936,9 +1924,6 @@
 
 <div class="w98-tray">
                 <div class="tray-icons">
-                    <button class="tray-icon" id="clippy-tray-toggle" title="Summon/Unsummon Clippy">
-                        <img src="https://win98icons.alexmeub.com/icons/png/msagent-1.png" alt="Clippy">
-                    </button>
                     <a href="https://www.instagram.com/barton.ting/" target="_blank" class="tray-icon" title="Instagram">
                         <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram">
                     </a>
