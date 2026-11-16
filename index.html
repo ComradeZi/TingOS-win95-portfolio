@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en" data-theme="green">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#02050a" />
+  <title>GRID//LOOP — Portfolio</title>
+  <meta name="description" content="A TRON-style endless corridor portfolio. Scroll or swipe to traverse." />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Three.js mounts its canvas here -->
+  <div id="viewport" aria-hidden="true"></div>
+
+  <!-- cinematic overlays (non-interactive) -->
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="glitch" id="glitch" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__dot"></span></div>
+
+  <!-- ======================= HUD ======================= -->
+  <header class="hud hud--top">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <div class="brand__text">
+        <h1 class="brand__title">GRID<span class="brand__slash">//</span>LOOP</h1>
+        <p class="brand__sub">PORTFOLIO&nbsp;&nbsp;&mdash;&nbsp;&nbsp;<span id="hud-count">0</span>&nbsp;PROJECTS</p>
+      </div>
+    </div>
+    <button class="viewall" id="view-all" aria-expanded="false" aria-controls="picker">&#9662;&nbsp;VIEW ALL PROJECTS</button>
+  </header>
+
+  <div class="hud hud--tr">
+    <button class="hud__link" id="about-open" aria-haspopup="dialog" aria-controls="about">ABOUT</button>
+  </div>
+
+  <div class="hud hud--bl">
+    <p class="hud__label">THEME</p>
+    <div class="theme-switcher" id="theme-switcher" role="group" aria-label="Color theme">
+      <button class="theme-btn" data-theme="green"  aria-label="Neon green theme"  aria-pressed="true"></button>
+      <button class="theme-btn" data-theme="orange" aria-label="Neon orange theme" aria-pressed="false"></button>
+      <button class="theme-btn" data-theme="cyan"   aria-label="Neon cyan theme"   aria-pressed="false"></button>
+    </div>
+  </div>
+
+  <div class="hud hud--br">
+    <div class="near">
+      <h2 class="near__title" id="near-title"></h2>
+      <p class="near__sub" id="near-sub"></p>
+    </div>
+    <p class="hud__hint"><span class="key">SCROLL</span> / <span class="key">SWIPE</span>&nbsp;TO&nbsp;TRAVERSE</p>
+  </div>
+
+  <div class="minimap" id="minimap" aria-hidden="true">
+    <div class="minimap__rail">
+      <span class="minimap__marker" id="minimap-marker"></span>
+      <div class="minimap__dots" id="minimap-dots"></div>
+    </div>
+  </div>
+
+  <!-- infinite right-to-left marquee -->
+  <footer class="ticker" aria-hidden="true">
+    <div class="ticker__track" id="ticker-track"></div>
+  </footer>
+
+  <!-- ====================== POPUP ====================== -->
+  <div class="popup" id="popup" aria-hidden="true">
+    <div class="popup__backdrop" data-close></div>
+    <article class="popup__panel" role="dialog" aria-modal="true" aria-labelledby="popup-title">
+      <span class="corner corner--tl" aria-hidden="true"></span>
+      <span class="corner corner--tr" aria-hidden="true"></span>
+      <span class="corner corner--bl" aria-hidden="true"></span>
+      <span class="corner corner--br" aria-hidden="true"></span>
+
+      <button class="popup__close" id="popup-close" aria-label="Close project">&times;</button>
+
+      <header class="popup__head">
+        <span class="popup__kicker" id="popup-kicker"></span>
+        <h2 class="popup__title" id="popup-title"></h2>
+      </header>
+
+      <div class="popup__body">
+        <div class="popup__media" id="popup-media"></div>
+        <aside class="popup__side" id="popup-side">
+          <dl class="popup__facts">
+            <div class="popup__fact"><dt>ROLE</dt><dd id="popup-role"></dd></div>
+            <div class="popup__fact"><dt>CLIENT</dt><dd id="popup-client"></dd></div>
+            <div class="popup__fact"><dt>TOOLS</dt><dd id="popup-tools"></dd></div>
+            <div class="popup__fact"><dt>DURATION</dt><dd id="popup-duration"></dd></div>
+          </dl>
+          <div class="popup__case" id="popup-case"></div>
+          <a class="popup__link" id="popup-link" href="#" target="_blank" rel="noopener">OPEN&nbsp;&#8599;</a>
+        </aside>
+      </div>
+
+      <footer class="popup__foot">
+        <p class="popup__desc" id="popup-desc"></p>
+        <ul class="popup__tags" id="popup-tags"></ul>
+      </footer>
+    </article>
+  </div>
+
+  <!-- ===================== FULLSCREEN ==================== -->
+  <div class="fullscreen" id="fullscreen" aria-hidden="true">
+    <div class="fullscreen__backdrop" id="fullscreen-backdrop"></div>
+    <button class="fs-nav fs-nav--prev" id="fs-prev" aria-label="Previous item">&#8249;</button>
+    <div class="fullscreen__content" id="fullscreen-content"></div>
+    <button class="fs-nav fs-nav--next" id="fs-next" aria-label="Next item">&#8250;</button>
+    <p class="fullscreen__hint" id="fullscreen-hint">CLICK ANYWHERE TO CLOSE</p>
+    <p class="fullscreen__count" id="fullscreen-count"></p>
+  </div>
+
+  <!-- ==================== PROJECT PICKER ==================== -->
+  <div class="picker" id="picker" aria-hidden="true">
+    <div class="picker__backdrop" data-picker-close></div>
+    <div class="picker__menu">
+      <div class="picker__viewport" id="picker-viewport">
+        <div class="picker__wheel" id="picker-wheel"></div>
+      </div>
+      <div class="picker__mask"></div>
+      <div class="picker__highlight"></div>
+    </div>
+  </div>
+
+  <!-- ======================= BOOT ======================= -->
+  <div class="boot" id="boot">
+    <div class="boot__inner">
+      <span class="boot__glyph" aria-hidden="true"></span>
+      <p class="boot__text">INITIALIZING CORRIDOR&hellip;</p>
+      <p class="boot__err" id="boot-err" hidden></p>
+    </div>
+  </div>
+
+  <!-- ====================== TOAST ====================== -->
+  <div class="toast" id="toast" role="status" aria-hidden="true"></div>
+
+  <!-- ====================== EDITOR ===================== -->
+  <div class="editor" id="editor" aria-hidden="true">
+    <div class="editor__backdrop" data-editor-close></div>
+    <div class="editor__panel">
+      <header class="editor__head">
+        <h2 class="editor__title">ADMIN // EDITOR</h2>
+        <p class="editor__sub">CTRL+SHIFT+E&nbsp;&middot;&nbsp;EDIT LIVE&nbsp;&middot;&nbsp;DOWNLOAD TO PERSIST</p>
+        <button class="editor__close" id="editor-close" aria-label="Close editor">&times;</button>
+      </header>
+      <div class="editor__bar">
+        <button class="editor__btn" id="editor-add">+ ADD PROJECT</button>
+        <span class="editor__spacer"></span>
+        <button class="editor__btn" id="editor-download">&#8595; DOWNLOAD projects.js</button>
+        <button class="editor__btn editor__btn--primary" id="editor-apply">APPLY</button>
+      </div>
+      <div class="editor__list" id="editor-list"></div>
+    </div>
+  </div>
+
+  <!-- ===================== TUNING EDITOR ===================== -->
+  <div class="editor tuning" id="tuning" aria-hidden="true">
+    <div class="editor__backdrop" data-tuning-close></div>
+    <div class="editor__panel">
+      <header class="editor__head">
+        <h2 class="editor__title">TUNING // EDITOR</h2>
+        <p class="editor__sub">CTRL+SHIFT+T&nbsp;&middot;&nbsp;LIVE&nbsp;&middot;&nbsp;EXPORT tunings.js</p>
+        <button class="editor__close" id="tuning-close" aria-label="Close tuning editor">&times;</button>
+      </header>
+      <div class="editor__bar">
+        <button class="editor__btn" id="tuning-reset">RESET DEFAULTS</button>
+        <span class="editor__spacer"></span>
+        <button class="editor__btn editor__btn--primary" id="tuning-export">&#8595; EXPORT tunings.js</button>
+      </div>
+      <div class="editor__char">
+        <label class="editor__char-label" for="character-select">AVATAR</label>
+        <select id="character-select"></select>
+      </div>
+      <div class="tuning-color">
+        <div class="tuning-color__title">THEME — CUSTOM ACCENT</div>
+        <div class="tuning-color__wheelwrap">
+          <canvas id="color-wheel" width="200" height="200"></canvas>
+          <span class="tuning-color__dot" id="color-dot"></span>
+        </div>
+        <div class="tuning-color__controls">
+          <label class="tuning-color__label">BRIGHTNESS</label>
+          <input type="range" id="color-value" min="20" max="100" value="100" />
+          <div class="tuning-color__hexwrap">
+            <span class="tuning-color__swatch" id="color-swatch"></span>
+            <input type="text" id="color-hex" spellcheck="false" />
+          </div>
+        </div>
+      </div>
+      <div class="editor__list" id="tuning-list"></div>
+    </div>
+  </div>
+
+  <!-- ====================== HELP ====================== -->
+  <div class="help" id="help" aria-hidden="true">
+    <div class="help__backdrop" data-help-close></div>
+    <div class="help__panel">
+      <header class="help__head">
+        <h2 class="help__title">CONTROLS</h2>
+        <button class="help__close" id="help-close" aria-label="Close help">&times;</button>
+      </header>
+      <ul class="help__list">
+        <li><span class="help__key">SCROLL / SWIPE</span> traverse the corridor</li>
+        <li><span class="help__key">&#8592; / &#8594;</span> previous / next project</li>
+        <li><span class="help__key">&#8593; / &#8595;</span> drift forward / back</li>
+        <li><span class="help__key">CTRL+SHIFT+E</span> project editor</li>
+        <li><span class="help__key">CTRL+SHIFT+T</span> tuning editor</li>
+        <li><span class="help__key">?</span> / <span class="help__key">H</span> this help</li>
+        <li><span class="help__key">ESC</span> close overlays</li>
+        <li>click a frame &rarr; open project</li>
+        <li>click a minimap dot &rarr; jump to project</li>
+        <li>click <span class="help__key">ABOUT</span> &rarr; profile &amp; contact</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ====================== ABOUT / CONTACT ====================== -->
+  <div class="about" id="about" aria-hidden="true">
+    <div class="about__backdrop" data-about-close></div>
+    <article class="about__panel" role="dialog" aria-modal="true" aria-labelledby="about-name">
+      <span class="corner corner--tl" aria-hidden="true"></span>
+      <span class="corner corner--tr" aria-hidden="true"></span>
+      <span class="corner corner--bl" aria-hidden="true"></span>
+      <span class="corner corner--br" aria-hidden="true"></span>
+
+      <button class="about__close" id="about-close" aria-label="Close about">&times;</button>
+
+      <header class="about__head">
+        <span class="about__kicker">// PROFILE</span>
+        <h2 class="about__name" id="about-name"></h2>
+        <p class="about__role" id="about-role"></p>
+      </header>
+
+      <p class="about__status" id="about-status" hidden>
+        <span class="about__status-dot" aria-hidden="true"></span>
+        <span id="about-status-text"></span>
+      </p>
+
+      <div class="about__bio" id="about-bio"></div>
+
+      <div class="about__contact">
+        <p class="about__contact-label">CONTACT</p>
+        <ul class="about__links" id="about-links"></ul>
+      </div>
+    </article>
+  </div>
+
+  <script>
+    // watchdog: if the 3D engine never reports ready, surface a helpful error
+    window.__gridloopTimer = setTimeout(function () {
+      if (!window.__GRIDLOOP_READY__) {
+        var err = document.getElementById('boot-err');
+        if (err) {
+          err.hidden = false;
+          err.textContent = 'The 3D engine failed to load. Serve this folder from a local web server (python serve.py) and try again.';
+        }
+      }
+    }, 10000);
+  </script>
+
+  <!-- persisted tunings (optional; exported from the tuning editor) -->
+  <script src="tunings.js"></script>
+
+  <!-- project data is a plain script so it works even opened as a file -->
+  <script src="projects.js"></script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/build/three.module.js",
+      "three/addons/": "./vendor/three/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
