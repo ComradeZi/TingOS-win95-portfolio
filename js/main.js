@@ -465,7 +465,7 @@ window.addEventListener('keydown', (e) => {
     toggleEditor();
     return;
   }
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'T' || e.key === 't')) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
     e.preventDefault();
     tuningEditor.toggle();
     return;
